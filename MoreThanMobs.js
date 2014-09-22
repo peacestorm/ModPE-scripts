@@ -5,6 +5,7 @@ ModPE.overrideTexture("images/mob/brown_chicken.png","http://i.imgur.com/0zTsjOu
 ModPE.overrideTexture("images/mob/ender_spider.png","http://i.imgur.com/vQCwwgs.png");
 ModPE.overrideTexture("images/mob/ender_cow.png","http://i.imgur.com/vQCwwgs.png");
 ModPE.overrideTexture("images/mob/pirate.png","http://www.minecraftskins.com/newuploaded_skins/skin_2014072410443157496.png");
+ModPE.overrideTexture("images/mob/mimic.png","http://i.imgur.com/BTcKiRQ.png");
 
 ModPE.setItem(500,"spawn_egg",7,"Spawn Ghost");
 ModPE.setItem(501,"spawn_egg",6,"Spawn Wolf Girl");
