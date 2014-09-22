@@ -15,5 +15,6 @@ Ender Cow
 
 Available on
 ===================
-Android (for MCPE) --> Download MoreThanMobs.js
-PC --> Not here on github
+*Android (for MCPE) --> Download MoreThanMobs.js
+
+*PC --> Not here on github
