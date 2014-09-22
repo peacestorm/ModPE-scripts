@@ -105,7 +105,7 @@ Entity.setRenderType(pirate,3);
 }
 }
 
-//*Copyright*
+//*Copyright & Permissions*
 //-------------
 //You may:
 //Edit this mod for personal use
@@ -117,6 +117,9 @@ Entity.setRenderType(pirate,3);
 //Include this mod in your modpack without permission
 //Use code of this mod in your own mod without permission
 //Monetize this mod by using AdFly or any other monetizing method
+//
+//For things that aren't listed here, always ask me
+
 
 //*Credits*
 //-----------
