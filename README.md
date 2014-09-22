@@ -12,3 +12,8 @@ Blue Creeper
 Brown Chicken
 Ender Spider
 Ender Cow
+
+Available on
+===================
+Android (for MCPE) --> Download MoreThanMobs.js
+PC --> Not here on github
