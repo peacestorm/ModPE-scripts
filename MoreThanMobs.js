@@ -33,7 +33,7 @@ Player.addItemCreativeInv(435,1,0);
 Player.addItemCreativeInv(436,1,0);
 
 function newLevel() {
-    clientMessage(ChatColor.GREEN+"AgameR MoreThanMobs PE"+ChatColor.RED+" 2.1 "+ChatColor.WHITE+"by peacestorm initialized");
+    clientMessage(ChatColor.GREEN+"AgameR MoreThanMobs PE"+ChatColor.RED+" 2.2 "+ChatColor.WHITE+"by peacestorm initialized");
 };
 
 function procCmd(cmd) {
@@ -125,7 +125,7 @@ Entity.setRenderType(pirate,3);
 
 //*Mod info*
 //------------
-//Mod version: 2.1
+//Mod version: 2.2
 //For full changelog, do /changelog morethanmobspe
 
 //*Todo-list*
