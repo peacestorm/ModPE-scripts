@@ -16,10 +16,8 @@ ModPE.setItem(505,"spawn_egg",6,"Spawn Ender Cow");
 ModPE.setItem(506,"spawn_egg",6,"Spawn Pirate");
 ModPE.setItem(-,"spawn_egg",7,"Spawn Mimic");
 ModPE.setItem(434,"experience_bottle",0,"Experience Bottle");
-//ModPE.setItem(435,"potion_bottle_drinkable",0,"Healing Potion");
 ModPE.setFoodItem(435,"potion_bottle_drinkable",0,20,"Healing Potion");
 ModPE.setFoodItem(436,"potion_bottle_empty",0,-11111,"Potion of Death");
-//ModPE.setItem(436,"potion_bottle_empty",0,"Potion of Death");
 
 //Spawn Eggs in creative!
 Player.addItemCreativeInv(500,1,0);
