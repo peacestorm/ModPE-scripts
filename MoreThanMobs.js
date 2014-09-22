@@ -95,6 +95,7 @@ Entity.setRenderType(wolfgirl,3);
 }else if(itemId == 505){var endercow = Level.spawnMob(x,y+1,z,11,"mob/ender_cow.png");
 }else if(itemId == 506){var pirate = Level.spawnMob(x,y+1,z,32,"mob/pirate.png");
 Entity.setRenderType(pirate,3);
+}else if(itemId == -){var mimic = Level.spawnMob(x,y+1,z,37,"mob/mimic.png");
 }else if(itemId == 434){var experiencebottle = ModPE.showTipMessage("Sorry, it is'nt functionally at the time");
 }else if(itemId == 435){var healingpotion = Player.setHealth(20);
 }else if(itemId == 436){var potionofdeath = Player.setHealth(0);
