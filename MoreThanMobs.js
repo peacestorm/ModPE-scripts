@@ -59,6 +59,8 @@ function procCmd(cmd) {
 	}else if (cmd == "summon pirate"){
         var pirate = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 32, "mob/pirate.png");
 		Entity.setRenderType(pirate,3);
+	}else if (cmd == "summon pirate"){
+        var pirate = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 37, "mob/pirate.png");
 	}else if (cmd == "disguise ghost"){
         Entity.setMobSkin(Player.getEntity(), "mob/ghost.png");
 		Entity.setRenderType(Player.getEntity(), 3);
@@ -80,6 +82,9 @@ function procCmd(cmd) {
 	}else if (cmd == "disguise pirate"){
         Entity.setMobSkin(Player.getEntity(), "mob/pirate.png");
 		Entity.setRenderType(Player.getEntity(), 3);
+	}else if (cmd == "disguise mimic"){
+        Entity.setMobSkin(Player.getEntity(), "mob/mimic.png");
+		Entity.setRenderType(Player.getEntity(), -);
     }
 };
 
