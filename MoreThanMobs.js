@@ -27,7 +27,7 @@ Player.addItemCreativeInv(503,1,0);
 Player.addItemCreativeInv(504,1,0);
 Player.addItemCreativeInv(505,1,0);
 Player.addItemCreativeInv(506,1,0);
-Player.addItemCreativeInv(-,1,0);
+Player.addItemCreativeInv(407,1,0);
 Player.addItemCreativeInv(434,1,0);
 Player.addItemCreativeInv(435,1,0);
 Player.addItemCreativeInv(436,1,0);
