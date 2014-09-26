@@ -109,13 +109,13 @@ Entity.setRenderType(pirate,3);
 //-------------
 //You may:
 //Edit this mod for personal use
-//Create a review of this mod
+//Create a review of this mod, as long as you give me credits and you put the link of this mod in the description
 //
 //You may NOT:
 //Distribute this mod without permission of peacestorm
 //Claim that this mod is yours
-//Include this mod in your modpack without permission
-//Use code of this mod in your own mod without permission
+//Include this mod in your modpack without permission of peacestorm
+//Use code of this mod in your own mod without permission of peacestorm
 //Monetize this mod by using AdFly or any other monetizing method
 //
 //For things that aren't listed here, always ask me
