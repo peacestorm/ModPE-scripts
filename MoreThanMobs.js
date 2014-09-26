@@ -128,7 +128,7 @@ Entity.setRenderType(pirate,3);
 
 //*Mod info*
 //------------
-//Mod version: 2.2
+//Mod version: 2.2 (in dev)
 //For full changelog, do /changelog morethanmobspe
 
 //*Todo-list*
@@ -136,6 +136,7 @@ Entity.setRenderType(pirate,3);
 //More items (maybe in 3.0)
 //More Mobs with custom rendertypes
 //Custom sounds? (far far future)
+//Built-in textures - No texturepack anymore
 
 //*Ideas*
 //---------
