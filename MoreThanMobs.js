@@ -52,7 +52,7 @@ function procCmd(cmd) {
         var brownchicken = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 10, "mob/brown_chicken.png");
 	}else if (cmd == "summon enderspider"){
         var enderspider = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 35, "mob/ender_spider.png");
-    }else if (cmd == "summon endercow"){
+        }else if (cmd == "summon endercow"){
         var endercow = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 11, "mob/ender_cow.png");
 	}else if (cmd == "summon pirate"){
         var pirate = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 32, "mob/pirate.png");
