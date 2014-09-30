@@ -39,7 +39,7 @@ function newLevel() {
 function procCmd(cmd) {
     cmd = cmd.toLowerCase();
     if (cmd == "changelog morethanmobspe"){
-        clientMessage("AgameR MoreThanMobs PE Changelog - 1.0: Initial release | 1.1: Added the Ender Spider | 2.0: Added Ender Cow, Pirate, a healing potion, a potion of death and a experience bottle, name of the mod changed to AgameR MoreThanMobs | 2.1: Added /summon command and /disguise command");
+        clientMessage("AgameR MoreThanMobs PE Changelog - 1.0: Initial release | 1.1: Added the Ender Spider | 2.0: Added Ender Cow, Pirate, a healing potion, a potion of death and a experience bottle, name of the mod changed to AgameR MoreThanMobs | 2.1: Added /summon command and /disguise command | 2.2: Added Mimic mob...");
     }else if (cmd == "summon ghost"){
         var ghost = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 32, "mob/ghost.png");
 		Entity.setRenderType(ghost,3);
@@ -128,7 +128,7 @@ Entity.setRenderType(pirate,3);
 
 //*Mod info*
 //------------
-//Mod version: 2.2 (in dev)
+//Mod version: 2.2
 //For full changelog, do /changelog morethanmobspe
 
 //*Todo-list*
