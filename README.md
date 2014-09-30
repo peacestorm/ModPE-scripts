@@ -10,7 +10,7 @@ Ghost
 
 Wolf Girl
 
-Mimic (in dev.)
+Mimic (in dev.) [PE EXCLUSIVE]
 
 Blue Creeper
 
