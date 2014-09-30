@@ -82,7 +82,7 @@ function procCmd(cmd) {
 		Entity.setRenderType(Player.getEntity(), 3);
 	}else if (cmd == "disguise mimic"){
         Entity.setMobSkin(Player.getEntity(), "mob/mimic.png");
-		Entity.setRenderType(Player.getEntity(), 27);
+		Entity.setRenderType(Player.getEntity(), -UNKNOWN-);
     }
 };
 
