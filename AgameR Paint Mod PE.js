@@ -189,7 +189,7 @@ Item.addShapedRecipe(326, 1, 0, [
 ["s", 351, 0, "t", 437, 0]);
 
 function newLevel() {
-    clientMessage(ChatColor.GREEN+"AgameR Paint Mod PE"+ChatColor.RED+" 1.2.2 "+ChatColor.WHITE+"by peacestorm initialized");
+    clientMessage(ChatColor.GREEN+"AgameR Paint Mod PE"+ChatColor.RED+" 1.2.3 (Build 1) "+ChatColor.WHITE+"by peacestorm initialized");
 };
 
 function procCmd(cmd) {
@@ -435,7 +435,7 @@ Level.setTile(x,y,z,159,15)
 
 //*Mod info*
 //------------
-//Mod version: 1.2.3
+//Mod version: 1.2.3 (Build 1)
 //For full changelog, do /changelog paintmodpe
 
 //*Ideas*
