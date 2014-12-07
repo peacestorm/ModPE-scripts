@@ -435,7 +435,7 @@ Level.setTile(x,y,z,159,15)
 
 //*Mod info*
 //------------
-//Mod version: 1.2.2
+//Mod version: 1.2.3
 //For full changelog, do /changelog paintmodpe
 
 //*Ideas*
