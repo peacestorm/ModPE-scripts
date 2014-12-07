@@ -3,7 +3,7 @@ ModPE.overrideTexture("images/mob/blue_creeper.png","http://i.imgur.com/UlqC7m5.
 ModPE.overrideTexture("images/mob/wolfgirl.png","http://www.minecraftskins.com/newuploaded_skins/skin_2014061510555588986.png");
 ModPE.overrideTexture("images/mob/brown_chicken.png","http://i.imgur.com/0zTsjOu.jpg");
 ModPE.overrideTexture("images/mob/ender_spider.png","http://i.imgur.com/vQCwwgs.png");
-ModPE.overrideTexture("images/mob/ender_cow.png","http://i.imgur.com/vQCwwgs.png");
+ModPE.overrideTexture("images/mob/ender_cow.png","http://i.imgur.com/0Lrbs3L.png");
 ModPE.overrideTexture("images/mob/pirate.png","http://www.minecraftskins.com/newuploaded_skins/skin_2014072410443157496.png");
 ModPE.overrideTexture("images/mob/mimic.png","http://i.imgur.com/BTcKiRQ.png");
 
@@ -39,7 +39,7 @@ function newLevel() {
 function procCmd(cmd) {
     cmd = cmd.toLowerCase();
     if (cmd == "changelog morethanmobspe"){
-        clientMessage("AgameR MoreThanMobs PE Changelog - 1.0: Initial release | 1.1: Added the Ender Spider | 2.0: Added Ender Cow, Pirate, a healing potion, a potion of death and a experience bottle, name of the mod changed to AgameR MoreThanMobs | 2.1: Added /summon command and /disguise command | 2.2: Added Mimic mob...");
+        clientMessage("AgameR MoreThanMobs PE Changelog - 1.0: Initial release | 1.1: Added the Ender Spider | 2.0: Added Ender Cow, Pirate, a healing potion, a potion of death and a experience bottle, name of the mod changed to AgameR MoreThanMobs | 2.1: Added /summon command and /disguise command | 2.2: Added Mimic mob; Improved spawn eggs; Better Ender Cow skin");
     }else if (cmd == "summon ghost"){
         var ghost = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 32, "mob/ghost.png");
 		Entity.setRenderType(ghost,3);
@@ -87,7 +87,6 @@ function procCmd(cmd) {
 };
 
 function useItem(x, y, z, itemId, blockId, side){
-
 if(itemId == 500){var ghost = Level.spawnMob(x,y+1,z,32,"mob/ghost.png");
 Entity.setRenderType(ghost,3);
 }else if(itemId == 501){var wolfgirl = Level.spawnMob(x,y+1,z,33,"mob/wolfgirl.png");
@@ -99,10 +98,19 @@ Entity.setRenderType(wolfgirl,3);
 }else if(itemId == 506){var pirate = Level.spawnMob(x,y+1,z,32,"mob/pirate.png");
 Entity.setRenderType(pirate,3);
 }else if(itemId == 407){var mimic = Level.spawnMob(x,y+1,z,37,"mob/mimic.png");
-}else if(itemId == 434){var experiencebottle = ModPE.showTipMessage("Sorry, it is'nt functionally at the time");
+}else if(itemId == 434){var experiencebottle = setVelY(Player.getEntity(),5);
 }else if(itemId == 435){var healingpotion = Player.setHealth(20);
 }else if(itemId == 436){var potionofdeath = Player.setHealth(0);
 }
+};
+
+function deathHook(attacker,victim){
+if(victim==ghost){
+Level.dropItem(Entity.getX(victim), Entity.getY(victim), Entity.getZ(victim), 1, 434, 1, 0);
+}
+};
+
+function leaveGame(){
 }
 
 //*Copyright & Permissions*
