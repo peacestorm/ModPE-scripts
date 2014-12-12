@@ -16,22 +16,22 @@ ModPE.overrideTexture("images/mob/red.png","http://i.imgur.com/lqQJYW3.png");
 ModPE.overrideTexture("images/mob/black.png","http://i.imgur.com/j2y5JxL.png");
 
 ModPE.setItem(437,"quiver",0,"Paint Brush",64);
-ModPE.setItem(394,"repeater",0,"White Paint Brush",1);
-ModPE.setItem(510,"iron_horse_armor",0,"Orange Paint Brush",1);
-ModPE.setItem(511,"gold_horse_armor",0,"Magenta Paint Brush"),1;
-ModPE.setItem(509,"minecart_furnace",0,"Light Blue Paint Brush",1);
-ModPE.setItem(508,"minecart_hopper",0,"Yellow Paint Brush",1);
-ModPE.setItem(507,"minecart_chest",0,"Lime Green Paint Brush",1);
-ModPE.setItem(401,"brewing_stand",0,"Pink Paint Brush",1);
-ModPE.setItem(402,"book_writable",0,"Gray Paint Brush",1);
-ModPE.setItem(403,"book_enchanted",0,"Light Gray Paint Brush",1);
-ModPE.setItem(395,"diamond_horse_armor",0,"Cyan Paint Brush",1);
-ModPE.setItem(396,"fishing_rod_cast",0,"Purple Paint Brush",1);
-ModPE.setItem(397,"minecart_tnt",0,"Blue Paint Brush",1);
-ModPE.setItem(410,"hopper",0,"Brown Paint Brush",1);
-ModPE.setItem(399,"fishing_rod_uncast",0,"Green Paint Brush",1);
-ModPE.setItem(322,"book_written",0,"Red Paint Brush",1);
-ModPE.setItem(326,"comparator",0,"Black Paint Brush",1);
+ModPE.setItem(394,"repeater",0,"White Paint Brush",64);
+ModPE.setItem(510,"iron_horse_armor",0,"Orange Paint Brush",64);
+ModPE.setItem(511,"gold_horse_armor",0,"Magenta Paint Brush",64);
+ModPE.setItem(509,"minecart_furnace",0,"Light Blue Paint Brush",64);
+ModPE.setItem(508,"minecart_hopper",0,"Yellow Paint Brush",64);
+ModPE.setItem(507,"minecart_chest",0,"Lime Green Paint Brush",64);
+ModPE.setItem(401,"brewing_stand",0,"Pink Paint Brush",64);
+ModPE.setItem(402,"book_writable",0,"Gray Paint Brush",64);
+ModPE.setItem(403,"book_enchanted",0,"Light Gray Paint Brush",64);
+ModPE.setItem(395,"diamond_horse_armor",0,"Cyan Paint Brush",64);
+ModPE.setItem(396,"fishing_rod_cast",0,"Purple Paint Brush",64);
+ModPE.setItem(397,"minecart_tnt",0,"Blue Paint Brush",64);
+ModPE.setItem(410,"hopper",0,"Brown Paint Brush",64);
+ModPE.setItem(399,"fishing_rod_uncast",0,"Green Paint Brush",64);
+ModPE.setItem(322,"book_written",0,"Red Paint Brush",64);
+ModPE.setItem(326,"comparator",0,"Black Paint Brush",64);
 
 Item.setMaxDamage(437, 10);
 Item.setMaxDamage(394, 10);
@@ -189,7 +189,7 @@ Item.addShapedRecipe(326, 1, 0, [
 ["s", 351, 0, "t", 437, 0]);
 
 function newLevel() {
-    clientMessage(ChatColor.GREEN+"AgameR Paint Mod PE"+ChatColor.RED+" 1.2.3 (Build 1) "+ChatColor.WHITE+"by peacestorm initialized");
+    clientMessage(ChatColor.GREEN+"AgameR Paint Mod PE"+ChatColor.RED+" 1.2.3 (Build 2) "+ChatColor.WHITE+"by peacestorm initialized");
 };
 
 function procCmd(cmd) {
@@ -209,212 +209,389 @@ function attackHook(attacker, victim) {
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 394, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 394, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 510) {
 		    Entity.setMobSkin(victim,"mob/orange.png");
 			Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 510, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 510, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 	    }}}else if (selecteditem == 511) {
 		    Entity.setMobSkin(victim,"mob/magenta.png");
 			Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 511, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 511, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 509) {
 		    Entity.setMobSkin(victim,"mob/lightblue.png");
 			Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 509, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 509, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 508) {
 		    Entity.setMobSkin(victim,"mob/yellow.png");
 			Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 508, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 508, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 507) {
 		    Entity.setMobSkin(victim,"mob/limegreen.png");
 			Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 507, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 507, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 401) {
 		    Entity.setMobSkin(victim,"mob/pink.png");
 			Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 401, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 401, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 402) {
 		    Entity.setMobSkin(victim,"mob/gray.png");
 		    Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 402, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 402, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 	    }}}else if (selecteditem == 403) {
 		    Entity.setMobSkin(victim,"mob/lightgray.png");
 		    Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 403, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 403, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 395) {
 		    Entity.setMobSkin(victim,"mob/cyan.png");
 		    Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 395, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 395, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 396) {
 		    Entity.setMobSkin(victim,"mob/purple.png");
 		    Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 396, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 397) {
 		    Entity.setMobSkin(victim,"mob/blue.png");
 		    Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 397, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 397, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 410) {
 		    Entity.setMobSkin(victim,"mob/brown.png");
 		    Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 410, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 410, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 399) {
 		    Entity.setMobSkin(victim,"mob/green.png");
 		    Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 399, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 399, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 322) {
 		    Entity.setMobSkin(victim,"mob/red.png");
 		    Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 322, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 322, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 326) {
 		    Entity.setMobSkin(victim,"mob/black.png");
 		    Entity.setHealth(victim,Entity.getHealth(victim) + 1);
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 326, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount());
+			Entity.setCarriedItem(attacker, 326, Player.getCarriedItemCount() - 1);
+			Player.addItemInventory(437,1,0);
     }}}}};
 
 function useItem(x,y,z,i,b) {
 var touchedblock = getTile(x,y,z)
+var gamemode = Level.getGameMode();
 if(i == 394) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,0);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 510) {
+}}}}else if(i == 510) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,1);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,1)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 511) {
+}}}}else if(i == 511) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,2);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,2)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 509) {
+}}}}else if(i == 509) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,3);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,3)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 508) {
+}}}}else if(i == 508) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,4);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,4)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 507) {
+}}}}else if(i == 507) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,5);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,5)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 401) {
+}}}}else if(i == 401) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,6);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,6)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 402) {
+}}}}else if(i == 402) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,7);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,7)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 403) {
+}}}}else if(i == 403) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,8);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,8)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 395) {
+}}}}else if(i == 395) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,9);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 495, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,9)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 495, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 396) {
+}}}}else if(i == 396) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,10);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 496, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,10)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 496, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 397) {
+}}}}else if(i == 397) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,11);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,11)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 410) {
+}}}}else if(i == 410) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,12);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,12)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 399) {
+}}}}else if(i == 399) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,13);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,13)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 322) {
+}}}}else if(i == 322) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,14);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,14)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 
-}}else if(i == 326) {
+}}}}else if(i == 326) {
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,15);
-}else {
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else {
 Level.setTile(x,y,z,159,15)
-}}};
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}}};
 
 //*Copyright*
 //-------------
@@ -435,7 +612,7 @@ Level.setTile(x,y,z,159,15)
 
 //*Mod info*
 //------------
-//Mod version: 1.2.3 (Build 1)
+//Mod version: 1.2.3 (Build 2)
 //For full changelog, do /changelog paintmodpe
 
 //*Ideas*
