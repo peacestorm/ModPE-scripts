@@ -188,12 +188,69 @@ Item.addShapedRecipe(326, 1, 0, [
 ], 
 ["s", 351, 0, "t", 437, 0]);
 
+var GUI;
+var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+
 function newLevel() {
-    clientMessage(ChatColor.GREEN+"AgameR Paint Mod PE"+ChatColor.RED+" 1.2.3 (Build 3) "+ChatColor.WHITE+"by peacestorm initialized");
+   ctx.runOnUiThread(new java.lang.Runnable(){
+   
+   
+                     run: function(){
+		
+        try{
+		
+		   GUI = new android.widget.PopupWindow();
+		   var layout = new android.widget.LinearLayout(ctx);
+		   var btn = new android.widget.Button(ctx);
+		   
+		   layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+		   layout.addView(btn);
+		   
+		   
+		   GUI.setContentView(layout);
+		   GUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+		   GUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+		   GUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.BOTTOM | android.view.Gravity.LEFT, 0, 0);
+		   
+		   btn.setText("[?]");
+		   btn.setOnClickListener(new android.view.View.OnClickListener(){
+		   
+		                          onClick: function(p1){
+								  
+		     var builder = new android.app.AlertDialog.Builder(ctx);
+			 builder.setMessage("You're using a beta build of AgameR Paint Mod PE. Please report bugs.");
+			 builder.setNegativeButton("Ok", new android.content.DialogInterface.OnClickListener(){
+			 
+			                            onClick: function(p1, p2){
+										
+				p1.cancel();				
+										
+										
+			}							
+			 
+		    });
+										
+		var dialog = builder.create();
+		dialog.show();
+			
+			}
+								  
+				                  });
+		
+		}
+		catch(err){
+		
+		   print("Error: " + err)
+		
+		}
+}
+                     });
+
+    clientMessage(ChatColor.GREEN+"AgameR Paint Mod PE"+ChatColor.RED+" 1.2.3 (Build 4) "+ChatColor.WHITE+"by peacestorm initialized");
 };
 
 function modTick() {
-ModPE.showTipMessage("AgameR Paint Mod PE 1.2.3 Build 3");
+ModPE.showTipMessage("AgameR Paint Mod PE 1.2.3 Build 4");
 };
 
 function procCmd(cmd) {
@@ -293,7 +350,7 @@ function attackHook(attacker, victim) {
 			if(gamemode == 0){
 			Entity.setCarriedItem(attacker, 396, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 			if(Player.getCarriedItemData() > 10){
-			Entity.setCarriedItem(attacker, 437, Player.getCarriedItemCount() - 1);
+			Entity.setCarriedItem(attacker, 396, Player.getCarriedItemCount() - 1);
 			Player.addItemInventory(437,1,0);
 		}}}else if (selecteditem == 397) {
 		    Entity.setMobSkin(victim,"mob/blue.png");
@@ -616,7 +673,7 @@ Player.addItemInventory(437,1,0);
 
 //*Mod info*
 //------------
-//Mod version: 1.2.3 (Build 3)
+//Mod version: 1.2.3 (Build 4)
 //For full changelog, do /changelog paintmodpe
 
 //*Ideas*
