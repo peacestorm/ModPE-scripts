@@ -189,7 +189,11 @@ Item.addShapedRecipe(326, 1, 0, [
 ["s", 351, 0, "t", 437, 0]);
 
 function newLevel() {
-    clientMessage(ChatColor.GREEN+"AgameR Paint Mod PE"+ChatColor.RED+" 1.2.3 (Build 2) "+ChatColor.WHITE+"by peacestorm initialized");
+    clientMessage(ChatColor.GREEN+"AgameR Paint Mod PE"+ChatColor.RED+" 1.2.3 (Build 3) "+ChatColor.WHITE+"by peacestorm initialized");
+};
+
+function modTick() {
+ModPE.showTipMessage("AgameR Paint Mod PE 1.2.3 Build 3");
 };
 
 function procCmd(cmd) {
@@ -484,14 +488,14 @@ Player.addItemInventory(437,1,0);
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,9);
 if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 495, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
 Level.setTile(x,y,z,159,9)
 if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 495, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
@@ -500,14 +504,14 @@ Player.addItemInventory(437,1,0);
 if(touchedblock == 35) {
 Level.setTile(x,y,z,35,10);
 if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 496, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
 Level.setTile(x,y,z,159,10)
 if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 496, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
@@ -612,7 +616,7 @@ Player.addItemInventory(437,1,0);
 
 //*Mod info*
 //------------
-//Mod version: 1.2.3 (Build 2)
+//Mod version: 1.2.3 (Build 3)
 //For full changelog, do /changelog paintmodpe
 
 //*Ideas*
