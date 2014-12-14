@@ -192,7 +192,7 @@ var GUI;
 var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 
 function newLevel() {
-   ctx.runOnUiThread(new java.lang.Runnable(){
+   /*ctx.runOnUiThread(new java.lang.Runnable(){
    
    
                      run: function(){
@@ -246,17 +246,17 @@ function newLevel() {
 }
                      });
 
-    clientMessage(ChatColor.GREEN+"AgameR Paint Mod PE"+ChatColor.RED+" 1.2.3 (Build 4) "+ChatColor.WHITE+"by peacestorm initialized");
+    */clientMessage(ChatColor.GREEN+"AgameR Paint Mod PE"+ChatColor.RED+" 1.2.3 "+ChatColor.WHITE+"by peacestorm initialized");
 };
 
 function modTick() {
-ModPE.showTipMessage("AgameR Paint Mod PE 1.2.3 Build 4");
+//ModPE.showTipMessage("AgameR Paint Mod PE 1.2.3");
 };
 
 function procCmd(cmd) {
     cmd = cmd.toLowerCase();
     if (cmd == "changelog paintmodpe"){
-        clientMessage("AgameR Paint Mod PE Changelog - 1.0: Initial release | 1.1: Added crafting recipes | 1.2: Paint any block you want, fixed item id conflict with the TooManyItems addon, added a new crafting recipe for the white paint brush | 1.2.1: Used paintbrushes will now turn into empty paintbrushes in survival; Added an easter egg | 1.2.2: Removed survival functionalities introduced in 1.2.1 due to crashes; Fixed some things | 1.2.3: Added back improved survival functionalities introduced in 1.2.1");
+        clientMessage("AgameR Paint Mod PE Changelog - 1.0: Initial release | 1.1: Added crafting recipes | 1.2: Paint any block you want, fixed item id conflict with the TooManyItems addon, added a new crafting recipe for the white paint brush | 1.2.1: Used paintbrushes will now turn into empty paintbrushes in survival; Added an easter egg | 1.2.2: Removed survival functionalities introduced in 1.2.1 due to crashes; Fixed some things | 1.2.3: Added a new and improved survival system; Fixed bugs");
     }
 };
 
@@ -673,7 +673,7 @@ Player.addItemInventory(437,1,0);
 
 //*Mod info*
 //------------
-//Mod version: 1.2.3 (Build 4)
+//Mod version: 1.2.3
 //For full changelog, do /changelog paintmodpe
 
 //*Ideas*
