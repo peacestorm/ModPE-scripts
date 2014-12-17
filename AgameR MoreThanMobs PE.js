@@ -32,14 +32,75 @@ Player.addItemCreativeInv(434,1,0);
 Player.addItemCreativeInv(435,1,0);
 Player.addItemCreativeInv(436,1,0);
 
+var GUI;
+var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+
 function newLevel() {
-    clientMessage(ChatColor.GREEN+"AgameR MoreThanMobs PE"+ChatColor.RED+" 2.2 (Build 1) "+ChatColor.WHITE+"by peacestorm initialized");
+   ctx.runOnUiThread(new java.lang.Runnable(){
+   
+   
+                     run: function(){
+		
+        try{
+		
+		   GUI = new android.widget.PopupWindow();
+		   var layout = new android.widget.LinearLayout(ctx);
+		   var btn = new android.widget.Button(ctx);
+		   
+		   layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+		   layout.addView(btn);
+		   
+		   
+		   GUI.setContentView(layout);
+		   GUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+		   GUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+		   GUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.BOTTOM | android.view.Gravity.LEFT, 0, 0);
+		   
+		   btn.setText("[?]");
+		   btn.setOnClickListener(new android.view.View.OnClickListener(){
+		   
+		                          onClick: function(p1){
+								  
+		     var builder = new android.app.AlertDialog.Builder(ctx);
+			 builder.setMessage("You're using a beta build of AgameR MoreThanMobs PE. Please report bugs.");
+			 builder.setNegativeButton("Ok", new android.content.DialogInterface.OnClickListener(){
+			 
+			                            onClick: function(p1, p2){
+										
+				p1.cancel();				
+										
+										
+			}							
+			 
+		    });
+										
+		var dialog = builder.create();
+		dialog.show();
+			
+			}
+								  
+				                  });
+		
+		}
+		catch(err){
+		
+		   print("Error: " + err)
+		
+		}
+}
+                     });
+
+    clientMessage(ChatColor.GREEN+"AgameR MoreThanMobs PE"+ChatColor.RED+" 2.2 (Build 2) "+ChatColor.WHITE+"by peacestorm initialized");
+};
+
+function modTick() {
+ModPE.showTipMessage("AgameR MoreThanMobs PE 2.2 Build 2");
 };
 
 function procCmd(cmd) {
     cmd = cmd.toLowerCase();
     if (cmd == "changelog morethanmobspe"){
-        clientMessage("AgameR MoreThanMobs PE Changelog - 1.0: Initial release | 1.1: Added the Ender Spider | 2.0: Added Ender Cow, Pirate, a healing potion, a potion of death and a experience bottle, name of the mod changed to AgameR MoreThanMobs | 2.1: Added /summon command and /disguise command | 2.2: Added Mimic mob; Improved spawn eggs; Better Ender Cow skin");
+        clientMessage("AgameR MoreThanMobs PE Changelog - 1.0: Initial release | 1.1: Added the Ender Spider | 2.0: Added Ender Cow, Pirate, a healing potion, a potion of death and a experience bottle, name of the mod changed to AgameR MoreThanMobs | 2.1: Added /summon command and /disguise command | 2.2: Added Mimic mob; Improved spawn eggs; Better Ender Cow skin; Experience bottle now works");
     }else if (cmd == "summon ghost"){
         var ghost = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 32, "mob/ghost.png");
 		Entity.setRenderType(ghost,EntityRenderType.player);
@@ -87,22 +148,44 @@ function procCmd(cmd) {
 };
 
 function useItem(x, y, z, itemId, blockId, side){
+var gamemode = Level.getGameMode();
 if(itemId == 500){var ghost = Level.spawnMob(x,y+1,z,32,"mob/ghost.png");
 Entity.setRenderType(ghost,EntityRenderType.player);
-}else if(itemId == 501){var wolfgirl = Level.spawnMob(x,y+1,z,33,"mob/wolfgirl.png");
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 500, Player.getCarriedItemCount() - 1);
+}}else if(itemId == 501){var wolfgirl = Level.spawnMob(x,y+1,z,33,"mob/wolfgirl.png");
 Entity.setRenderType(wolfgirl,EntityRenderType.player);
-}else if(itemId == 502){var bluecreeper = Level.spawnMob(x,y+1,z,33,"mob/blue_creeper.png");
-}else if(itemId == 503){var brownchicken = Level.spawnMob(x,y+1,z,10,"mob/brown_chicken.png");
-}else if(itemId == 504){var enderspider = Level.spawnMob(x,y+1,z,35,"mob/ender_spider.png");
-}else if(itemId == 505){var endercow = Level.spawnMob(x,y+1,z,11,"mob/ender_cow.png");
-}else if(itemId == 506){var pirate = Level.spawnMob(x,y+1,z,32,"mob/pirate.png");
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 501, Player.getCarriedItemCount() - 1);
+}}else if(itemId == 502){var bluecreeper = Level.spawnMob(x,y+1,z,33,"mob/blue_creeper.png");
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 502, Player.getCarriedItemCount() - 1);
+}}else if(itemId == 503){var brownchicken = Level.spawnMob(x,y+1,z,10,"mob/brown_chicken.png");
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 503, Player.getCarriedItemCount() - 1);
+}}else if(itemId == 504){var enderspider = Level.spawnMob(x,y+1,z,35,"mob/ender_spider.png");
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 504, Player.getCarriedItemCount() - 1);
+}}else if(itemId == 505){var endercow = Level.spawnMob(x,y+1,z,11,"mob/ender_cow.png");
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 505, Player.getCarriedItemCount() - 1);
+}}else if(itemId == 506){var pirate = Level.spawnMob(x,y+1,z,32,"mob/pirate.png");
 Entity.setRenderType(pirate,EntityRenderType.player);
-}else if(itemId == 407){var mimic = Level.spawnMob(x,y+1,z,37,"mob/mimic.png");
-}else if(itemId == 434){var experiencebottle = setVelY(Player.getEntity(),5);
-}else if(itemId == 435){var healingpotion = Player.setHealth(20);
-}else if(itemId == 436){var potionofdeath = Player.setHealth(0);
-}
-};
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 506, Player.getCarriedItemCount() - 1);
+}}else if(itemId == 407){var mimic = Level.spawnMob(x,y+1,z,37,"mob/mimic.png");
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 407, Player.getCarriedItemCount() - 1);
+}}else if(itemId == 434){var experiencebottle = setVelY(Player.getEntity(),5);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 434, Player.getCarriedItemCount() - 1);
+}}else if(itemId == 435){var healingpotion = Player.setHealth(20);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 435, Player.getCarriedItemCount() - 1);
+}}else if(itemId == 436){var potionofdeath = Player.setHealth(0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 436, Player.getCarriedItemCount() - 1);
+}}};
 
 /*function attackHook(attacker,victim){
 if(Player.getCarriedItem() == itemId){
@@ -136,7 +219,7 @@ function leaveGame(){
 
 //*Mod info*
 //------------
-//Mod version: 2.2 (Build 1)
+//Mod version: 2.2 (Build 2)
 //For full changelog, do /changelog morethanmobspe
 
 //*Todo-list*
