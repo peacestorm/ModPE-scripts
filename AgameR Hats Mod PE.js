@@ -26,6 +26,9 @@ ModPE.overrideTexture("images/mob/char_creeperhat.png","http://i.imgur.com/zCHuS
 ModPE.overrideTexture("images/mob/char_3dglasses.png","http://i.imgur.com/QjCZFJu.png");
 ModPE.overrideTexture("images/mob/char_froghat.png","http://i.imgur.com/p0b66lE.png");
 
+var GUI;
+var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+
 function newLevel() {
    ctx.runOnUiThread(new java.lang.Runnable(){
    
@@ -81,11 +84,11 @@ function newLevel() {
 }
                      });
 
-    clientMessage(ChatColor.GREEN+"AgameR Hats Mod PE"+ChatColor.RED+" 1.2 (Build 1) "+ChatColor.WHITE+"by peacestorm initialized");
+    clientMessage(ChatColor.GREEN+"AgameR Hats Mod PE"+ChatColor.RED+" 1.2 (Build 2) "+ChatColor.WHITE+"by peacestorm initialized");
 };
 
 function modTick() {
-ModPE.showTipMessage("AgameR Hats Mod PE 1.2 Build 1");
+ModPE.showTipMessage("AgameR Hats Mod PE 1.2 Build 2");
 };
 
 function procCmd(cmd) {
@@ -174,7 +177,7 @@ function procCmd(cmd) {
 
 //*Mod info*
 //------------
-//Mod version: 1.2 (Build 1)
+//Mod version: 1.2 (Build 2)
 //For full changelog, do /changelog hatsmodpe
 
 
