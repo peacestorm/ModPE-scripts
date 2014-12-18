@@ -18,19 +18,84 @@ ModPE.overrideTexture("images/mob/char_sponge.png","http://i.imgur.com/Mob1g1k.p
 ModPE.overrideTexture("images/mob/char_gravel.png","http://i.imgur.com/XfRFdN1.png");
 ModPE.overrideTexture("images/mob/char_bricks.png","http://i.imgur.com/l6GdVgG.png");
 ModPE.overrideTexture("images/mob/char_mushroom.png","http://i.imgur.com/8O0zLG6.png");
+ModPE.overrideTexture("images/mob/char_tnt.png","http://i.imgur.com/ctniXgJ.png");
+ModPE.overrideTexture("images/mob/char_santahat.png","http://i.imgur.com/1QFmx8U.png");
+ModPE.overrideTexture("images/mob/char_elfhat.png","http://i.imgur.com/wOBtf1F.png");
+ModPE.overrideTexture("images/mob/char_villagerhat.png","http://i.imgur.com/lIOE3SP.png");
+ModPE.overrideTexture("images/mob/char_creeperhat.png","http://i.imgur.com/zCHuSFL.png");
+ModPE.overrideTexture("images/mob/char_3dglasses.png","http://i.imgur.com/QjCZFJu.png");
+ModPE.overrideTexture("images/mob/char_froghat.png","http://i.imgur.com/p0b66lE.png");
 
 function newLevel() {
-    clientMessage(ChatColor.GREEN+"AgameR Hats Mod PE"+ChatColor.RED+" 1.2 "+ChatColor.WHITE+"by peacestorm initialized");
+   ctx.runOnUiThread(new java.lang.Runnable(){
+   
+   
+                     run: function(){
+		
+        try{
+		
+		   GUI = new android.widget.PopupWindow();
+		   var layout = new android.widget.LinearLayout(ctx);
+		   var btn = new android.widget.Button(ctx);
+		   
+		   layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+		   layout.addView(btn);
+		   
+		   
+		   GUI.setContentView(layout);
+		   GUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+		   GUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+		   GUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.BOTTOM | android.view.Gravity.LEFT, 0, 0);
+		   
+		   btn.setText("[?]");
+		   btn.setOnClickListener(new android.view.View.OnClickListener(){
+		   
+		                          onClick: function(p1){
+								  
+		     var builder = new android.app.AlertDialog.Builder(ctx);
+			 builder.setMessage("You're using a beta build of AgameR Hats Mod PE. Please report bugs.");
+			 builder.setNegativeButton("Ok", new android.content.DialogInterface.OnClickListener(){
+			 
+			                            onClick: function(p1, p2){
+										
+				p1.cancel();				
+										
+										
+			}							
+			 
+		    });
+										
+		var dialog = builder.create();
+		dialog.show();
+			
+			}
+								  
+				                  });
+		
+		}
+		catch(err){
+		
+		   print("Error: " + err)
+		
+		}
+}
+                     });
+
+    clientMessage(ChatColor.GREEN+"AgameR Hats Mod PE"+ChatColor.RED+" 1.2 (Build 1) "+ChatColor.WHITE+"by peacestorm initialized");
+};
+
+function modTick() {
+ModPE.showTipMessage("AgameR Hats Mod PE 1.2 Build 1");
 };
 
 function procCmd(cmd) {
     cmd = cmd.toLowerCase();
     if (cmd == "changelog hatsmodpe"){
-        clientMessage("AgameR Hats Mod PE Changelog - 1.0: Initial release | 1.1: Added much more block hats; Improved some hats | 1.2: Added more block hats; Improved some hats");
+        clientMessage("AgameR Hats Mod PE Changelog - 1.0: Initial release | 1.1: Added much more block hats; Improved some hats | 1.2 - The christmas update: Added more hats; Improved some hats");
     }else if (cmd == "hat set grass"){
         Entity.setMobSkin(Player.getEntity(),"mob/char_grass.png");
     }else if (cmd == "hat set dirt"){
-        Entity.setMobSkin(Player.getEntity(),"mob/char_dirt.png");
+        var hat = Entity.setMobSkin(Player.getEntity(),"mob/char_dirt.png");
     }else if (cmd == "hat set stone"){
         Entity.setMobSkin(Player.getEntity(),"mob/char_stone.png");
     }else if (cmd == "hat set sand"){
@@ -65,14 +130,26 @@ function procCmd(cmd) {
         Entity.setMobSkin(Player.getEntity(),"mob/char_gravel.png");
     }else if (cmd == "hat set bricks"){
         Entity.setMobSkin(Player.getEntity(),"mob/char_bricks.png");
-	}else if (cmd == "hat set mushroom"){
+    }else if (cmd == "hat set mushroom"){
         Entity.setMobSkin(Player.getEntity(),"mob/char_mushroom.png");
-	}else if (cmd == "hat set white-wool"){
-        Entity.setMobSkin(Player.getEntity(),"mob/char_white-wool.png");
+    }else if (cmd == "hat set tnt"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_tnt.png");
+    }else if (cmd == "hat set santahat"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_santahat.png");
+    }else if (cmd == "hat set elfhat"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_elfhat.png");
+    }else if (cmd == "hat set villagerhat"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_villagerhat.png");
+    }else if (cmd == "hat set creeperhat"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_creeperhat.png");
+    }else if (cmd == "hat set 3dglasses"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_3dglasses.png");
+    }else if (cmd == "hat set froghat"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_froghat.png");
     }else if (cmd == "hat reset"){
         Entity.setMobSkin(Player.getEntity(),"mob/char.png");
     }else if (cmd == "hat types"){
-        clientMessage("grass, dirt, stone, sand, wood, woodenplanks, chest, glass, cobblestone, bedrock, obsidian, cactus, glowstone, ice, netherrack, snow, sponge, gravel, bricks, mushroom, white-wool");
+        clientMessage("grass, dirt, stone, sand, wood, woodenplanks, chest, glass, cobblestone, bedrock, obsidian, cactus, glowstone, ice, netherrack, snow, sponge, gravel, bricks, mushroom, tnt, santahat, elfhat, villagerhat, creeperhat, 3dglasses, froghat");
 }};
 
 //*Copyright & Permissions*
@@ -97,7 +174,7 @@ function procCmd(cmd) {
 
 //*Mod info*
 //------------
-//Mod version: 1.2
+//Mod version: 1.2 (Build 1)
 //For full changelog, do /changelog hatsmodpe
 
 
