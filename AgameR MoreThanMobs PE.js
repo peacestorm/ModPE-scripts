@@ -36,7 +36,7 @@ var GUI;
 var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 
 function newLevel() {
-   ctx.runOnUiThread(new java.lang.Runnable(){
+   /*ctx.runOnUiThread(new java.lang.Runnable(){
    
    
                      run: function(){
@@ -90,23 +90,23 @@ function newLevel() {
 }
                      });
 
-    clientMessage(ChatColor.GREEN+"AgameR MoreThanMobs PE"+ChatColor.RED+" 2.2 (Build 2) "+ChatColor.WHITE+"by peacestorm initialized");
+    */clientMessage(ChatColor.GREEN+"AgameR MoreThanMobs PE"+ChatColor.RED+" 2.2 "+ChatColor.WHITE+"by peacestorm initialized");
 };
 
 function modTick() {
-ModPE.showTipMessage("AgameR MoreThanMobs PE 2.2 Build 2");
+/*ModPE.showTipMessage("AgameR MoreThanMobs PE 2.2 Build 2");*/
 };
 
 function procCmd(cmd) {
     cmd = cmd.toLowerCase();
     if (cmd == "changelog morethanmobspe"){
-        clientMessage("AgameR MoreThanMobs PE Changelog - 1.0: Initial release | 1.1: Added the Ender Spider | 2.0: Added Ender Cow, Pirate, a healing potion, a potion of death and a experience bottle, name of the mod changed to AgameR MoreThanMobs | 2.1: Added /summon command and /disguise command | 2.2: Added Mimic mob; Improved spawn eggs; Better Ender Cow skin; Experience bottle now works");
+        clientMessage("AgameR MoreThanMobs PE Changelog - 1.0: Initial release | 1.1: Added the Ender Spider | 2.0: Added Ender Cow, Pirate, a healing potion, a potion of death and a experience bottle, name of the mod changed to AgameR MoreThanMobs | 2.1: Added /summon command and /disguise command | 2.2: Added Mimic mob; Improved spawn eggs; Better Ender Cow skin; Experience bottle now works; Some improvements");
     }else if (cmd == "summon ghost"){
         var ghost = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 32, "mob/ghost.png");
-		Entity.setRenderType(ghost,EntityRenderType.player);
+	Entity.setRenderType(ghost,EntityRenderType.player);
 	}else if (cmd == "summon wolfgirl"){
         var wolfgirl = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 33, "mob/wolfgirl.png");
-		Entity.setRenderType(wolfgirl,EntityRenderType.player);
+	Entity.setRenderType(wolfgirl,EntityRenderType.player);
 	}else if (cmd == "summon bluecreeper"){
         var bluecreeper = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 33, "mob/blue_creeper.png");
 	}else if (cmd == "summon brownchicken"){
@@ -117,33 +117,33 @@ function procCmd(cmd) {
         var endercow = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 11, "mob/ender_cow.png");
 	}else if (cmd == "summon pirate"){
         var pirate = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 32, "mob/pirate.png");
-		Entity.setRenderType(pirate,EntityRenderType.player);
+	Entity.setRenderType(pirate,EntityRenderType.player);
 	}else if (cmd == "summon mimic"){
         var mimic = Level.spawnMob(Player.getX(), Player.getY(), Player.getZ(), 37, "mob/mimic.png");
 	}else if (cmd == "disguise ghost"){
         Entity.setMobSkin(Player.getEntity(), "mob/ghost.png");
-		Entity.setRenderType(Player.getEntity(), EntityRenderType.player);
+	Entity.setRenderType(Player.getEntity(), EntityRenderType.player);
 	}else if (cmd == "disguise wolfgirl"){
         Entity.setMobSkin(Player.getEntity(), "mob/wolfgirl.png");
-		Entity.setRenderType(Player.getEntity(), EntityRenderType.player);
+	Entity.setRenderType(Player.getEntity(), EntityRenderType.player);
 	}else if (cmd == "disguise bluecreeper"){
         Entity.setMobSkin(Player.getEntity(), "mob/blue_creeper.png");
-		Entity.setRenderType(Player.getEntity(), EntityRenderType.creeper);
+	Entity.setRenderType(Player.getEntity(), EntityRenderType.creeper);
 	}else if (cmd == "disguise brownchicken"){
         Entity.setMobSkin(Player.getEntity(), "mob/brown_chicken.png");
-		Entity.setRenderType(Player.getEntity(), EntityRenderType.chicken);
+	Entity.setRenderType(Player.getEntity(), EntityRenderType.chicken);
 	}else if (cmd == "disguise enderspider"){
         Entity.setMobSkin(Player.getEntity(), "mob/ender_spider.png");
-		Entity.setRenderType(Player.getEntity(), EntityRenderType.spider);
+	Entity.setRenderType(Player.getEntity(), EntityRenderType.spider);
 	}else if (cmd == "disguise endercow"){
         Entity.setMobSkin(Player.getEntity(), "mob/ender_cow.png");
-		Entity.setRenderType(Player.getEntity(), EntityRenderType.cow);
+	Entity.setRenderType(Player.getEntity(), EntityRenderType.cow);
 	}else if (cmd == "disguise pirate"){
         Entity.setMobSkin(Player.getEntity(), "mob/pirate.png");
-		Entity.setRenderType(Player.getEntity(), EntityRenderType.player);
+	Entity.setRenderType(Player.getEntity(), EntityRenderType.player);
 	}else if (cmd == "disguise mimic"){
         Entity.setMobSkin(Player.getEntity(), "mob/mimic.png");
-		Entity.setRenderType(Player.getEntity(), EntityRenderType.slime);
+	Entity.setRenderType(Player.getEntity(), EntityRenderType.slime);
     }
 };
 
@@ -219,7 +219,7 @@ function leaveGame(){
 
 //*Mod info*
 //------------
-//Mod version: 2.2 (Build 2)
+//Mod version: 2.2
 //For full changelog, do /changelog morethanmobspe
 
 //*Todo-list*
