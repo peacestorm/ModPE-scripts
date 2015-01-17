@@ -23,14 +23,22 @@ ModPE.overrideTexture("images/mob/char_santahat.png","http://i.imgur.com/1QFmx8U
 ModPE.overrideTexture("images/mob/char_elfhat.png","http://i.imgur.com/wOBtf1F.png");
 ModPE.overrideTexture("images/mob/char_villagerhat.png","http://i.imgur.com/lIOE3SP.png");
 ModPE.overrideTexture("images/mob/char_creeperhat.png","http://i.imgur.com/zCHuSFL.png");
+ModPE.overrideTexture("images/mob/char_pighat.png","http://i.imgur.com/cLySmoz.png");
+ModPE.overrideTexture("images/mob/char_zombiehat.png","http://i.imgur.com/SLIW2io.png");
+ModPE.overrideTexture("images/mob/char_herobrinehat.png","http://i.imgur.com/S0Mi8Di.png");
 ModPE.overrideTexture("images/mob/char_3dglasses.png","http://i.imgur.com/QjCZFJu.png");
 ModPE.overrideTexture("images/mob/char_froghat.png","http://i.imgur.com/p0b66lE.png");
+ModPE.overrideTexture("images/mob/char_cap.png","http://i.imgur.com/IujDaE3.png");
+ModPE.overrideTexture("images/mob/char_tophat.png","http://i.imgur.com/ahNdG9m.png");
+ModPE.overrideTexture("images/mob/char_present.png","http://i.imgur.com/r1ndlvu.png");
+ModPE.overrideTexture("images/mob/char_popcorn.png","http://i.imgur.com/xAxzHBt.png");
+ModPE.overrideTexture("images/mob/char_nyancat.png","http://i.imgur.com/KtfJ4pz.png");
 
 var GUI;
 var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 
 function newLevel() {
-   ctx.runOnUiThread(new java.lang.Runnable(){
+   /*ctx.runOnUiThread(new java.lang.Runnable(){
    
    
                      run: function(){
@@ -84,11 +92,11 @@ function newLevel() {
 }
                      });
 
-    clientMessage(ChatColor.GREEN+"AgameR Hats Mod PE"+ChatColor.RED+" 1.2 (Build 2) "+ChatColor.WHITE+"by peacestorm initialized");
+    */clientMessage(ChatColor.GREEN+"AgameR Hats Mod PE"+ChatColor.RED+" 1.2 "+ChatColor.WHITE+"by peacestorm initialized");
 };
 
 function modTick() {
-ModPE.showTipMessage("AgameR Hats Mod PE 1.2 Build 2");
+//ModPE.showTipMessage("AgameR Hats Mod PE 1.2 Build 2");
 };
 
 function procCmd(cmd) {
@@ -98,7 +106,7 @@ function procCmd(cmd) {
     }else if (cmd == "hat set grass"){
         Entity.setMobSkin(Player.getEntity(),"mob/char_grass.png");
     }else if (cmd == "hat set dirt"){
-        var hat = Entity.setMobSkin(Player.getEntity(),"mob/char_dirt.png");
+        Entity.setMobSkin(Player.getEntity(),"mob/char_dirt.png");
     }else if (cmd == "hat set stone"){
         Entity.setMobSkin(Player.getEntity(),"mob/char_stone.png");
     }else if (cmd == "hat set sand"){
@@ -145,14 +153,30 @@ function procCmd(cmd) {
         Entity.setMobSkin(Player.getEntity(),"mob/char_villagerhat.png");
     }else if (cmd == "hat set creeperhat"){
         Entity.setMobSkin(Player.getEntity(),"mob/char_creeperhat.png");
+    }else if (cmd == "hat set pighat"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_pighat.png");
+    }else if (cmd == "hat set zombiehat"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_zombiehat.png");
+	}else if (cmd == "hat set herobrinehat"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_herobrinehat.png");
     }else if (cmd == "hat set 3dglasses"){
         Entity.setMobSkin(Player.getEntity(),"mob/char_3dglasses.png");
     }else if (cmd == "hat set froghat"){
         Entity.setMobSkin(Player.getEntity(),"mob/char_froghat.png");
+    }else if (cmd == "hat set cap"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_cap.png");
+    }else if (cmd == "hat set tophat"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_tophat.png");
+    }else if (cmd == "hat set present"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_present.png");
+    }else if (cmd == "hat set popcorn"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_popcorn.png")
+    }else if (cmd == "hat set nyancat"){
+        Entity.setMobSkin(Player.getEntity(),"mob/char_nyancat.png")
     }else if (cmd == "hat reset"){
         Entity.setMobSkin(Player.getEntity(),"mob/char.png");
     }else if (cmd == "hat types"){
-        clientMessage("grass, dirt, stone, sand, wood, woodenplanks, chest, glass, cobblestone, bedrock, obsidian, cactus, glowstone, ice, netherrack, snow, sponge, gravel, bricks, mushroom, tnt, santahat, elfhat, villagerhat, creeperhat, 3dglasses, froghat");
+        clientMessage("grass, dirt, stone, sand, wood, woodenplanks, chest, glass, cobblestone, bedrock, obsidian, cactus, glowstone, ice, netherrack, snow, sponge, gravel, bricks, mushroom, tnt, santahat, elfhat, villagerhat, creeperhat, pighat, zombiehat, herobrinehat, 3dglasses, froghat, cap, tophat, present, popcorn, nyancat");
 }};
 
 //*Copyright & Permissions*
@@ -177,7 +201,7 @@ function procCmd(cmd) {
 
 //*Mod info*
 //------------
-//Mod version: 1.2 (Build 2)
+//Mod version: 1.2
 //For full changelog, do /changelog hatsmodpe
 
 
