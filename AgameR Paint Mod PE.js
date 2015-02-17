@@ -805,6 +805,7 @@ Player.addItemInventory(437,1,0);
 //*Credits*
 //-----------
 //Creator: peacestorm
+//Betatester: Ethan061903
 
 //*Mod info*
 //------------
