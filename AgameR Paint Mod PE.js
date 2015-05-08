@@ -479,7 +479,7 @@ function Web(url) {
 var GUI;
 var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 
-const CURRENT_VERSION = "2.0 Build 1";
+const CURRENT_VERSION = "2.0 Build 2";
 var latestVersion;
 
 var currentActivity = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
@@ -506,7 +506,7 @@ function newLevel() {
 		   GUI.setContentView(layout);
 		   GUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
 		   GUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
-		   GUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.BOTTOM | android.view.Gravity.LEFT, 0, 0);
+		   GUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.TOP | android.view.Gravity.LEFT, 0, 0);
 		   
 		   btn.setText("[?]");
 		   btn.setOnClickListener(new android.view.View.OnClickListener(){
@@ -554,23 +554,63 @@ builder.setPositiveButton("Report bugs", new android.content.DialogInterface.OnC
 }
                      });
 
-    
-	if(initialized == false){
-		clientMessage(ChatColor.GREEN+"AgameR Paint Mod PE "+ChatColor.RED+CURRENT_VERSION+ChatColor.WHITE+" by peacestorm initialized");
-		initialized = true;
-	}else if(initialized == true){
-		clientMessage(ChatColor.GREEN+"AgameR Paint Mod PE "+ChatColor.RED+CURRENT_VERSION+ChatColor.WHITE+" by peacestorm");
-	}
+    if (initialized == false) {
+        initialized = true;
+        clientMessage(ChatColor.GREEN + "[AgameR Paint Mod PE]" + ChatColor.WHITE + " Initialized");
+    }
+    new java.lang.Thread(new java.lang.Runnable() {
+        run: function() {
+            getLatestVersion();
+            if (latestVersion != CURRENT_VERSION && latestVersion != undefined) {
+                clientMessage(ChatColor.GREEN + "[AgameR Paint Mod PE]" + ChatColor.WHITE + " There is a new version available (v" + latestVersion + ")!");
+            } else {
+                currentActivity.runOnUiThread(new java.lang.Runnable() {
+                    run: function() {
+                        android.widget.Toast.makeText(currentActivity, new android.text.Html.fromHtml("<b>AgameR Paint Mod PE</b> You have the latest version"), 0).show();
+                    }
+                });
+            }
+        }
+    }).start();
 };
 
+function getLatestVersion() {
+    try {
+        // download content
+        var url = new java.net.URL("https://raw.githubusercontent.com/peacestorm/ModPE-scripts/master/version/agamer-paintmodpe-version");
+        var connection = url.openConnection();
+
+        // get content
+        inputStream = connection.getInputStream();
+
+        // read result
+        var loadedVersion = "";
+        var bufferedVersionReader = new java.io.BufferedReader(new java.io.InputStreamReader(inputStream));
+        var rowVersion = "";
+        while ((rowVersion = bufferedVersionReader.readLine()) != null) {
+            loadedVersion += rowVersion;
+        }
+        latestVersion = loadedVersion.split(" ")[0];
+
+        // close what needs to be closed
+        bufferedVersionReader.close();
+
+        // test
+        //clientMessage(CURRENT_VERSION + " " + latestVersion);
+    } catch (err) {
+        clientMessage(ChatColor.GREEN + "[AgameR Paint Mod PE]" + ChatColor.WHITE + " Can't check for updates, please check your Internet connection.");
+        ModPE.log("[AgameR Paint Mod PE] getLatestVersion() caught an error: " + err);
+    }
+}
+
 function modTick() {
-ModPE.showTipMessage("AgameR Paint Mod PE "+CURRENT_VERSION);
+ModPE.showTipMessage("AgameR Paint Mod PE v"+CURRENT_VERSION+"\nMCPE v"+ModPE.getMinecraftVersion());
 };
 
 function procCmd(cmd) {
     cmd = cmd.toLowerCase();
     if (cmd == "changelog paintmodpe"){
-        clientMessage("AgameR Paint Mod PE Changelog - 1.0: Initial release | 1.1: Added crafting recipes | 1.2: Paint any block you want, fixed item id conflict with the TooManyItems addon, added a new crafting recipe for the white paint brush | 1.2.1: Used paintbrushes will now turn into empty paintbrushes in survival; Added an easter egg | 1.2.2: Removed survival functionalities introduced in 1.2.1 due to crashes; Fixed some things | 1.2.3: Added a new and improved survival system; Fixed bugs | 1.3: Added carpet painting; Some improvements | 1.3.1: Painting mobs no longer damages them; Some improvements | 2.0: Added many new colored blocks; ");
+        clientMessage("AgameR Paint Mod PE Changelog - 1.0: Initial release | 1.1: Added crafting recipes | 1.2: Paint any block you want, fixed item id conflict with the TooManyItems addon, added a new crafting recipe for the white paint brush | 1.2.1: Used paintbrushes will now turn into empty paintbrushes in survival; Added an easter egg | 1.2.2: Removed survival functionalities introduced in 1.2.1 due to crashes; Fixed some things | 1.2.3: Added a new and improved survival system; Fixed bugs | 1.3: Added carpet painting; Some improvements | 1.3.1: Painting mobs no longer damages them; Some improvements | 2.0: Added many new colored blocks; Added an update checker");
     }
 };
 
