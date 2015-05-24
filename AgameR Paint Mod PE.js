@@ -15,23 +15,23 @@ ModPE.overrideTexture("images/mob/green.png","http://i.imgur.com/s4W0IuF.png");
 ModPE.overrideTexture("images/mob/red.png","http://i.imgur.com/lqQJYW3.png");
 ModPE.overrideTexture("images/mob/black.png","http://i.imgur.com/j2y5JxL.png");
 
-ModPE.setItem(437,"quiver",0,"Paint Brush",64);
-ModPE.setItem(394,"repeater",0,"White Paint Brush",64);
-ModPE.setItem(510,"iron_horse_armor",0,"Orange Paint Brush",64);
-ModPE.setItem(511,"gold_horse_armor",0,"Magenta Paint Brush",64);
-ModPE.setItem(509,"minecart_furnace",0,"Light Blue Paint Brush",64);
-ModPE.setItem(508,"minecart_hopper",0,"Yellow Paint Brush",64);
-ModPE.setItem(507,"minecart_chest",0,"Lime Green Paint Brush",64);
-ModPE.setItem(401,"brewing_stand",0,"Pink Paint Brush",64);
-ModPE.setItem(402,"book_writable",0,"Gray Paint Brush",64);
-ModPE.setItem(403,"book_enchanted",0,"Light Gray Paint Brush",64);
-ModPE.setItem(395,"diamond_horse_armor",0,"Cyan Paint Brush",64);
-ModPE.setItem(396,"fishing_rod_cast",0,"Purple Paint Brush",64);
-ModPE.setItem(397,"minecart_tnt",0,"Blue Paint Brush",64);
-ModPE.setItem(410,"hopper",0,"Brown Paint Brush",64);
-ModPE.setItem(399,"fishing_rod_uncast",0,"Green Paint Brush",64);
-ModPE.setItem(322,"book_written",0,"Red Paint Brush",64);
-ModPE.setItem(326,"comparator",0,"Black Paint Brush",64);
+ModPE.setItem(437,"quiver",0,"Empty Paintbrush",64);
+ModPE.setItem(394,"repeater",0,"White Paintbrush",64);
+ModPE.setItem(510,"iron_horse_armor",0,"Orange Paintbrush",64);
+ModPE.setItem(511,"gold_horse_armor",0,"Magenta Paintbrush",64);
+ModPE.setItem(509,"minecart_furnace",0,"Light Blue Paintbrush",64);
+ModPE.setItem(508,"minecart_hopper",0,"Yellow Paintbrush",64);
+ModPE.setItem(507,"minecart_chest",0,"Lime Green Paintbrush",64);
+ModPE.setItem(401,"brewing_stand",0,"Pink Paintbrush",64);
+ModPE.setItem(402,"book_writable",0,"Gray Paintbrush",64);
+ModPE.setItem(403,"book_enchanted",0,"Light Gray Paintbrush",64);
+ModPE.setItem(395,"diamond_horse_armor",0,"Cyan Paintbrush",64);
+ModPE.setItem(396,"fishing_rod_cast",0,"Purple Paintbrush",64);
+ModPE.setItem(397,"minecart_tnt",0,"Blue Paintbrush",64);
+ModPE.setItem(410,"hopper",0,"Brown Paintbrush",64);
+ModPE.setItem(399,"fishing_rod_uncast",0,"Green Paintbrush",64);
+ModPE.setItem(322,"book_written",0,"Red Paintbrush",64);
+ModPE.setItem(326,"comparator",0,"Black Paintbrush",64);
 
 //Wooden Planks
 Block.defineBlock(176,"Orange Wooden Planks",[["planks",0]],0,2,0);
@@ -479,7 +479,7 @@ function Web(url) {
 var GUI;
 var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 
-const CURRENT_VERSION = "2.0 Build 2";
+const CURRENT_VERSION = "2.0 Build 3";
 var latestVersion;
 
 var currentActivity = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
@@ -610,7 +610,7 @@ ModPE.showTipMessage("AgameR Paint Mod PE v"+CURRENT_VERSION+"\nMCPE v"+ModPE.ge
 function procCmd(cmd) {
     cmd = cmd.toLowerCase();
     if (cmd == "changelog paintmodpe"){
-        clientMessage("AgameR Paint Mod PE Changelog - 1.0: Initial release | 1.1: Added crafting recipes | 1.2: Paint any block you want, fixed item id conflict with the TooManyItems addon, added a new crafting recipe for the white paint brush | 1.2.1: Used paintbrushes will now turn into empty paintbrushes in survival; Added an easter egg | 1.2.2: Removed survival functionalities introduced in 1.2.1 due to crashes; Fixed some things | 1.2.3: Added a new and improved survival system; Fixed bugs | 1.3: Added carpet painting; Some improvements | 1.3.1: Painting mobs no longer damages them; Some improvements | 2.0: Added many new colored blocks; Added an update checker");
+        clientMessage("AgameR Paint Mod PE Changelog - 1.0: Initial release | 1.1: Added crafting recipes | 1.2: Paint any block you want, fixed item id conflict with the TooManyItems addon, added a new crafting recipe for the white Paintbrush | 1.2.1: Used paintbrushes will now turn into empty paintbrushes in survival; Added an easter egg | 1.2.2: Removed survival functionalities introduced in 1.2.1 due to crashes; Fixed some things | 1.2.3: Added a new and improved survival system; Fixed bugs | 1.3: Added carpet painting; Some improvements | 1.3.1: Painting mobs no longer damages them; Some improvements | 2.0: Added many new colored blocks *Colored Wooden Planks, Sponges, Glass Blocks and Leaves*; Added an update checker; New Paintbrush textures by @SimonP_GG64 *he is awesome, go follow him on Twitter!*; Fixed some bugs; Overall improvements");
     }
 };
 
@@ -788,8 +788,22 @@ Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,20,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,19,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,18,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -825,8 +839,22 @@ Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,201,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,216,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,231,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -862,12 +890,26 @@ Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,202,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,217,0);
 if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount() - 1);
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,232,0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
 Level.setTile(x,y,z,159,2);
@@ -899,12 +941,26 @@ Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,203,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,218,0);
 if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount() - 1);
+Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,233,0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
 Level.setTile(x,y,z,159,3);
@@ -936,8 +992,22 @@ Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,204,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,219,0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,234,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -973,8 +1043,22 @@ Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,205,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,220,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,235,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1010,8 +1094,22 @@ Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,206,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,221,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,236,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1047,15 +1145,29 @@ Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,207,0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
-Level.setTile(x,y,z,222,0)
+Level.setTile(x,y,z,222,0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,237,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,7)
+Level.setTile(x,y,z,159,7);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1071,14 +1183,21 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else if(b == 171){
-Level.setTile(x,y,z,171,8)
+Level.setTile(x,y,z,171,8);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else if(b == 5||b == 176||b == 177||b == 178||b == 179||b == 180||b == 181||b == 182||b == 193||b == 194||b == 195||b == 196||b == 197||b == 198||b == 199||b == 200){
-Level.setTile(x,y,z,193,0)
+Level.setTile(x,y,z,193,0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,208,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1086,6 +1205,13 @@ Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount() - 1)
 Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,223,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,238,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1108,7 +1234,7 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else if(b == 171){
-Level.setTile(x,y,z,171,9)
+Level.setTile(x,y,z,171,9);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1121,8 +1247,22 @@ Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,209,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,224,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,239,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1160,8 +1300,22 @@ Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,210,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,225,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,240,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1197,8 +1351,22 @@ Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,211,0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,226,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,241,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1234,8 +1402,22 @@ Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,212,0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,227,0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,242,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1271,8 +1453,22 @@ Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,213,0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,228,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,244,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1308,8 +1504,22 @@ Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,214,0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,229,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,250,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1345,8 +1555,22 @@ Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
+Level.setTile(x,y,z,215,0);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 19||b == 216||b == 217||b == 218||b == 219||b == 220||b == 221||b == 222||b == 223||b == 224||b == 225||b == 226||b == 227||b == 228||b == 229||b == 230){
 Level.setTile(x,y,z,230,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 18||b == 231||b == 232||b == 233||b == 234||b == 235||b == 236||b == 237||b == 238||b == 239||b == 240||b == 241||b == 242||b == 244||b == 250||b == 251){
+Level.setTile(x,y,z,251,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1365,7 +1589,7 @@ Player.addItemInventory(437,1,0);
 //-------------
 //You may:
 //Edit this mod for personal use
-//Create a review of this mod
+//Create a review of this mod *YOU MUST PUT THE LINK TO THE MINECRAFT FORUMS THREAD IN THE DESCRIPTION!*
 //
 //You may NOT:
 //Distribute this mod without permission of peacestorm
