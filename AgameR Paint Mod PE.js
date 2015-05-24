@@ -251,7 +251,7 @@ Block.setColor(251,[0x000000]);
 Block.setDestroyTime(251,0.2);
 Block.setRenderLayer(251, 1);
 
-Player.addItemCreativeInv(176,1,0);
+/*Player.addItemCreativeInv(176,1,0);
 Player.addItemCreativeInv(177,1,0);
 Player.addItemCreativeInv(178,1,0);
 Player.addItemCreativeInv(179,1,0);
@@ -311,7 +311,7 @@ Player.addItemCreativeInv(242,1,0);
 Player.addItemCreativeInv(243,1,0);
 Player.addItemCreativeInv(244,1,0);
 Player.addItemCreativeInv(250,1,0);
-Player.addItemCreativeInv(251,1,0);
+Player.addItemCreativeInv(251,1,0);*/
 
 Item.setMaxDamage(437, 10);
 Item.setMaxDamage(394, 10);
@@ -479,7 +479,7 @@ function Web(url) {
 var GUI;
 var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 
-const CURRENT_VERSION = "2.0 Build 3";
+const CURRENT_VERSION = "2.0 Build 4";
 var latestVersion;
 
 var currentActivity = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
@@ -774,6 +774,13 @@ Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,0)
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
 }}}else if(b == 171){
 Level.setTile(x,y,z,171,0)
 if(gamemode == 0){
@@ -810,16 +817,18 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,0)
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 394, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 510) {
+}}else if(i == 510) {
 if(b == 35) {
 Level.setTile(x,y,z,35,1);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,1)
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -861,16 +870,18 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,1)
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 510, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 511) {
+}}else if(i == 511) {
 if(b == 35) {
 Level.setTile(x,y,z,35,2);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,2)
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -912,16 +923,18 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,2);
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 509) {
+}}else if(i == 509) {
 if(b == 35) {
 Level.setTile(x,y,z,35,3);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,3);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -942,7 +955,7 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else if(b == 20||b == 201||b == 202||b == 203||b == 204||b == 205||b == 206||b == 207||b == 208||b == 209||b == 210||b == 211||b == 212||b == 213||b == 214||b == 215){
-Level.setTile(x,y,z,203,0)
+Level.setTile(x,y,z,203,0);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -963,16 +976,18 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,3);
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 509, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 508) {
+}}else if(i == 508) {
 if(b == 35) {
 Level.setTile(x,y,z,35,4);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,4);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1014,20 +1029,22 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,4);
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 508, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 507) {
+}}else if(i == 507) {
 if(b == 35) {
 Level.setTile(x,y,z,35,5);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,5);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 511, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else if(b == 171){
 Level.setTile(x,y,z,171,5);
@@ -1065,14 +1082,9 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,5);
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 507, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 401) {
+}}else if(i == 401) {
 if(b == 35) {
 Level.setTile(x,y,z,35,6);
 if(gamemode == 0){
@@ -1080,6 +1092,13 @@ Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount(), Pla
 if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,6);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,6);
 }}}else if(b == 171){
 Level.setTile(x,y,z,171,6);
 if(gamemode == 0){
@@ -1116,16 +1135,18 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,6);
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 401, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 402) {
+}}else if(i == 402) {
 if(b == 35) {
 Level.setTile(x,y,z,35,7);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,7);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1167,16 +1188,18 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,7);
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 402, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 403) {
+}}else if(i == 403) {
 if(b == 35) {
 Level.setTile(x,y,z,35,8);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,8);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1218,16 +1241,18 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,8)
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 403, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 395) {
+}}else if(i == 395) {
 if(b == 35) {
 Level.setTile(x,y,z,35,9);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,9);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1271,16 +1296,18 @@ Player.addItemInventory(437,1,0);
 /*}}}else if(b == 66||b == 27){
 clientMessage("Rails can't be painted, sorry");*/
 }}}else {
-Level.setTile(x,y,z,159,9)
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 395, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 396) {
+}}else if(i == 396) {
 if(b == 35) {
 Level.setTile(x,y,z,35,10);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,10);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1322,16 +1349,18 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,10)
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 396, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 397) {
+}}else if(i == 397) {
 if(b == 35) {
 Level.setTile(x,y,z,35,11);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,11);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1373,16 +1402,18 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,11)
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 397, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 410) {
+}}else if(i == 410) {
 if(b == 35) {
 Level.setTile(x,y,z,35,12);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,12);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1424,16 +1455,18 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,12);
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 410, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 399) {
+}}else if(i == 399) {
 if(b == 35) {
 Level.setTile(x,y,z,35,13);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,13);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1475,16 +1508,18 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,13);
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 399, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 322) {
+}}else if(i == 322) {
 if(b == 35) {
 Level.setTile(x,y,z,35,14);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,14);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1526,16 +1561,18 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,14)
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 322, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
+ModPE.showTipMessage("This block can't be painted!");
 
-}}}}else if(i == 326) {
+}}else if(i == 326) {
 if(b == 35) {
 Level.setTile(x,y,z,35,15);
+if(gamemode == 0){
+Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
+if(Player.getCarriedItemData() > 10){
+Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount() - 1);
+Player.addItemInventory(437,1,0);
+}}}else if(b == 159) {
+Level.setTile(x,y,z,159,15);
 if(gamemode == 0){
 Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
 if(Player.getCarriedItemData() > 10){
@@ -1577,13 +1614,8 @@ if(Player.getCarriedItemData() > 10){
 Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount() - 1);
 Player.addItemInventory(437,1,0);
 }}}else {
-Level.setTile(x,y,z,159,15)
-if(gamemode == 0){
-Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount(), Player.getCarriedItemData() + 1);
-if(Player.getCarriedItemData() > 10){
-Entity.setCarriedItem(Player.getEntity(), 326, Player.getCarriedItemCount() - 1);
-Player.addItemInventory(437,1,0);
-}}}}};
+ModPE.showTipMessage("This block can't be painted!");
+}}};
 
 //*Copyright*
 //-------------
