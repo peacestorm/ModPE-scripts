@@ -15,23 +15,23 @@ ModPE.overrideTexture("images/mob/green.png","http://i.imgur.com/s4W0IuF.png");
 ModPE.overrideTexture("images/mob/red.png","http://i.imgur.com/lqQJYW3.png");
 ModPE.overrideTexture("images/mob/black.png","http://i.imgur.com/j2y5JxL.png");
 
-ModPE.setItem(437,"quiver",0,"Empty Paintbrush",64);
-ModPE.setItem(394,"repeater",0,"White Paintbrush",64);
-ModPE.setItem(510,"iron_horse_armor",0,"Orange Paintbrush",64);
-ModPE.setItem(511,"gold_horse_armor",0,"Magenta Paintbrush",64);
-ModPE.setItem(509,"minecart_furnace",0,"Light Blue Paintbrush",64);
-ModPE.setItem(508,"minecart_hopper",0,"Yellow Paintbrush",64);
-ModPE.setItem(507,"minecart_chest",0,"Lime Green Paintbrush",64);
-ModPE.setItem(401,"brewing_stand",0,"Pink Paintbrush",64);
-ModPE.setItem(402,"book_writable",0,"Gray Paintbrush",64);
-ModPE.setItem(403,"book_enchanted",0,"Light Gray Paintbrush",64);
-ModPE.setItem(395,"diamond_horse_armor",0,"Cyan Paintbrush",64);
-ModPE.setItem(396,"fishing_rod_cast",0,"Purple Paintbrush",64);
-ModPE.setItem(397,"minecart_tnt",0,"Blue Paintbrush",64);
-ModPE.setItem(410,"hopper",0,"Brown Paintbrush",64);
-ModPE.setItem(399,"fishing_rod_uncast",0,"Green Paintbrush",64);
-ModPE.setItem(322,"book_written",0,"Red Paintbrush",64);
-ModPE.setItem(326,"comparator",0,"Black Paintbrush",64);
+ModPE.setItem(437,"empty_paintbrush",0,"Empty Paintbrush",64);
+ModPE.setItem(394,"white_paintbrush",0,"White Paintbrush",64);
+ModPE.setItem(510,"orange_paintbrush",0,"Orange Paintbrush",64);
+ModPE.setItem(511,"magenta_paintbrush",0,"Magenta Paintbrush",64);
+ModPE.setItem(509,"lightblue_paintbrush",0,"Light Blue Paintbrush",64);
+ModPE.setItem(508,"yellow_paintbrush",0,"Yellow Paintbrush",64);
+ModPE.setItem(507,"lime_paintbrush",0,"Lime Green Paintbrush",64);
+ModPE.setItem(401,"pink_paintbrush",0,"Pink Paintbrush",64);
+ModPE.setItem(402,"darkgrey_paintbrush",0,"Gray Paintbrush",64);
+ModPE.setItem(403,"lightgrey_paintbrush",0,"Light Gray Paintbrush",64);
+ModPE.setItem(395,"cyan_paintbrush",0,"Cyan Paintbrush",64);
+ModPE.setItem(396,"purple_paintbrush",0,"Purple Paintbrush",64);
+ModPE.setItem(397,"blue_paintbrush",0,"Blue Paintbrush",64);
+ModPE.setItem(410,"brown_paintbrush",0,"Brown Paintbrush",64);
+ModPE.setItem(399,"green_paintbrush",0,"Green Paintbrush",64);
+ModPE.setItem(322,"red_paintbrush",0,"Red Paintbrush",64);
+ModPE.setItem(326,"black_paintbrush",0,"Black Paintbrush",64);
 
 //Wooden Planks
 Block.defineBlock(176,"Orange Wooden Planks",[["planks",0]],0,2,0);
@@ -1636,7 +1636,7 @@ ModPE.showTipMessage("This block can't be painted!");
 
 //*Mod info*
 //------------
-//Mod version: 2.0
+//Mod version: 2.0.1
 //For full changelog, do /changelog paintmodpe
 
 //*Ideas*
