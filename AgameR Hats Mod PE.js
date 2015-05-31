@@ -235,7 +235,7 @@ function procCmd(cmd) {
         Entity.setHat("mob/char.png",Player.getEntity());
 	}else if (cmd[1] == "types"){
         clientMessage("grass, dirt, stone, sand, wood, woodenplanks, chest, glass, cobblestone, bedrock, obsidian, cactus, glowstone, ice, netherrack, snow, sponge, gravel, bricks, mushroom, tnt, santahat, elfhat, villagerhat, creeperhat, pighat, zombiehat, herobrinehat, 3dglasses, froghat, cap, tophat, present, popcorn, nyancat");
-}};
+}}};
 
 //*Copyright & Permissions*
 //-------------
