@@ -111,7 +111,6 @@ function newLevel() {
 		}
 }
                      });
-
     */if(initialized == false){
 		clientMessage(ChatColor.GREEN+"AgameR Hats Mod PE"+ChatColor.RED+" 1.2.2 "+ChatColor.WHITE+"by peacestorm initialized");
 		initialized = true;
@@ -154,18 +153,13 @@ function procCmd(cmd) {
 		dialog.show();
 			
 			}
-								  
-				                  });
-		
-		}
 		catch(err){
 		
 		   print("Error: " + err)
-		
 		}
-		
+		}
         });
-	}}else if (cmd[0] == "hat"){
+	}else if (cmd[0] == "hat"){
 	if (cmd[1] == "set"){
 	if (cmd[2] == "grass"){
         Entity.setHat("mob/char_" + cmd[2] + ".png",Player.getEntity());
