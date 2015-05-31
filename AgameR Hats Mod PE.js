@@ -1,3 +1,10 @@
+/*
+Name: AgameR Paint Mod PE
+Version: 1.2.1
+Author: peacestorm
+*/
+
+
 ModPE.overrideTexture("images/mob/char_grass.png","http://i.imgur.com/zAjeODx.png");
 ModPE.overrideTexture("images/mob/char_dirt.png","http://i.imgur.com/o0h68Yx.png");
 ModPE.overrideTexture("images/mob/char_stone.png","http://i.imgur.com/bbvgn6X.png");
@@ -110,19 +117,20 @@ function newLevel() {
 		initialized = true;
 	}else if(initialized == true){
 		clientMessage(ChatColor.GREEN+"AgameR Hats Mod PE"+ChatColor.RED+" 1.2.1 "+ChatColor.WHITE+"by peacestorm");
+clientMessage("§bYou §4must §bbe connected to internet at §4all §btimes.");
 	}
 };
 
-function modTick() {
+
+//function modTick() { 
 //ModPE.showTipMessage("AgameR Hats Mod PE 1.2 Build 2"); <-- Beta builds
 //ModPE.showTipMessage(Entity.getMobSkin(Player.getEntity())); <-- Current hat
-};
+//};
 
 function procCmd(cmd) {
     cmd = cmd.split(" ");
-    if (cmd[0] == "changelog"){
-	    if (cmd[1] == "hatsmodpe"){
-        clientMessage("AgameR Hats Mod PE Changelog - 1.0: Initial release | 1.1: Added much more block hats; Improved some hats | 1.2 - The christmas update: Added more hats; Improved some hats | 1.2.1: Fixed some bugs; Some improvements");
+    if (cmd[0] == "changelog" && cmd[1] == "hatsmodpe"){
+        clientMessage("AgameR Hats Mod PE Changelog - 1.0:\n Initial release \n| 1.1: Added much more block hats\n | Improved some hats\n | 1.2 - The christmas update: Added more hats \n| Improved some hats \n| 1.2.1: Fixed some bugs \n| Some improvements");
 	}}else if (cmd[0] == "hat"){
 	if (cmd[1] == "set"){
 	if (cmd[2] == "grass"){
@@ -199,7 +207,7 @@ function procCmd(cmd) {
         Entity.setHat("mob/char.png",Player.getEntity());
 	}else if (cmd[1] == "types"){
         clientMessage("grass, dirt, stone, sand, wood, woodenplanks, chest, glass, cobblestone, bedrock, obsidian, cactus, glowstone, ice, netherrack, snow, sponge, gravel, bricks, mushroom, tnt, santahat, elfhat, villagerhat, creeperhat, pighat, zombiehat, herobrinehat, 3dglasses, froghat, cap, tophat, present, popcorn, nyancat");
-}}};
+}};
 
 //*Copyright & Permissions*
 //-------------
@@ -215,16 +223,6 @@ function procCmd(cmd) {
 //Monetize this mod by using AdFly or any other monetizing method
 //
 //For things that aren't listed here, always ask me
-
-
-//*Credits*
-//-----------
-//Creator: peacestorm
-
-//*Mod info*
-//------------
-//Mod version: 1.2.1
-//For full changelog, do /changelog hatsmodpe
 
 
 //*Ideas*
