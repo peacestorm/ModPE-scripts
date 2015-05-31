@@ -113,11 +113,11 @@ function newLevel() {
                      });
 
     */if(initialized == false){
-		clientMessage(ChatColor.GREEN+"AgameR Hats Mod PE"+ChatColor.RED+" 1.2.1 "+ChatColor.WHITE+"by peacestorm initialized");
+		clientMessage(ChatColor.GREEN+"AgameR Hats Mod PE"+ChatColor.RED+" 1.2.2 "+ChatColor.WHITE+"by peacestorm initialized");
 		initialized = true;
 	}else if(initialized == true){
-		clientMessage(ChatColor.GREEN+"AgameR Hats Mod PE"+ChatColor.RED+" 1.2.1 "+ChatColor.WHITE+"by peacestorm");
-clientMessage("§bYou §4must §bbe connected to internet at §4all §btimes.");
+		clientMessage(ChatColor.GREEN+"AgameR Hats Mod PE"+ChatColor.RED+" 1.2.2 "+ChatColor.WHITE+"by peacestorm");
+//clientMessage("§bYou §4must §bbe connected to internet at §4all §btimes.");
 	}
 };
 
@@ -130,7 +130,41 @@ clientMessage("§bYou §4must §bbe connected to internet at §4all §btimes.");
 function procCmd(cmd) {
     cmd = cmd.split(" ");
     if (cmd[0] == "changelog" && cmd[1] == "hatsmodpe"){
-        clientMessage("AgameR Hats Mod PE Changelog - 1.0:\n Initial release \n| 1.1: Added much more block hats\n | Improved some hats\n | 1.2 - The christmas update: Added more hats \n| Improved some hats \n| 1.2.1: Fixed some bugs \n| Some improvements");
+        ctx.runOnUiThread(new java.lang.Runnable(){
+   
+   
+                     run: function(){
+		
+        try{
+		     var builder = new android.app.AlertDialog.Builder(ctx);
+		     	 builder.setTitle("AgameR Hats Mod PE Changelog");
+			 builder.setMessage("1.0: Initial release\n1.1: Added much more block hats\nImproved some hats\n1.2 - The Christmas Update: Added more hats\nImproved some hats \n1.2.1: Fixed some bugs\nSome improvements\n1.2.2: New Changelog system\nOverall improvements);
+			 builder.setNegativeButton("Ok", new android.content.DialogInterface.OnClickListener(){
+			 
+			                            onClick: function(p1, p2){
+										
+				p1.cancel();				
+										
+										
+			}							
+			 
+		    });
+										
+		var dialog = builder.create();
+		dialog.show();
+			
+			}
+								  
+				                  });
+		
+		}
+		catch(err){
+		
+		   print("Error: " + err)
+		
+		}
+		
+        });
 	}}else if (cmd[0] == "hat"){
 	if (cmd[1] == "set"){
 	if (cmd[2] == "grass"){
