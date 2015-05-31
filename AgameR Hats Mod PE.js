@@ -138,7 +138,7 @@ function procCmd(cmd) {
         try{
 		     var builder = new android.app.AlertDialog.Builder(ctx);
 		     	 builder.setTitle("AgameR Hats Mod PE Changelog");
-			 builder.setMessage("1.0: Initial release\n1.1: Added much more block hats\nImproved some hats\n1.2 - The Christmas Update: Added more hats\nImproved some hats \n1.2.1: Fixed some bugs\nSome improvements\n1.2.2: New Changelog system\nOverall improvements);
+			 builder.setMessage("1.0: Initial release\n1.1: Added much more block hats\nImproved some hats\n1.2 - The Christmas Update: Added more hats\nImproved some hats \n1.2.1: Fixed some bugs\nSome improvements\n1.2.2: New Changelog system\nOverall improvements");
 			 builder.setNegativeButton("Ok", new android.content.DialogInterface.OnClickListener(){
 			 
 			                            onClick: function(p1, p2){
