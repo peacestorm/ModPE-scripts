@@ -1,3 +1,22 @@
+Agamer MoreOptions PE
+============
+Mod Info
+----------
+This mod adds many new options and hacks into MCPE.
+
+Features
+-----------------------
+* Hacks
+* Cheats
+* OptiFine
+* Morphing
+* Other options
+
+Available on
+-----------------------
+Android (for MCPE) --> Download AgameR MoreOptions PE.js
+
+
 Agamer MoreThanMobs
 ============
 Mod Info
