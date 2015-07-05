@@ -479,7 +479,7 @@ function Web(url) {
 var GUI;
 var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 
-const CURRENT_VERSION = "2.0";
+const CURRENT_VERSION = "2.0.1";
 var latestVersion;
 
 var currentActivity = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
@@ -610,7 +610,7 @@ ModPE.showTipMessage("AgameR Paint Mod PE v"+CURRENT_VERSION+"\nMCPE v"+ModPE.ge
 function procCmd(cmd) {
     cmd = cmd.toLowerCase();
     if (cmd == "changelog paintmodpe"){
-        clientMessage("AgameR Paint Mod PE Changelog - 1.0: Initial release | 1.1: Added crafting recipes | 1.2: Paint any block you want, fixed item id conflict with the TooManyItems addon, added a new crafting recipe for the white Paintbrush | 1.2.1: Used paintbrushes will now turn into empty paintbrushes in survival; Added an easter egg | 1.2.2: Removed survival functionalities introduced in 1.2.1 due to crashes; Fixed some things | 1.2.3: Added a new and improved survival system; Fixed bugs | 1.3: Added carpet painting; Some improvements | 1.3.1: Painting mobs no longer damages them; Some improvements | 2.0: Added many new colored blocks *Colored Wooden Planks, Sponges, Glass Blocks and Leaves*; Added an update checker; New Paintbrush textures by @SimonP_GG64 *he is awesome, go follow him on Twitter!*; New Empty Paintbrush crafting recipe; Fixed some bugs; Overall improvements");
+        clientMessage("AgameR Paint Mod PE Changelog - 1.0: Initial release | 1.1: Added crafting recipes | 1.2: Paint any block you want, fixed item id conflict with the TooManyItems addon, added a new crafting recipe for the white Paintbrush | 1.2.1: Used paintbrushes will now turn into empty paintbrushes in survival; Added an easter egg | 1.2.2: Removed survival functionalities introduced in 1.2.1 due to crashes; Fixed some things | 1.2.3: Added a new and improved survival system; Fixed bugs | 1.3: Added carpet painting; Some improvements | 1.3.1: Painting mobs no longer damages them; Some improvements | 2.0: Added many new colored blocks *Colored Wooden Planks, Sponges, Glass Blocks and Leaves*; Added an update checker; New Paintbrush textures by @SimonP_GG64 *he is awesome, go follow him on Twitter!*; New Empty Paintbrush crafting recipe; Fixed some bugs; Overall improvements | 2.0.1: Updated to MCPE v0.11.x");
     }
 };
 
