@@ -331,23 +331,90 @@ Item.setMaxDamage(399, 10);
 Item.setMaxDamage(322, 10);
 Item.setMaxDamage(326, 10);
 
-Player.addItemCreativeInv(437,1,0);
-Player.addItemCreativeInv(394,1,0);
-Player.addItemCreativeInv(510,1,0);
-Player.addItemCreativeInv(511,1,0);
-Player.addItemCreativeInv(509,1,0);
-Player.addItemCreativeInv(508,1,0);
-Player.addItemCreativeInv(507,1,0);
-Player.addItemCreativeInv(401,1,0);
-Player.addItemCreativeInv(402,1,0);
-Player.addItemCreativeInv(403,1,0);
-Player.addItemCreativeInv(395,1,0);
-Player.addItemCreativeInv(396,1,0);
-Player.addItemCreativeInv(397,1,0);
-Player.addItemCreativeInv(410,1,0);
-Player.addItemCreativeInv(399,1,0);
-Player.addItemCreativeInv(322,1,0);
-Player.addItemCreativeInv(326,1,0);
+var loadBlocksCreativeInv = false;
+
+ModPE.initCreativeItems = function () {
+	Player.addItemCreativeInv(437,1,0);
+	Player.addItemCreativeInv(394,1,0);
+	Player.addItemCreativeInv(510,1,0);
+	Player.addItemCreativeInv(511,1,0);
+	Player.addItemCreativeInv(509,1,0);
+	Player.addItemCreativeInv(508,1,0);
+	Player.addItemCreativeInv(507,1,0);
+	Player.addItemCreativeInv(401,1,0);
+	Player.addItemCreativeInv(402,1,0);
+	Player.addItemCreativeInv(403,1,0);
+	Player.addItemCreativeInv(395,1,0);
+	Player.addItemCreativeInv(396,1,0);
+	Player.addItemCreativeInv(397,1,0);
+	Player.addItemCreativeInv(410,1,0);
+	Player.addItemCreativeInv(399,1,0);
+	Player.addItemCreativeInv(322,1,0);
+	Player.addItemCreativeInv(326,1,0);
+	if(loadBlocksCreativeInv == true){
+		Player.addItemCreativeInv(176,1,0);
+		Player.addItemCreativeInv(177,1,0);
+		Player.addItemCreativeInv(178,1,0);
+		Player.addItemCreativeInv(179,1,0);
+		Player.addItemCreativeInv(180,1,0);
+		Player.addItemCreativeInv(181,1,0);
+		Player.addItemCreativeInv(182,1,0);
+		Player.addItemCreativeInv(193,1,0);
+		Player.addItemCreativeInv(194,1,0);
+		Player.addItemCreativeInv(195,1,0);
+		Player.addItemCreativeInv(196,1,0);
+		Player.addItemCreativeInv(197,1,0);
+		Player.addItemCreativeInv(198,1,0);
+		Player.addItemCreativeInv(199,1,0);
+		Player.addItemCreativeInv(200,1,0);
+		Player.addItemCreativeInv(201,1,0);
+		Player.addItemCreativeInv(202,1,0);
+		Player.addItemCreativeInv(203,1,0);
+		Player.addItemCreativeInv(204,1,0);
+		Player.addItemCreativeInv(205,1,0);
+		Player.addItemCreativeInv(206,1,0);
+		Player.addItemCreativeInv(207,1,0);
+		Player.addItemCreativeInv(208,1,0);
+		Player.addItemCreativeInv(209,1,0);
+		Player.addItemCreativeInv(210,1,0);
+		Player.addItemCreativeInv(211,1,0);
+		Player.addItemCreativeInv(212,1,0);
+		Player.addItemCreativeInv(213,1,0);
+		Player.addItemCreativeInv(214,1,0);
+		Player.addItemCreativeInv(215,1,0);
+		Player.addItemCreativeInv(216,1,0);
+		Player.addItemCreativeInv(217,1,0);
+		Player.addItemCreativeInv(218,1,0);
+		Player.addItemCreativeInv(219,1,0);
+		Player.addItemCreativeInv(220,1,0);
+		Player.addItemCreativeInv(221,1,0);
+		Player.addItemCreativeInv(222,1,0);
+		Player.addItemCreativeInv(223,1,0);
+		Player.addItemCreativeInv(224,1,0);
+		Player.addItemCreativeInv(225,1,0);
+		Player.addItemCreativeInv(226,1,0);
+		Player.addItemCreativeInv(227,1,0);
+		Player.addItemCreativeInv(228,1,0);
+		Player.addItemCreativeInv(229,1,0);
+		Player.addItemCreativeInv(230,1,0);
+		Player.addItemCreativeInv(231,1,0);
+		Player.addItemCreativeInv(232,1,0);
+		Player.addItemCreativeInv(233,1,0);
+		Player.addItemCreativeInv(234,1,0);
+		Player.addItemCreativeInv(235,1,0);
+		Player.addItemCreativeInv(236,1,0);
+		Player.addItemCreativeInv(237,1,0);
+		Player.addItemCreativeInv(238,1,0);
+		Player.addItemCreativeInv(239,1,0);
+		Player.addItemCreativeInv(240,1,0);
+		Player.addItemCreativeInv(241,1,0);
+		Player.addItemCreativeInv(242,1,0);
+		Player.addItemCreativeInv(243,1,0);
+		Player.addItemCreativeInv(244,1,0);
+		Player.addItemCreativeInv(250,1,0);
+		Player.addItemCreativeInv(251,1,0);
+	}
+}
 
 Item.addShapedRecipe(437, 1, 0, [
 "   ",
@@ -479,8 +546,9 @@ function Web(url) {
 var GUI;
 var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 
-const CURRENT_VERSION = "2.0.1";
+const CURRENT_VERSION = "2.0.2";
 var latestVersion;
+var latestPocketEditionVersion;
 
 var currentActivity = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 var sdcard = android.os.Environment.getExternalStorageDirectory();
@@ -553,7 +621,7 @@ builder.setPositiveButton("Report bugs", new android.content.DialogInterface.OnC
 		}
 }
                      });*/
-
+	ModPE.initCreativeItems();
     if (initialized == false) {
         initialized = true;
         clientMessage(ChatColor.GREEN + "[AgameR Paint Mod PE]" + ChatColor.WHITE + " Initialized");
@@ -562,7 +630,7 @@ builder.setPositiveButton("Report bugs", new android.content.DialogInterface.OnC
         run: function() {
             getLatestVersion();
             if (latestVersion != CURRENT_VERSION && latestVersion != undefined) {
-                clientMessage(ChatColor.GREEN + "[AgameR Paint Mod PE]" + ChatColor.WHITE + " There is a new version available (v" + latestVersion + ")!");
+                clientMessage(ChatColor.GREEN + "[AgameR Paint Mod PE]" + ChatColor.WHITE + " There is a new version available (v" + latestVersion + " for Minecraft Pocket Edition v" + latestPocketEditionVersion + ")!");
             } else {
                 currentActivity.runOnUiThread(new java.lang.Runnable() {
                     run: function() {
@@ -591,6 +659,7 @@ function getLatestVersion() {
             loadedVersion += rowVersion;
         }
         latestVersion = loadedVersion.split(" ")[0];
+        latestPocketEditionVersion = loadedVersion.split(" ")[1];
 
         // close what needs to be closed
         bufferedVersionReader.close();
@@ -610,7 +679,7 @@ ModPE.showTipMessage("AgameR Paint Mod PE v"+CURRENT_VERSION+"\nMCPE v"+ModPE.ge
 function procCmd(cmd) {
     cmd = cmd.toLowerCase();
     if (cmd == "changelog paintmodpe"){
-        clientMessage("AgameR Paint Mod PE Changelog - 1.0: Initial release | 1.1: Added crafting recipes | 1.2: Paint any block you want, fixed item id conflict with the TooManyItems addon, added a new crafting recipe for the white Paintbrush | 1.2.1: Used paintbrushes will now turn into empty paintbrushes in survival; Added an easter egg | 1.2.2: Removed survival functionalities introduced in 1.2.1 due to crashes; Fixed some things | 1.2.3: Added a new and improved survival system; Fixed bugs | 1.3: Added carpet painting; Some improvements | 1.3.1: Painting mobs no longer damages them; Some improvements | 2.0: Added many new colored blocks *Colored Wooden Planks, Sponges, Glass Blocks and Leaves*; Added an update checker; New Paintbrush textures by @SimonP_GG64 *he is awesome, go follow him on Twitter!*; New Empty Paintbrush crafting recipe; Fixed some bugs; Overall improvements | 2.0.1: Updated to MCPE v0.11.x");
+        clientMessage("AgameR Paint Mod PE Changelog - 1.0: Initial release | 1.1: Added crafting recipes | 1.2: Paint any block you want, fixed item id conflict with the TooManyItems addon, added a new crafting recipe for the white Paintbrush | 1.2.1: Used paintbrushes will now turn into empty paintbrushes in survival; Added an easter egg | 1.2.2: Removed survival functionalities introduced in 1.2.1 due to crashes; Fixed some things | 1.2.3: Added a new and improved survival system; Fixed bugs | 1.3: Added carpet painting; Some improvements | 1.3.1: Painting mobs no longer damages them; Some improvements | 2.0: Added many new colored blocks *Colored Wooden Planks, Sponges, Glass Blocks and Leaves*; Added an update checker; New Paintbrush textures by @SimonP_GG64 *he is awesome, go follow him on Twitter!*; New Empty Paintbrush crafting recipe; Fixed some bugs; Overall improvements | 2.0.1: Updated to MCPE v0.11.x | 2.0.2: Fixed items not showing up in creative; Small code changes");
     }
 };
 
@@ -1636,7 +1705,7 @@ ModPE.showTipMessage("This block can't be painted!");
 
 //*Mod info*
 //------------
-//Mod version: 2.0.1
+//Mod version: 2.0.2
 //For full changelog, do /changelog paintmodpe
 
 //*Ideas*
