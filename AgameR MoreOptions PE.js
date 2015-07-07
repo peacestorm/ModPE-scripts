@@ -6207,7 +6207,8 @@ function xRay(onOrOff) {
 }
 
 var settingsPath = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang/minecraftpe/mods/";
-	
+
+//Save and load by @Daw330073
 function Save(){
     java.io.File(settingsPath).mkdirs();
     var newFile = new java.io.File(settingsPath,"moreoptionspe.txt");
