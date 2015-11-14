@@ -23,6 +23,7 @@ var nameColor = "§b";
 var healthColor = "§c";
 var betterGlass = "off";
 var experimentalFeatures = "off";
+var defaultUrl = "https://google.com/"; //<-- Default Webbrowser URL; Default: https://google.com/
 
 /*Per world config*/
 var HomeX;
@@ -42,8 +43,460 @@ var line0;
 var line1;
 var line2;
 var line3;
+var newScript;
+var webViewer;
 var MoreOptionsPE = {};
 //End of Some vars
+
+ModPE.getCurrentLanguage = function() {
+    var file = new java.io.File("/sdcard/games/com.mojang/minecraftpe/options.txt");
+    var br = new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file)));
+    var read, lang;
+    while((read = br.readLine()) != null) {
+        if(read.split(":")[0] == "game_language") {
+            lang = read.split(":")[1];
+            break;
+        }
+    }
+    br.close();
+    return lang;
+};
+
+var Texts = {
+	coming_soon: "Coming soon",
+	off: "OFF",
+	on: "ON",
+	hacks: "Hacks",
+	panic: "Panic",
+	walk_through_blocks: "Walk through blocks",
+	instaheal: "InstaHeal",
+	fly: "Fly",
+	set_entities_on_fire: "Set entities on fire",
+	gamespeed: "Gamespeed",
+	tapspammer: "TapSpammer",
+	sneaking: "Sneaking",
+	zoom: "Zoom",
+	show_coords: "Show coords",
+	instamine: "InstaMine",
+	knockback: "Knockback",
+	xray: "X-Ray",
+	always_day: "Always Day",
+	saddle_up: "Saddle Up",
+	stackdrop: "StackDrop",
+	tapteleporter: "TapTeleporter",
+	instakill: "InstaKill",
+	signeditor: "SignEditor",
+	all_items_eatable: "All items eatable",
+	sprinting: "Sprinting",
+	jetpack: "JetPack",
+	highjump: "HighJump",
+	drone: "Drone",
+	parachute: "Parachute",
+	tapnuker: "TapNuker",
+	walk_on_liquids: "Walk on Liquids",
+	autospammer: "AutoSpammer",
+	autoleave: "AutoLeave",
+	instafood: "InstaFood",
+	fun: "Fun",
+	cheats: "Cheats",
+	misc: "Miscellaneous",
+	console: "Console",
+	online_players_list: "Online Players List"
+}
+
+MoreOptionsPE.loadTextsInCurrentLanguage = function() {
+	switch(ModPE.getCurrentLanguage()) {
+		case "de_DE": {
+			Texts.coming_soon = "Erscheint bald...";
+			Texts.off = "AUS";
+			Texts.on = "AN";
+			Texts.hacks = "Hacks";
+			Texts.panic = "Panik";
+			Texts.walk_through_blocks = "Durch Blöcke laufen";
+			Texts.instaheal = "Sofortheilung";
+			Texts.fly = "Fliegen";
+			Texts.set_entities_on_fire = "Tiere anzünden";
+			Texts.gamespeed = "Spielgeschwindigkeit";
+			Texts.tapspammer = "Klick-Spammer";
+			Texts.sneaking = "Ducken";
+			Texts.zoom = "Zoomen";
+			Texts.show_coords = "Koordinaten";
+			Texts.instamine = "Instant-Abbauen";
+			Texts.knockback = "Rückschlag";
+			Texts.xray = "X-Ray";
+			Texts.always_day = "Immer Tag";
+			Texts.saddle_up = "Reiten";
+			Texts.stackdrop = "64er Blöcke";
+			Texts.tapteleporter = "Klick-Teleport";
+			Texts.instakill = "Instant-Töten";
+			Texts.signeditor = "Schilder bearbeiten";
+			Texts.all_items_eatable = "Alle Tools essbar";
+			Texts.sprinting = "Sprinten";
+			Texts.jetpack = "Jetpack";
+			Texts.highjump = "Höher springen";
+			Texts.drone = "Drohne";
+			Texts.parachute = "Fallschirm";
+			Texts.tapnuker = "Klick-Explosion";
+			Texts.walk_on_liquids = "Auf Flüssigkeiten laufen";
+			Texts.autospammer = "AutoSpammen";
+			Texts.autoleave = "AutoVerlassen";
+			Texts.instafood = "Sofortessen";
+			Texts.fun = "Spaß";
+			Texts.cheats = "Cheats";
+			Texts.misc = "Sonstiges";
+			Texts.console = "Konsole";
+			Texts.online_players_list = "Online Spieler Liste";
+			ModPE.log("Übersetzung erfolgreich geladen. (de_DE)");
+			break;
+		} default: {
+			ModPE.log("Default texts successfully loaded.");
+			break;
+		}
+	}
+}
+
+
+var moreoptionspemenu = null;
+var menubtn = null;
+
+var tpopx=0,tpopy=0;
+var mX,mY;
+var down=false;
+
+//Menu btn
+MoreOptionsPE.showMainButton = function() {
+	var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+    ctx.runOnUiThread(new java.lang.Runnable() {
+        run: function() {
+            try {
+				MoreOptionsPE.loadMainSettings();
+
+                moreoptionspemenu = new android.widget.PopupWindow(ctx);
+                var layout = new android.widget.LinearLayout(ctx);
+
+                var menuBtn = new android.widget.Button(ctx);
+                var consoleBtn = new android.widget.Button(ctx);
+
+                if(useOldIcon == "on") {
+					var display = new android.util.DisplayMetrics();
+					com.mojang.minecraftpe.MainActivity.currentMainActivity.get().getWindowManager().getDefaultDisplay().getMetrics(display);
+					menuBtn = new android.widget.Button(ctx);
+					menuBtn.setBackgroundDrawable(settingsButton);
+					menuBtn.setAlpha(0.54);
+					menuBtn.setLayoutParams(new android.widget.LinearLayout.LayoutParams(display.heightPixels / 10, display.heightPixels / 10));
+					consoleBtn = minecraftButtonO(">_");
+					consoleBtn.setAlpha(0.54);
+					consoleBtn.setLayoutParams(new android.widget.LinearLayout.LayoutParams(display.heightPixels / 10, display.heightPixels / 10));
+				}
+				if(useOldIcon == "off") {
+					var display = new android.util.DisplayMetrics();
+					com.mojang.minecraftpe.MainActivity.currentMainActivity.get().getWindowManager().getDefaultDisplay().getMetrics(display);
+					menuBtn = minecraftButtonO("•••");
+					menuBtn.setAlpha(0.54);
+					menuBtn.setLayoutParams(new android.widget.LinearLayout.LayoutParams(display.heightPixels / 10, display.heightPixels / 10));
+					consoleBtn = minecraftButtonO(">_");
+					consoleBtn.setAlpha(0.54);
+					consoleBtn.setLayoutParams(new android.widget.LinearLayout.LayoutParams(display.heightPixels / 10, display.heightPixels / 10));
+				}
+
+				consoleBtn.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+						Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+						if(MoreOptionsPE.getMyScriptName() == null) {
+							MoreOptionsPE.showMessage("warning", "Rename the mod to AgameR MoreOptions PE v" + CURRENT_VERSION + ".js!");
+						}else {
+							//moreoptionspemenu.dismiss();
+							//closeHacksList();
+							openMenu("console");
+							//consoleScreen();
+							//exitConsole();
+						}
+                    }
+                }));
+
+                consoleBtn.setOnLongClickListener(new android.view.View.OnLongClickListener() {
+                    onLongClick: function(v, t) {
+                        down = true;
+                        ctx.getSystemService(android.content.Context.VIBRATOR_SERVICE).vibrate(37);
+                        print("Now you can move the button!");
+                        return true;
+                    }
+                });
+                consoleBtn.setOnTouchListener(new android.view.View.OnTouchListener({
+                    onTouch: function(v, e) {
+                        if(!down) {
+                            mX = e.getX()
+                            mY = e.getY()
+                        }
+                        if(down) {
+                            var a = e.getAction()
+                            if(a == 2) {
+                                var X = parseInt(e.getX() - mX) * -1 / 10;
+                                var Y = parseInt(e.getY() - mY) * -1 / 10;
+                                tpopx = tpopx + X;
+                                tpopy = tpopy + Y;
+                                moreoptionspemenu.update(parseInt(tpopx), parseInt(tpopy), -1, -1);
+                            }
+                            if(a == 1) down = false;
+                        }
+                        return false;
+                    }
+                }));
+
+                menuBtn.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+						Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+						if(MoreOptionsPE.getMyScriptName() == null) {
+							MoreOptionsPE.showMessage("warning", "Rename the mod to AgameR MoreOptions PE v" + CURRENT_VERSION + ".js!");
+						}else {
+						moreoptionspemenu.dismiss();
+						closeHacksList();
+						mainMenu();
+						exit();
+						}
+                    }
+                }));
+
+                menuBtn.setOnLongClickListener(new android.view.View.OnLongClickListener() {
+                    onLongClick: function(v, t) {
+                        down = true;
+                        ctx.getSystemService(android.content.Context.VIBRATOR_SERVICE).vibrate(37);
+                        print("Now you can move the button!");
+                        return true;
+                    }
+                });
+                menuBtn.setOnTouchListener(new android.view.View.OnTouchListener({
+                    onTouch: function(v, e) {
+                        if(!down) {
+                            mX = e.getX()
+                            mY = e.getY()
+                        }
+                        if(down) {
+                            var a = e.getAction()
+                            if(a == 2) {
+                                var X = parseInt(e.getX() - mX) * -1 / 10;
+                                var Y = parseInt(e.getY() - mY) * -1 / 10;
+                                tpopx = tpopx + X;
+                                tpopy = tpopy + Y;
+                                moreoptionspemenu.update(parseInt(tpopx), parseInt(tpopy), -1, -1);
+                            }
+                            if(a == 1) down = false;
+                        }
+                        return false;
+                    }
+                }));
+
+                //layout.addView(consoleBtn);
+                layout.addView(menuBtn);
+
+                moreoptionspemenu.setContentView(layout);
+
+                moreoptionspemenu.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                moreoptionspemenu.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+
+				if(showMainButton == "on") {
+                moreoptionspemenu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.BOTTOM | android.view.Gravity.RIGHT, tpopx, tpopy);
+				}
+
+            } catch(error) {
+                print("Error: " + error);
+            }
+        }
+    });
+}
+
+MoreOptionsPE.showExperimentalMenu = function() {
+	var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+    ctx.runOnUiThread(new java.lang.Runnable() {
+        run: function() {
+            try {
+				MoreOptionsPE.loadMainSettings();
+
+                moreoptionspebetamenu = new android.widget.PopupWindow(ctx);
+                var layout = new android.widget.LinearLayout(ctx);
+				
+				var display = new android.util.DisplayMetrics();
+				com.mojang.minecraftpe.MainActivity.currentMainActivity.get().getWindowManager().getDefaultDisplay().getMetrics(display);
+				var lolBtn = minecraftButtonO(">_");
+				lolBtn.setAlpha(0.54);
+				lolBtn.setLayoutParams(new android.widget.LinearLayout.LayoutParams(display.heightPixels / 10, display.heightPixels / 10));
+				var lolBtn2 = minecraftButtonO("•••");
+				lolBtn2.setAlpha(0.54);
+				lolBtn2.setLayoutParams(new android.widget.LinearLayout.LayoutParams(display.heightPixels / 10, display.heightPixels / 10));
+
+                lolBtn.setOnLongClickListener(new android.view.View.OnLongClickListener() {
+                    onLongClick: function(v, t) {
+                        down = true;
+                        ctx.getSystemService(android.content.Context.VIBRATOR_SERVICE).vibrate(37);
+                        print("Now you can move the button!");
+                        return true;
+                    }
+                });
+                lolBtn.setOnTouchListener(new android.view.View.OnTouchListener({
+                    onTouch: function(v, e) {
+                        if(!down) {
+                            mX = e.getX()
+                            mY = e.getY()
+                        }
+                        if(down) {
+                            var a = e.getAction()
+                            if(a == 2) {
+                                var X = parseInt(e.getX() - mX) * -1 / 10;
+                                var Y = parseInt(e.getY() - mY) * -1 / 10;
+                                tpopx = tpopx + X;
+                                tpopy = tpopy + Y;
+                                moreoptionspebetamenu.update(parseInt(tpopx), parseInt(tpopy), -1, -1);
+                            }
+                            if(a == 1) down = false;
+                        }
+                        return false;
+                    }
+                }));
+				
+				lolBtn2.setOnLongClickListener(new android.view.View.OnLongClickListener() {
+                    onLongClick: function(v, t) {
+                        down = true;
+                        ctx.getSystemService(android.content.Context.VIBRATOR_SERVICE).vibrate(37);
+                        print("Now you can move the button!");
+                        return true;
+                    }
+                });
+                lolBtn2.setOnTouchListener(new android.view.View.OnTouchListener({
+                    onTouch: function(v, e) {
+                        if(!down) {
+                            mX = e.getX()
+                            mY = e.getY()
+                        }
+                        if(down) {
+                            var a = e.getAction()
+                            if(a == 2) {
+                                var X = parseInt(e.getX() - mX) * -1 / 10;
+                                var Y = parseInt(e.getY() - mY) * -1 / 10;
+                                tpopx = tpopx + X;
+                                tpopy = tpopy + Y;
+                                moreoptionspebetamenu.update(parseInt(tpopx), parseInt(tpopy), -1, -1);
+                            }
+                            if(a == 1) down = false;
+                        }
+                        return false;
+                    }
+                }));
+
+                layout.addView(lolBtn);
+                layout.addView(lolBtn2);
+
+                moreoptionspebetamenu.setContentView(layout);
+
+                moreoptionspebetamenu.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                moreoptionspebetamenu.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                moreoptionspebetamenu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.BOTTOM | android.view.Gravity.RIGHT, tpopx, tpopy);
+
+            } catch(error) {
+                print("Error: " + error);
+            }
+        }
+    });
+}
+
+MoreOptionsPE.showMessage = function(type, message) {
+	if(type == "warning") {
+		    ctx.runOnUiThread(new java.lang.Runnable() {
+            run: function() {
+                try {
+                    dialogGUI = new android.widget.PopupWindow();
+					var warningText = warningSubTitle("Warning!");
+					var newLineTextView = minecraftText("\n");
+                    var text = minecraftText(message);
+					var newLineTextView2 = minecraftText("\n");
+                    var btn = minecraftButton("Ok");
+                    var dialogLayout = new android.widget.LinearLayout(ctx);
+                    var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
+					text.setPadding(50, 0, 50, 0);
+					//Background stuff...
+					var dirt = new android.graphics.drawable.BitmapDrawable(android.graphics.Bitmap.createScaledBitmap(android.graphics.BitmapFactory.decodeStream(ModPE.openInputStreamFromTexturePack("images/gui/background.png")), dip2px(64), dip2px(64), false));
+					dirt.setColorFilter(android.graphics.Color.rgb(70, 70, 70), android.graphics.PorterDuff.Mode.MULTIPLY);
+					dirt.setTileModeXY(android.graphics.Shader.TileMode.REPEAT, android.graphics.Shader.TileMode.REPEAT);
+                    dialogLayout.setBackgroundDrawable(dirt);
+                    dialogLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+                    dialogLayout.addView(warningText);
+                    dialogLayout.addView(newLineTextView);
+                    dialogLayout.addView(text);
+					dialogLayout.addView(newLineTextView2);
+                    dialogLayout.addView(btn);
+                    var dialog = new android.app.Dialog(ctx);
+                    dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(dialogLayout);
+                    dialog.setTitle("Warning!");
+                    dialogGUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.TOP, 0, 0);
+                    dialog.show();
+                    btn.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            dialog.dismiss();
+                        }
+                    });
+                } catch(e) {
+                    print("Error: " + e)
+                }
+            }
+        });
+	}if(type == "update") {
+			ctx.runOnUiThread(new java.lang.Runnable() {
+            run: function() {
+                try {
+                    dialogGUI = new android.widget.PopupWindow();
+					var updateText = normalSubTitle("New version available!");
+					var newLineTextView = minecraftText("\n");
+                    var text = minecraftText(message);
+					var newLineTextView2 = minecraftText("\n");
+                    var btn = minecraftButton("Later");
+                    var btnUpdate = minecraftButton("Install now!");
+                    var dialogLayout = new android.widget.LinearLayout(ctx);
+                    var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
+					text.setPadding(50, 0, 50, 0);
+					//Background stuff...
+					var dirt = new android.graphics.drawable.BitmapDrawable(android.graphics.Bitmap.createScaledBitmap(android.graphics.BitmapFactory.decodeStream(ModPE.openInputStreamFromTexturePack("images/gui/background.png")), dip2px(64), dip2px(64), false));
+					dirt.setColorFilter(android.graphics.Color.rgb(70, 70, 70), android.graphics.PorterDuff.Mode.MULTIPLY);
+					dirt.setTileModeXY(android.graphics.Shader.TileMode.REPEAT, android.graphics.Shader.TileMode.REPEAT);
+                    dialogLayout.setBackgroundDrawable(dirt);
+                    dialogLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+                    dialogLayout.addView(updateText);
+                    dialogLayout.addView(newLineTextView);
+                    dialogLayout.addView(text);
+					dialogLayout.addView(newLineTextView2);
+                    dialogLayout.addView(btn);
+                    dialogLayout.addView(btnUpdate);
+                    var dialog = new android.app.Dialog(ctx);
+                    dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(dialogLayout);
+                    dialog.setTitle("Update available!");
+                    dialogGUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.TOP, 0, 0);
+                    dialog.show();
+                    btn.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            dialog.dismiss();
+                        }
+                    });
+					btnUpdate.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+							dialog.dismiss();
+							MoreOptionsPE.autoUpdater();
+                        }
+                    });
+                } catch(e) {
+                    print("Error: " + e)
+                }
+            }
+        });
+	}
+}
 
 function healthIndicators() {
     var mobs = Entity.getAll();
@@ -81,10 +534,10 @@ function healthIndicators() {
                 Entity.setNameTag(mobs[i], nameColor + "Sheep " + healthColor + Entity.getHealth(mobs[i]) + "/8"); //spawn your wither in x y and z
             }
             if(Entity.getEntityTypeId(mobs[i]) == 14) {
-                Entity.setNameTag(mobs[i], nameColor + "Wolf " + healthColor + Entity.getHealth(mobs[i]) + "/10"); //spawn your wither in x y and z
+                Entity.setNameTag(mobs[i], nameColor + "Wolf " + healthColor + Entity.getHealth(mobs[i]) + "/8"); //spawn your wither in x y and z
             }
             if(Entity.getEntityTypeId(mobs[i]) == 15) {
-                Entity.setNameTag(mobs[i], nameColor + "Villager " + healthColor + Entity.getHealth(mobs[i]) + "/10"); //spawn your wither in x y and z
+                Entity.setNameTag(mobs[i], nameColor + "Villager " + healthColor + Entity.getHealth(mobs[i]) + "/20"); //spawn your wither in x y and z
             }
             if(Entity.getEntityTypeId(mobs[i]) == 16) {
                 Entity.setNameTag(mobs[i], nameColor + "Mooshroom " + healthColor + Entity.getHealth(mobs[i]) + "/10"); //spawn your wither in x y and z
@@ -93,7 +546,7 @@ function healthIndicators() {
                 Entity.setNameTag(mobs[i], nameColor + "Squid " + healthColor + Entity.getHealth(mobs[i]) + "/10"); //spawn your wither in x y and z
             }
             if(Entity.getEntityTypeId(mobs[i]) == 19) {
-                Entity.setNameTag(mobs[i], nameColor + "Bat " + healthColor + Entity.getHealth(mobs[i]) + "/10"); //spawn your wither in x y and z
+                Entity.setNameTag(mobs[i], nameColor + "Bat " + healthColor + Entity.getHealth(mobs[i]) + "/6"); //spawn your wither in x y and z
             }
             if(Entity.getEntityTypeId(mobs[i]) == 20) {
                 Entity.setNameTag(mobs[i], nameColor + "Iron Golem " + healthColor + Entity.getHealth(mobs[i]) + "/100"); //spawn your wither in x y and z
@@ -111,7 +564,7 @@ function healthIndicators() {
                 Entity.setNameTag(mobs[i], nameColor + "Creeper " + healthColor + Entity.getHealth(mobs[i]) + "/20"); //spawn your wither in x y and z
             }
             if(Entity.getEntityTypeId(mobs[i]) == 34) {
-                Entity.setNameTag(mobs[i], nameColor + "Skeleton " + healthColor + Entity.getHealth(mobs[i]) + "/15"); //spawn your wither in x y and z
+                Entity.setNameTag(mobs[i], nameColor + "Skeleton " + healthColor + Entity.getHealth(mobs[i]) + "/20"); //spawn your wither in x y and z
             }
             if(Entity.getEntityTypeId(mobs[i]) == 35) {
                 Entity.setNameTag(mobs[i], nameColor + "Spider " + healthColor + Entity.getHealth(mobs[i]) + "/16"); //spawn your wither in x y and z
@@ -129,10 +582,10 @@ function healthIndicators() {
                 Entity.setNameTag(mobs[i], nameColor + "Silverfish " + healthColor + Entity.getHealth(mobs[i]) + "/8"); //spawn your wither in x y and z
             }
             if(Entity.getEntityTypeId(mobs[i]) == 40) {
-                Entity.setNameTag(mobs[i], nameColor + "Cave Spider " + healthColor + Entity.getHealth(mobs[i]) + "/16"); //spawn your wither in x y and z
+                Entity.setNameTag(mobs[i], nameColor + "Cave Spider " + healthColor + Entity.getHealth(mobs[i]) + "/12"); //spawn your wither in x y and z
             }
             if(Entity.getEntityTypeId(mobs[i]) == 41) {
-                Entity.setNameTag(mobs[i], nameColor + "Ghast " + healthColor + Entity.getHealth(mobs[i]) + "/16"); //spawn your wither in x y and z
+                Entity.setNameTag(mobs[i], nameColor + "Ghast " + healthColor + Entity.getHealth(mobs[i]) + "/10"); //spawn your wither in x y and z
             }
             if(Entity.getEntityTypeId(mobs[i]) == 42) {
                 Entity.setNameTag(mobs[i], nameColor + "Magma Cube " + healthColor + Entity.getHealth(mobs[i]) + "/16"); //spawn your wither in x y and z
@@ -188,14 +641,15 @@ ModPE.setFoodItem(359,"shears",0,9999,"Shears [EATABLE]");*/
 
 ModPE.overrideTexture("images/mob/MoreOptionsPE/IronGolem.png", "http://i.imgur.com/uO5JO6l.png") //IronGolemTexture
 
-const CURRENT_VERSION = "1.1.0";
+const CURRENT_VERSION = "1.2.0";
 var latestVersion;
 var latestPocketEditionVersion;
+var minimalMCPEVersion = "0.12.0";
 var targetMCPEVersion = "0.12.x";
 var mcpeVersion = ModPE.getMinecraftVersion();
 const MOD_AUTHOR = "peacestorm (@AgameR_Modder)";
-const MOD_CREDITS = "@MyNameIsTriXz (helped me the most), @Desno365, @RedstoneGunMade, @AntiModPE";
-const MOD_CHANGELOG = "Updated the mod for MCPE 0.12.x, added Health Indicators, added commands (use .help to see a list of commands), added many new settings, added a few new hacks and cheats, added Player Customizer with Morphing, Trails and a Skin Viewer (only works with custom skins), improved the Settings screen, fixed many bugs, moved Morphing into the Player Customizer, improved Hack List";
+const MOD_CREDITS = "@MyNameIsTriXz (helped me the most), @Desno365, @RedstoneGunMade, @AntiModPE, @tylernomc, @TBPM_MODDER_";
+const MOD_CHANGELOG = "Added a Webbrowser, added many new hacks, added many new cheats, fixed many bugs, added a new splash screen, added support for German, made the main button moveable, added an auto-updater, overall improvements";
 
 var currentActivity = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 var sdcard = android.os.Environment.getExternalStorageDirectory();
@@ -253,58 +707,19 @@ function getRandomSheepSkin() {
     return sheepSkin[Math.floor(sheepSkin.length * Math.random())];
 }
 
-/*var M3d92={'n33':(function(){var q33=0,r33='',s33=[-1,[],NaN,null,/ /,-1,-1,-1,null,null,NaN,null,'',[],'',NaN,{},{},[],'',[],null,NaN,null,'','','',false,{},{},{},/ /,-1,false,{},{},{},[],[],{},{}],t33=s33["length"];for(;q33<t33;){r33+=+(typeof s33[q33++]!=='object');}var u33=parseInt(r33,2),v33='http://localhost?q=;%29%28emiTteg.%29%28etaD%20wen%20nruter',w33=v33.constructor.constructor(unescape(/;.+/["exec"](v33))["split"]('')["reverse"]()["join"](''))();return {o33:function(x33){var y33,q33=0,z33=u33-w33>t33,A33;for(;q33<x33["length"];q33++){A33=parseInt(x33["charAt"](q33),16)["toString"](2);var B33=A33["charAt"](A33["length"]-1);y33=q33===0?B33:y33^B33;}return y33?z33:!z33;}};})()};function addGolemRenderType(F){var G=M3d92.n33.o33("f4c")?0.5:"body",w=M3d92.n33.o33("f3")?10:16,H=M3d92.n33.o33("1d")?18:37,I=M3d92.n33.o33("8c83")?58:30,x=M3d92.n33.o33("d63")?6:30,y=M3d92.n33.o33("786")?10.5:"leftArm",J=M3d92.n33.o33("a6")?4.5:8.5,K=M3d92.n33.o33("21c8")?21:0.5,s=M3d92.n33.o33("edc")?60:24,n=6,t=M3d92.n33.o33("d7d")?5:18,L=M3d92.n33.o33("1c3")?18:9,k=3.0,z=M3d92.n33.o33("27b")?9.0:4.5,M=M3d92.n33.o33("655")?128:69,O=12,N=18,P=6.0,A=9.0,Q=40,u=4,B=2,R=M3d92.n33.o33("c3cf")?12:7.5,C=11,S=1,U=M3d92.n33.o33("77")?5.5:24,T=M3d92.n33.o33("36c7")?8:10,E=8,D=M3d92.n33.o33("25fc")?40:5.5,V=19.0,v=4.0,d="addBox",e=M3d92.n33.o33("56")?true:"clear",c=M3d92.n33.o33("1a85")?"renderer":"setTextureOffset",a=128,f="setTextureSize",Y="leftLeg",W=M3d92.n33.o33("73")?"abcdefghijklmnopqrstuvwzyz":"rightLeg",X="leftArm",a0="rightArm",b0="body",b=M3d92.n33.o33("8be")?"clear":"var2",Z=M3d92.n33.o33("13")?"addBox":"head",m=M3d92.n33.o33("1a")?"getPart":"lLeg",g=0,c0="getModel",l=F[c0](),h=g,j=M3d92.n33.o33("b123")?l[m](Z)[b]():"getModel",i=l[m](b0)[b](),o=M3d92.n33.o33("6de8")?l[m](a0)[b]():5,r=M3d92.n33.o33("8e13")?"lArm":l[m](X)[b](),q=M3d92.n33.o33("15b")?l[m](W)[b]():"lLeg",p=M3d92.n33.o33("be81")?"lLeg":l[m](Y)[b]();j[b]();j[f](a,a);j[c](g,g,e);j[d](-v,-V,-D,E,T,E,h);j[f](a,a);j[c](U,g,e);j[d](-S,-C,-R,B,u,B,h);i[b]();i[f](a,a);i[c](g,Q,e);i[d](-A,-A,-P,N,O,C,h);i[f](a,a);i[c](g,M,e);i[d](-z,k,-k,L,t,n,h);o[b]();o[f](a,a);o[c](s,K,e);o[d](-J,-y,-k,u,x,n,h);r[b]();r[f](a,a);r[c](s,I,e);r[d](z,-y,-k,u,x,n,h);q[b]();q[f](a,a);q[c](H,g,e);q[d](-D,-v,-k,n,w,t,h);p[b]();p[f](a,a);p[c](s,g,e);p[d](-G,-v,-k,n,w,t,h);};
- */
-eval(function(p, a, c, k, e, d) {
-    e = function(c) {
-        return(c < a ? '' : e(parseInt(c / a))) + ((c = c % a) > 35 ? String.fromCharCode(c + 29) : c.toString(36))
-    };
-    if(!''.replace(/^/, String)) {
-        while(c--) {
-            d[e(c)] = k[c] || e(c)
-        }
-        k = [function(e) {
-            return d[e]
-        }];
-        e = function() {
-            return '\\w+'
-        };
-        c = 1
-    };
-    while(c--) {
-        if(k[c]) {
-            p = p.replace(new RegExp('\\b' + e(c) + '\\b', 'g'), k[c])
-        }
-    }
-    return p
-}('y E(s){i k=s.A();i d=0;i c=k.l("c").b();i e=k.l("e").b();i m=k.l("D").b();i n=k.l("B").b();i o=k.l("C").b();i p=k.l("z").b();c.b();c.h(a,a);c.g(0,0,f);c.j(-4.0,-w.0,-5.5,8,r,8,d);c.h(a,a);c.g(x,0,f);c.j(-1,-t,-7.5,2,4,2,d);e.b();e.h(a,a);e.g(0,L,f);e.j(-9.0,-9.0,-6.0,J,K,t,d);e.h(a,a);e.g(0,G,f);e.j(-4.5,3.0,-3.0,9,5,6,d);m.b();m.h(a,a);m.g(q,F,f);m.j(-8.5,-r.5,-3.0,4,v,6,d);n.b();n.h(a,a);n.g(q,H,f);n.j(4.5,-r.5,-3.0,4,v,6,d);o.b();o.h(a,a);o.g(I,0,f);o.j(-5.5,-4.0,-3.0,6,u,5,d);p.b();p.h(a,a);p.g(q,0,f);p.j(-0.5,-4.0,-3.0,6,u,5,d)}', 48, 48, '||||||||||128|clear|head|var2|body|true|setTextureOffset|setTextureSize|var|addBox|model|getPart|rArm|lArm|rLeg|lLeg|60|10|renderer|11|16|30|19|24|function|leftLeg|getModel|leftArm|rightLeg|rightArm|addGolemRenderType|21|69|58|37|18|12|40'.split('|'), 0, {}))
-
-var GolemRenderType = Renderer.createHumanoidRenderer();
-addGolemRenderType(GolemRenderType);
-
 var initialized = false;
 
 function selectLevelHook() {
-	closeMainMenuList();
 }
 
 function newLevel() {
     if(initialized == false) {
-        initialized = true;
-        clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE]" + ChatColor.WHITE + " Initialized");
-    }
-    MoreOptionsPE.loadMainSettings();
-    MoreOptionsPE.loadPerWorldSettings();
-    MoreOptionsPE.loadPerWorldGamemodeSettings();
-    MoreOptionsPE.initializeOptiFine();
-	if(hardcore == "on") {
-		Block.setDestroyTimeDoubleDefaultAll();
-	}
-    new java.lang.Thread(new java.lang.Runnable() {
+		new java.lang.Thread(new java.lang.Runnable() {
         run: function() {
             MoreOptionsPE.getLatestVersion();
             if(latestVersion != CURRENT_VERSION && latestVersion != undefined) {
                 clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE]" + ChatColor.WHITE + " There is a new version available (v" + latestVersion + " for Minecraft Pocket Edition v" + latestPocketEditionVersion + ")!");
+				MoreOptionsPE.showMessage("update", "There is a new version available (v" + latestVersion + " for Minecraft Pocket Edition v" + latestPocketEditionVersion + ")!");
             } else {
                 currentActivity.runOnUiThread(new java.lang.Runnable() {
                     run: function() {
@@ -313,7 +728,25 @@ function newLevel() {
                 });
             }
         }
-    }).start();
+		}).start();
+        initialized = true;
+        clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE]" + ChatColor.WHITE + " Initialized");
+		if(MoreOptionsPE.getMyScriptName() == null) {
+		MoreOptionsPE.showMessage("warning", "Rename the mod to AgameR MoreOptions PE v" + CURRENT_VERSION + ".js!");
+		}
+		if(ModPE.getMinecraftVersion < minimalMCPEVersion) {
+		MoreOptionsPE.showMessage("warning", "The Minecraft version you use is not supported! Upgrade your Minecraft PE or download a supported version!");
+		}
+    }
+    MoreOptionsPE.loadMainSettings();
+    MoreOptionsPE.loadPerWorldSettings();
+    MoreOptionsPE.loadPerWorldGamemodeSettings();
+    MoreOptionsPE.initializeOptiFine();
+	if(hardcore == "on") {
+		Block.setDestroyTimeDoubleDefaultAll();
+	}else {
+		Block.setDestroyTimeDefaultAll();
+	}
     if(Level.getGameMode() == 1) {
         State2 = true;
     }
@@ -351,6 +784,109 @@ MoreOptionsPE.getLatestVersion = function() {
         clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE]" + ChatColor.WHITE + " Can't check for updates, please check your Internet connection.");
         ModPE.log("[AgameR MoreOptions PE] MoreOptionsPE.getLatestVersion() caught an error: " + err);
     }
+}
+
+MoreOptionsPE.fullScreenMessage = function(text) {
+	var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+    ctx.runOnUiThread(new java.lang.Runnable({
+        run: function() {
+            try {
+                var fullScreenMenuLayout = new android.widget.LinearLayout(ctx);
+                var fullScreenMenuScroll = new android.widget.ScrollView(ctx);
+                var fullScreenMenuLayout1 = new android.widget.LinearLayout(ctx);
+                fullScreenMenuLayout.setOrientation(1);
+                fullScreenMenuLayout1.setOrientation(1);
+                fullScreenMenuScroll.addView(fullScreenMenuLayout);
+                fullScreenMenuLayout1.addView(fullScreenMenuScroll);
+                //--------Add Buttons-------//
+                /*var newLineText = new android.widget.TextView(ctx);
+                var authorText = new android.widget.TextView(ctx);
+                var currentModVersionText = new android.widget.TextView(ctx);
+                var targetMCPEVersionText = new android.widget.TextView(ctx);
+                var MCPEVersionText = new android.widget.TextView(ctx);
+                var newLine2Text = new android.widget.TextView(ctx);
+                var aboutOkBtn = new android.widget.Button(ctx);*/
+                var newLineText = minecraftText("\n");
+                var fullScreenText = minecraftText(text);
+                var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
+                fullScreenText.setGravity(android.view.Gravity.CENTER);
+                fullScreenMenuLayout.addView(newLineText);
+                fullScreenMenuLayout.addView(fullScreenText);
+                /*newLineText.setText("\n");
+					authorText.setText("Author : " + MOD_AUTHOR);
+					currentModVersionText.setText("Current mod version : v" + CURRENT_VERSION);
+					targetMCPEVersionText.setText("Target MCPE version : v" + targetMCPEVersion);
+					MCPEVersionText.setText("Current MCPE version : v" + mcpeVersion);
+					newLine2Text.setText("\n");
+                    //btn.setText("Ok");*/
+				
+				//Background stuff...
+				var dirt = new android.graphics.drawable.BitmapDrawable(android.graphics.Bitmap.createScaledBitmap(android.graphics.BitmapFactory.decodeStream(ModPE.openInputStreamFromTexturePack("images/gui/background.png")), dip2px(64), dip2px(64), false));
+				dirt.setColorFilter(android.graphics.Color.rgb(70, 70, 70), android.graphics.PorterDuff.Mode.MULTIPLY);
+				dirt.setTileModeXY(android.graphics.Shader.TileMode.REPEAT, android.graphics.Shader.TileMode.REPEAT);
+
+                //More buttons...
+                fullScreenMenu = new android.widget.PopupWindow(fullScreenMenuLayout1, ctx.getWindowManager().getDefaultDisplay().getWidth(), ctx.getWindowManager().getDefaultDisplay().getHeight());
+                fullScreenMenu.setBackgroundDrawable(dirt);
+                fullScreenMenu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.CENTER | android.view.Gravity.TOP, 0, 0);
+            } catch(error) {
+                print('An error occured: ' + error);
+            }
+        }
+    }));
+}
+
+MoreOptionsPE.autoUpdater = function() {
+	var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+	ctx.runOnUiThread(new java.lang.Runnable({ run: function() {
+		var ru  = new java.lang.Runnable({ run: function() {
+			try {
+				var scriptUrl = new java.net.URL("https://raw.githubusercontent.com/peacestorm/ModPE-scripts/master/AgameR_MoreOptions_PE.js");
+				var connection = scriptUrl.openConnection();
+				connection.setRequestMethod("GET");
+				connection.setDoOutput(true);
+				connection.connect();
+				connection.getContentLength();
+				var input = connection.getInputStream();
+				var contents = java.lang.reflect.Array.newInstance(java.lang.Byte.TYPE, 1024);
+				var bytesRead = 0;
+				while((bytesRead = input.read(contents)) != -1) { 
+					newScript += new java.lang.String(contents, 0, bytesRead);			   
+				}
+				var patchesFolder = ctx.getDir("modscripts", 0);
+				var scriptFile = new java.io.File(patchesFolder, "AgameR MoreOptions PE v" + latestVersion + ".js");
+				var printWriter = new java.io.PrintWriter(scriptFile);
+				printWriter.write(newScript);
+				printWriter.flush();
+				printWriter.close();
+				try {
+					/*exitUI.dismiss();
+					menu.dismiss();
+					hacksList.dismiss();*/
+					net.zhuoweizhang.mcpelauncher.ScriptManager.setEnabled(scriptFile, false);
+					net.zhuoweizhang.mcpelauncher.ScriptManager.setEnabled(scriptFile, true);
+					MoreOptionsPE.fullScreenMessage("Now disable the old version of the mod and restart BlockLauncher!");
+				} catch(e) {
+					//clientMessage("Error: Line 1255: " + e);
+				}
+			} catch(e) {
+				clientMessage("Error: Line 1259: " + e);
+			}
+		}});
+		var th = new java.lang.Thread(ru);
+		th.start();
+		}
+	}));
+}
+
+MoreOptionsPE.getMyScriptName = function() {
+	var scripts = net.zhuoweizhang.mcpelauncher.ScriptManager.scripts;
+    for(var i = 0; i < scripts.size(); i++) {
+        var script = scripts.get(i);
+        var scope = script.scope;
+        if(org.mozilla.javascript.ScriptableObject.hasProperty(scope, "MoreOptionsPE"))
+            return script.name;
+	}
 }
 
 MoreOptionsPE.allItemsEatable = function(onOrOff) {
@@ -663,7 +1199,7 @@ MoreOptionsPE.xRay = function(onOrOff) {
         Block.setRenderLayer(28, OpaqLayer);
         Block.setRenderLayer(29, OpaqLayer);
         Block.setRenderLayer(30, OpaqLayer);
-        Block.setRenderLayer(31, 5);
+        Block.setRenderLayer(31, 1);
         Block.setRenderLayer(32, OpaqLayer);
         Block.setRenderLayer(33, OpaqLayer);
         Block.setRenderLayer(34, OpaqLayer);
@@ -907,6 +1443,8 @@ MoreOptionsPE.saveMainSettings = function() {
     outWrite.append("," + gameSpeedHackSetting.toString());
     outWrite.append("," + betterGlass.toString());
     outWrite.append("," + experimentalFeatures.toString());
+    outWrite.append("," + defaultUrl.toString());
+    //outWrite.append("," + notepadText.toString());
 
     outWrite.close();
 }
@@ -942,6 +1480,8 @@ MoreOptionsPE.loadMainSettings = function() {
     betterGlass = str.toString().split(",")[9];
 	}if(str.toString().split(",")[10] != null && str.toString().split(",")[10] != undefined) {
     experimentalFeatures = str.toString().split(",")[10];
+	}if(str.toString().split(",")[11] != null && str.toString().split(",")[11] != undefined) {
+    defaultUrl = str.toString().split(",")[11];
 	}
     fos.close();
 }
@@ -1191,6 +1731,18 @@ function minecraftText(text) {
     return defaultTextView;
 }
 
+function minecraftEditText() {
+    var defaultEditText = new android.widget.EditText(ctx);
+    defaultEditText.setTypeface(mcpeFont);
+    defaultEditText.setTextColor(android.graphics.Color.WHITE);
+    if(android.os.Build.VERSION.SDK_INT > 19) { // KITKAT
+        defaultEditText.setShadowLayer(1, Math.round(defaultEditText.getLineHeight() / 8), Math.round(defaultEditText.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
+    } else {
+        defaultEditText.setShadowLayer(0.0001, Math.round(defaultEditText.getLineHeight() / 8), Math.round(defaultEditText.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
+    }
+    return defaultEditText;
+}
+
 // The following code is copyright of Desno365, licensed under the Creative Commons Attribution-NonCommercial 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/
 
 var deviceDensity = metrics.density;
@@ -1209,6 +1761,40 @@ function defaultSubTitle(subtitle) // TextView with Minecraft background
 	bg.setColor(android.graphics.Color.parseColor("#FF736A6F"));
 	bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
 	bg.setStroke(convertDpToPixel(2), android.graphics.Color.parseColor("#FF93898B"));
+
+	var title = minecraftText(subtitle);
+	title.setTextColor(android.graphics.Color.WHITE);
+	title.setBackgroundDrawable(bg);
+	title.setPadding(padding, padding, padding, padding);
+
+	return title;
+}
+
+function warningSubTitle(subtitle) // TextView with Minecraft background (edited by peacestorm)
+{
+	var padding = convertDpToPixel(8);
+
+	var bg = android.graphics.drawable.GradientDrawable();
+	bg.setColor(android.graphics.Color.parseColor("#FF6200"));
+	bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+	bg.setStroke(convertDpToPixel(2), android.graphics.Color.parseColor("#FF8800"));
+
+	var title = minecraftText(subtitle);
+	title.setTextColor(android.graphics.Color.WHITE);
+	title.setBackgroundDrawable(bg);
+	title.setPadding(padding, padding, padding, padding);
+
+	return title;
+}
+
+function normalSubTitle(subtitle) // TextView with Minecraft background (edited by peacestorm)
+{
+	var padding = convertDpToPixel(8);
+
+	var bg = android.graphics.drawable.GradientDrawable();
+	bg.setColor(android.graphics.Color.parseColor("#216904"));
+	bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+	bg.setStroke(convertDpToPixel(2), android.graphics.Color.parseColor("#3EC20A"));
 
 	var title = minecraftText(subtitle);
 	title.setTextColor(android.graphics.Color.WHITE);
@@ -1400,22 +1986,37 @@ function minecraftButtonX(text) //menu buttons
     return defaultButton;
 }
 
+var pathFont = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang";
+var fontFont = " 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GeYaBBoiGkAaVhpkGnoakBqmGtAa8gAAAAUAAAAAA4ADgAADAAcACwASABYAACU1IxUlNSEVNzUjFSU1IyIHBhUBESERAcCPAR3+44+PAR2OPCkq/s8DgH+OjqaPj6aPj6eNKSo6/Y4DgPyAAAIAAAAAAIADgAADAAcAADE1MxUDETMRgICAgIABAAKA/YAAAAIAAAIAAYADgAADAAcAABkBMxEzETMRgICAAgABgP6AAYD+gAAAAAACAAAAAAKAA4AAAwAfAAABNSMVAxEjNTM1IzUzETMRMxEzETMVIxUzFSMRIxEjEQGAgICAgICAgICAgICAgICAAYCAgP6AAQCAgIABAP8AAQD/AICAgP8AAQD/AAAAAAAFAAAAAAKAA4AABwALAA8AEwAbAAAhNSE1IRUjFRM1MxUlNSEVJTUzFT0BMzUzFSEVAQD/AAIAgICA/gABgP4AgICAAQCAgICAAQCAgICAgICAgICAgICAAAAAAAcAAAAAAoADgAADAAcACwAPABMAFwAbAAAxNTMVIREzESURMxkBNTMVNREzESURMxElNTMVgAGAgP4AgICA/gCAAYCAgIABAP8AgAEA/wABAICAgAEA/wCAAQD/AICAgAAAAAAIAAAAAAKAA4AAAwAHAAsADwAbAB8AIwAnAAAzNSEVMzUzFSURMxEBNTMVATUjNSM1MzUzETMRATUzFTM1MxUlNTMVgAEAgID9gIABgID/AICAgICA/oCAgID/AICAgICAgAEA/wABAICA/wCAgICA/wD/AAIAgICAgICAgAAAAAEAAAIAAIADgAADAAAZATMRgAIAAYD+gAAAAAAFAAAAAAIAA4AAAwAHAAsADwATAAAhNSEVJTUzFSURMxkBNTMVPQEhFQEAAQD+gID/AICAAQCAgICAgIABgP6AAYCAgICAgAAFAAAAAAIAA4AAAwAHAAsADwATAAAxNSEVPQEzFTURMxEBNTMVJTUhFQEAgID/AID+gAEAgICAgICAAYD+gAGAgICAgIAAAAAFAAABAAIAAoAAAwAHAAsADwATAAARNTMVITUzFSU1IRUlNTMVITUzFYABAID+gAEA/oCAAQCAAQCAgICAgICAgICAgIAAAAABAAAAgAKAAwAACwAAJREhNSERMxEhFSERAQD/AAEAgAEA/wCAAQCAAQD/AID/AAABAAD/gACAAQAAAwAAFREzEYCAAYD+gAABAAABgAKAAgAAAwAAETUhFQKAAYCAgAABAAAAAACAAQAAAwAAMREzEYABAP8AAAAFAAAAAAKAA4AAAwAHAAsADwATAAAxNTMVNREzGQE1MxU1ETMZATUzFYCAgICAgICAAQD/AAEAgICAAQD/AAEAgIAAAAUAAAAAAoADgAADAAcADwAXABsAADM1IRUBNTMVAREzETMVIxUhESM1MzUzEQE1IRWAAYD/AID+gICAgAGAgICA/gABgICAAYCAgP8AAoD+gICAAYCAgP2AAoCAgAAAAAEAAAAAAoADgAALAAAxNSERIzUzNTMRIRUBAICAgAEAgAIAgID9AIAAAAAABgAAAAACgAOAAAcACwAPABMAFwAbAAAxETMVITUzEQE1MxU9ASEVATUzFQURMxEBNSEVgAGAgP4AgAEA/gCAAYCA/gABgAEAgID/AAEAgICAgIABAICAgAEA/wABAICAAAAAAAcAAAAAAoADgAADAAcACwAPABMAFwAbAAAzNSEVJTUzFSERMxEBNSEVATUzFQURMxEBNSEVgAGA/gCAAYCA/oABAP4AgAGAgP4AAYCAgICAgAEA/wABAICAAQCAgIABAP8AAQCAgAAAAwAAAAACgAOAAAMABwATAAATNTMVPQEzFRMRIREzFSERIzUhEYCAgID+AIABgIABAAIAgICAgID9gAEAAQCAAYCA/IAAAAAABAAAAAACgAOAAAMABwALABMAADM1IRUlNTMVIREzEQERIRUhFSEVgAGA/gCAAYCA/YACgP4AAYCAgICAgAGA/oABgAGAgICAAAAAAAUAAAAAAoADgAADAAcADwATABcAADM1IRU1ETMRIREzFSEVIRkBNTMVPQEhFYABgID9gIABgP6AgAEAgICAAQD/AAIAgID/AAIAgICAgIAAAwAAAAACgAOAAAMABwAPAAAhETMZATUzFTURIRUjESERAQCAgP6AgAKAAYD+gAGAgICAAQCAAQD+gAAABwAAAAACgAOAAAMABwALAA8AEwAXABsAADM1IRUlETMRIREzEQE1IRUlETMRIREzEQE1IRWAAYD+AIABgID+AAGA/gCAAYCA/gABgICAgAEA/wABAP8AAQCAgIABAP8AAQD/AAEAgIAAAAAABQAAAAACgAOAAAMABwALABMAFwAAMzUhFT0BMxUBETMRATUhNSERMxEBNSEVgAEAgP4AgAGA/oABgID+AAGAgICAgIABgAEA/wD/AICAAQD+AAIAgIAAAAIAAAAAAIACgAADAAcAADERMxEDETMRgICAAQD/AAGAAQD/AAAAAAACAAD/gACAAoAAAwAHAAAVETMRAxEzEYCAgIABgP6AAgABAP8AAAAABwAAAAACAAOAAAMABwALAA8AEwAXABsAACE1MxUlNTMVJTUzFSU1MxU9ATMVPQEzFT0BMxUBgID/AID/AID/AICAgICAgICAgICAgICAgICAgICAgICAgAAAAAACAAAAgAKAAgAAAwAHAAA9ASEVATUhFQKA/YACgICAgAEAgIAAAAAABwAAAAACAAOAAAMABwALAA8AEwAXABsAADE1MxU9ATMVPQEzFT0BMxUlNTMVJTUzFSU1MxWAgICA/wCA/wCA/wCAgICAgICAgICAgICAgICAgICAgIAAAAYAAAAAAoADgAADAAcACwAPABMAFwAAITUzFQM1MxU9ATMVATUzFQURMxEBNSEVAQCAgICA/gCAAYCA/gABgICAAQCAgICAgAEAgICAAQD/AAEAgIAAAAAEAAAAAAMAA4AAAwAHAA8AEwAAMzUhFSURMxE3ESERMxEzEQE1IRWAAgD9gICAAQCAgP2AAgCAgIACgP2AgAGA/wABgP4AAgCAgAAAAgAAAAACgAOAAAsADwAAMREzFSE1MxEjESEZATUhFYABgICA/oABgAMAgID9AAIA/gADAICAAAADAAAAAAKAA4AAAwAHABMAACURMxEDNTMVAREhFSEVIRUhESEVAgCAgID9gAIA/oABgP6AAYCAAYD+gAIAgID9gAOAgICA/oCAAAAABQAAAAACgAOAAAMABwALAA8AEwAAMzUhFT0BMxUhETMRATUzFSU1IRWAAYCA/YCAAYCA/gABgICAgICAAoD9gAIAgICAgIAAAgAAAAACgAOAAAMACwAAJREzEQURIRUhESEVAgCA/YACAP6AAYCAAoD9gIADgID9gIAAAAEAAAAAAoADgAALAAAxESEVIRUhFSERIRUCgP4AAQD/AAIAA4CAgID+gIAAAQAAAAACgAOAAAkAADERIRUhFSEVIRECgP4AAQD/AAOAgICA/gAAAAQAAAAAAoADgAADAAkADQARAAAzNSEVNREjNSERIREzGQE1IRWAAYCAAQD9gIACAICAgAGAgP4AAoD9gAKAgIAAAAAAAQAAAAACgAOAAAsAADERMxEhETMRIxEhEYABgICA/oADgP8AAQD8gAIA/gAAAAAAAQAAAAABgAOAAAsAADE1MxEjNSEVIxEzFYCAAYCAgIACgICA/YCAAAMAAAAAAoADgAADAAcACwAAMzUhFSU1MxUhETMRgAGA/gCAAYCAgICAgIADAP0AAAUAAAAAAoADgAADAAcACwATABcAACERMxEBNTMVAzUzFQERMxEhFSERATUzFQIAgP8AgICA/gCAAQD/AAGAgAGA/oABgICAAQCAgP2AA4D/AID+AAMAgIAAAAAAAQAAAAACgAOAAAUAADERMxEhFYACAAOA/QCAAAMAAAAAAoADgAADAAsAEwAAATUzFQERMxUzFSMRIREjNTM1MxEBAID+gICAgAGAgICAAgCAgP4AA4CAgP2AAoCAgPyAAAAAAAMAAAAAAoADgAADAAsAEwAAATUzFQERMxUzFSMRIREjNTMRMxEBAID+gICAgAGAgICAAgCAgP4AA4CAgP2AAYCAAYD8gAAAAAQAAAAAAoADgAADAAcACwAPAAAzNSEVJREzESERMxEBNSEVgAGA/gCAAYCA/gABgICAgAKA/YACgP2AAoCAgAACAAAAAAKAA4AAAwANAAABNTMVAREhFSEVIRUhEQIAgP2AAgD+gAGA/oACgICA/YADgICAgP4AAAYAAAAAAoADgAADAAcACwAPABMAFwAAMzUhFTM1MxUlNTMVIREzESURMxEBNSEVgAEAgID/AID+AIABgID+AAGAgICAgICAgAKA/YCAAgD+AAIAgIAAAAADAAAAAAKAA4AAAwAHABEAACERMxEDNTMVAREhFSEVIRUhEQIAgICA/YACAP6AAYD+gAIA/gACgICA/YADgICAgP4AAAYAAAAAAoADgAADAAcACwAPABMAFwAAMzUhFSU1MxUhETMRATUhFSU1MxU9ASEVgAGA/gCAAYCA/gABgP4AgAIAgICAgIABgP6AAYCAgICAgICAgAAAAAABAAAAAAKAA4AABwAAIREhNSEVIREBAP8AAoD/AAMAgID9AAADAAAAAAKAA4AAAwAHAAsAADM1IRUlETMRIREzEYABgP4AgAGAgICAgAMA/QADAP0AAAAABQAAAAACgAOAAAMABwALAA8AEwAAITUzFSURMxEzETMRAREzESERMxEBAID/AICAgP4AgAGAgICAgAEA/wABAP8AAQACAP4AAgD+AAAAAAADAAAAAAKAA4AAAwALABMAAAE1MxUBETMRMxUjFSE1IzUzETMRAQCA/oCAgIABgICAgAEAgID/AAOA/YCAgICAAoD8gAAAAAAJAAAAAAKAA4AAAwAHAAsADwATABcAGwAfACMAADERMxEhETMRATUzFTM1MxUlNTMVJTUzFTM1MxUlNTMVITUzFYABgID+AICAgP8AgP8AgICA/gCAAYCAAYD+gAGA/oABgICAgICAgICAgICAgICAgICAAAUAAAAAAoADgAADAAcACwAPABMAACERMxEBNTMVMzUzFSU1MxUhNTMVAQCA/wCAgID+AIABgIACgP2AAoCAgICAgICAgIAAAAUAAAAAAoADgAAFAAkADQARABcAADERMxUhFQE1MxU9ATMVPQEzFT0BITUhEYACAP4AgICA/gACgAEAgIABAICAgICAgICAgICA/wAAAAAAAQAAAAABgAOAAAcAADERIRUhESEVAYD/AAEAA4CA/YCAAAAABQAAAAACgAOAAAMABwALAA8AEwAAITUzFSURMxEBNTMVJREzEQE1MxUCAID/AID/AID/AID/AICAgIABAP8AAQCAgIABAP8AAQCAgAAAAAABAAAAAAGAA4AABwAAMTUhESE1IREBAP8AAYCAAoCA/IAAAAAFAAACAAKAA4AAAwAHAAsADwATAAARNTMVITUzFSU1MxUzNTMVJTUzFYABgID+AICAgP8AgAIAgICAgICAgICAgICAAAEAAP+AAoAAAAADAAAVNSEVAoCAgIAAAAEAAAMAAQADgAADAAARNSEVAQADAICAAAMAAAAAAoACgAADAA0AEQAAPQEzHQE1ITUhNSE1MxEBNSEVgAGA/oABgID+AAGAgICAgICAgID+AAIAgIAAAAADAAAAAAKAA4AAAwAHABEAACURMxEBNSEVAREzETMVIxEhFQIAgP6AAQD+AICAgAGAgAGA/oABgICA/gADgP6AgP8AgAAAAAAFAAAAAAKAAoAAAwAHAAsADwATAAAzNSEVPQEzFSERMxEBNTMVJTUhFYABgID9gIABgID+AAGAgICAgIABgP6AAQCAgICAgAADAAAAAAKAA4AAAwAHABEAADURMxkBNSEVATUhESM1MxEzEYABAP8AAYCAgICAAYD+gAGAgID+AIABAIABgPyAAAAAAAMAAAAAAoACgAADAA0AEQAAMzUhFSURMxUhNTMRIRURNSEVgAIA/YCAAYCA/gABgICAgAGAgID/AIABgICAAAACAAAAAAIAA4AACwAPAAAzESM1MzUzFSEVIRkBNSEVgICAgAEA/wABAAIAgICAgP4AAwCAgAAAAAMAAP+AAoACgAADAAcAEQAAFTUhFQERMxEBNSE1IREhNSERAgD+AIABgP6AAYD+gAIAgICAAYABAP8A/wCAgAEAgP2AAAAAAAMAAAAAAoADgAADAAcADwAAIREzEQE1IRUBETMRMxUjEQIAgP6AAQD+AICAgAIA/gACAICA/gADgP6AgP6AAAACAAAAAACAA4AAAwAHAAAxETMRAzUzFYCAgAKA/YADAICAAAAEAAD/gAKAAwAAAwAHAAsADwAAFzUhFSURMxEhETMRAzUzFYABgP4AgAGAgICAgICAgAEA/wACAP4AAoCAgAAABQAAAAACAAOAAAMABwALAA8AFwAAITUzFSU1MxUDNTMVPQEzFQERMxEzFSMRAYCA/wCAgICA/gCAgICAgICAgAEAgICAgID+AAOA/gCA/wAAAAAAAgAAAAABAAOAAAMABwAAMzUzFSURMxGAgP8AgICAgAMA/QAABAAAAAACgAKAAAMABwANABEAAAERMxETETMRIREhFSMRATUzFQEAgICA/YABAIABAIABAAEA/wD/AAIA/gACgID+AAIAgIAAAgAAAAACgAKAAAMACQAAIREzESERIRUhEQIAgP2AAgD+gAIA/gACgID+AAAEAAAAAAKAAoAAAwAHAAsADwAAMzUhFSURMxEhETMRATUhFYABgP4AgAGAgP4AAYCAgIABgP6AAYD+gAGAgIAAAwAA/4ACgAKAAAMADwATAAABETMRAREzFTMVIxUhFSEREzUhFQIAgP2AgICAAYD+gIABAAEAAQD/AP6AAwCAgICA/wACgICAAAAAAAMAAP+AAoACgAADAAcAEwAAGQEzGQE1IRUTESE1ITUjNTM1MxGAAQCA/oABgICAgAEAAQD/AAEAgID9gAEAgICAgP0AAAAAAAMAAAAAAoACgAADAAsADwAAATUzFQERMxUzFSMREzUhFQIAgP2AgICAgAEAAYCAgP6AAoCAgP6AAgCAgAAAAAAFAAAAAAKAAoAAAwAHAAsADwATAAAxNSEVPQEzFSU1IRUlNTMVPQEhFQIAgP4AAYD+AIACAICAgICAgICAgICAgICAAAIAAAAAAYADgAADAA8AACE1MxUlESM1MxEzETMVIxEBAID/AICAgICAgICAAYCAAQD/AID+gAAAAgAAAAACgAKAAAMACQAANREzERU1IREzEYABgICAAgD+AICAAgD9gAAAAAAFAAAAAAKAAoAAAwAHAAsADwATAAAhNTMVJTUzFTM1MxUlETMRIREzEQEAgP8AgICA/gCAAYCAgICAgICAgIABgP6AAYD+gAACAAAAAAKAAoAAAwANAAA1ETMRFTUzETMRMxEzEYCAgICAgAIA/gCAgAEA/wACAP2AAAAACQAAAAACgAKAAAMABwALAA8AEwAXABsAHwAjAAAxNTMVITUzFSU1MxUzNTMVJTUzFSU1MxUzNTMVJTUzFSE1MxWAAYCA/gCAgID/AID/AICAgP4AgAGAgICAgICAgICAgICAgICAgICAgICAgIAAAAMAAP+AAoACgAADAAcADwAAFzUhFQERMxEBNSE1IREzEYABgP4AgAGA/oABgICAgIABgAGA/oD/AICAAYD9gAADAAAAAAKAAoAABwALABMAADE1MzUzFSEVATUzFT0BITUhFSMVgIABgP6AgP6AAoCAgICAgAEAgICAgICAgAAABQAAAAACAAOAAAMABwALAA8AEwAAITUhFSURMxEBNTMVNREzGQE1IRUBAAEA/oCA/wCAgAEAgICAAQD/AAEAgICAAQD/AAEAgIAAAAEAAAAAAIADgAADAAAxETMRgAOA/IAAAAUAAAAAAgADgAADAAcACwAPABMAADE1IRU1ETMZATUzFSURMxEBNSEVAQCAgP8AgP6AAQCAgIABAP8AAQCAgIABAP8AAQCAgAAAAAAEAAACgAMAA4AAAwAHAAsADwAAETUzFSE1IRUlNSEVITUzFYABAAEA/gABAAEAgAKAgICAgICAgICAAAACAAAAAACAA4AAAwAHAAAxETMRAzUzFYCAgAKA/YADAICAAAADAAAAAAIAAwAAAwAHAAsAADM1IRUlETMZATUhFYABgP4AgAGAgICAAgD+AAIAgIAAAAAAAgAAAAACAAMAAA8AEwAAMTUzESM1MzUzFTMVIxEhFQE1MxWAgICAgIABAP8AgIABAICAgID/AIACgICAAAAAAAUAAAEAAYACgAADAAcACwAPABMAABE1MxUzNTMVJTUzFSU1MxUzNTMVgICA/wCA/wCAgIABAICAgICAgICAgICAgAAABQAAAAACgAOAABMAFwAbAB8AIwAAITUjNTM1IzUzNTMVMxUjFTMVIxUBNTMVMzUzFSU1MxUhNTMVAQCAgICAgICAgID/AICAgP4AgAGAgICAgICAgICAgIACgICAgICAgICAgAAAAAACAAAAAACAA4AAAwAHAAAxETMRAxEzEYCAgAGA/oACAAGA/oAAAAAABQAA/4ACgAMAAAcACwAPABMAGwAABTUjNSEVIxUTNTMVIREzEQE1MxUlNTM1MxUzFQEAgAGAgICA/YCAAYCA/gCAgICAgICAgAEAgIABgP6AAQCAgICAgICAAAADAAAAAAMAA4AABwALAA8AAAERIRUjFTMVFxEhEQcRIREBAAEAgICA/gCAAwABAAGAgICAgAKA/YCAA4D8gAAAAQAAAQABgAMAAAcAABkBITUhNSERAQD/AAGAAQABAICA/gAACgAAAAACgAKAAAMABwALAA8AEwAXABsAHwAjACcAACE1MxUzNTMVJTUzFTM1MxUlNTMVMzUzFSU1MxUzNTMVJTUzFTM1MxUBAICAgP4AgICA/gCAgID/AICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAEAAACAAoABgAAFAAAlNSE1IRECAP4AAoCAgID/AAAAAQCAAQACAAGAAAMAABM1IRWAAYABAICAAAAAAAMAAAAAAwADgAAFAA0AEQAAAREhESMVBTUjNTMRIREHESERAQABAIABAICA/gCAAwABAAGA/wCAgICAAYD9gIADgPyAAAAAAAEAAAMAAoADgAADAAARNSEVAoADAICAAAIAAAIAAYADgAADAAcAAAE1IxUHESERAQCAgAGAAoCAgIABgP6AAAACAAD/gAKAAwAAAwAPAAAVNSEVAREhNSERMxEhFSERAoD+gP8AAQCAAQD/AICAgAEAAQCAAQD/AID/AAACAAACAAEAA4AABQAJAAAZATMVMxUDNTMVgICAgAIAAQCAgAEAgIAAAQAAAgABAAOAAAcAABE1MzUjNSERgIABAAIAgICA/oAAAAAAAQGAAwACgAOAAAMAAAE1IRUBgAEAAwCAgAAAAAEAAP+AAoADAAAJAAAVETMRIREzESEVgAGAgP4AgAOA/YACgP0AgAADAAAAAAKAAwAAAwANABEAABE1MxUTESM1MzUjNSERMxEzEYCAgICAAQCAgAIAgID+AAGAgICA/QADAP0AAAAAAQAAAYAAgAIAAAMAABE1MxWAAYCAgAAAAgCA/4ACAACAAAMABwAAFzUhFT0BMxWAAQCAgICAgICAAAAAAQAAAoAAgAOAAAMAABkBMxGAAoABAP8AAAAAAAIAAAIAAYADgAADAAcAAAE1IxUHESERAQCAgAGAAoCAgIABgP6AAAAKAAAAAAKAAoAAAwAHAAsADwATABcAGwAfACMAJwAAMTUzFTM1MxUlNTMVMzUzFSU1MxUzNTMVJTUzFTM1MxUlNTMVMzUzFYCAgP8AgICA/wCAgID+AICAgP4AgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAIAAAAAAKAA4AAAwAJAA0AEQAVABkAHQAhAAAxNTMVIREzFTMVJREzESU1MxUlNTMVNREzESURMxElNTMVgAEAgID+AIABAID+gICA/gCAAYCAgIABAICAgAEA/wCAgICAgICAAQD/AIABAP8AgICAAAAAAAcAAAAAAoADgAADAAcADQARABUAGQAdAAAxNTMVNREzEQU1IxEhEQE1MxU1ETMRJREzESU1MxWAgAEAgAEA/oCAgP4AgAGAgICAgAEA/wCAgAEA/oABgICAgAEA/wCAAQD/AICAgAAABwAAAAACgAOAAAMABwANABEAFQAdACEAADE1MxU1ETMRBTUjESERATUzFTURMxEhNTM1IzUhEQE1MxWAgAEAgAEA/oCAgP4AgIABAAEAgICAgAEA/wCAgAEA/oABgICAgAEA/wCAgID+gAEAgIAAAAYAAAAAAoADgAADAAcACwAPABMAFwAAMzUhFT0BMxUhETMZATUzFT0BMxUDNTMVgAGAgP2AgICAgICAgICAgAEA/wABAICAgICAAQCAgAAAAwAAAAACgAOAAAsADwATAAAxETMVITUzESMRIRkBNSEVATUhFYABgICA/oABgP4AAQACAICA/gABAP8AAgCAgAEAgIAAAAAAAwAAAAACgAOAAAsADwATAAAxETMVITUzESMRIRkBNSEVAzUhFYABgICA/oABgIABAAIAgID+AAEA/wACAICAAQCAgAAFAAAAAAKAA4AACwAPABMAFwAbAAAxETMVITUzESMRIRkBNSEVJTUzFSE1MxUlNSEVgAGAgID+gAGA/gCAAYCA/gABgAIAgID+AAEA/wACAICAgICAgICAgIAAAAUAAAAAAwADgAALAA8AFwAbAB8AADERMxUhNTMRIxEhEQM1Mx0BNSE1IRUjFQE1IRUhNTMVgAGAgID+gICAAQABAID+gAEAAQCAAgCAgP4AAQD/AAKAgICAgICAgAEAgICAgAAEAAAAAAKAA4AACwAPABMAFwAAMREzFSE1MxEjESEZATUhFQE1MxUzNTMVgAGAgID+gAGA/oCAgIACAICA/gABAP8AAgCAgAEAgICAgAAAAAMAAAAAAoADgAALAA8AEwAAMREzFSE1MxEjESEZATUhFQE1MxWAAYCAgP6AAYD/AIACAICA/gABAP8AAgCAgAEAgIAAAQAAAAACgAOAABUAADERMxUzNSM1IRUhFTMVIxEhFSERIxGAgIACAP8AgIABAP6AgAMAgICAgICA/oCAAgD+AAAAAAAHAAD/gAKAA4AAAwAHAAsADwATABcAGwAABTUhFT0BMxUlNSEVPQEzFSERMxEBNTMVJTUhFQEAAQCA/gABgID9gIABgID+AAGAgICAgICAgICAgICAAgD+AAGAgICAgIAAAAAAAgAAAAACgAOAAAsADwAAMREhFSEVIRUhFSEVATUhFQKA/gABAP8AAgD9gAEAAoCAgICAgAMAgIAAAAAAAgAAAAACgAOAAAsADwAAMREhFSEVIRUhFSEVATUhFQKA/gABAP8AAgD/AAEAAoCAgICAgAMAgIAAAAAABQAAAAACgAOAAAkADQARABUAGQAAMREzFSEVIRUhFQE1IRUlNTMVITUzFSU1IRWAAQD/AAIA/gABgP4AgAGAgP4AAYACAICAgIACAICAgICAgICAgIAAAAMAAAAAAoADgAALAA8AEwAAMREhFSEVIRUhFSEVATUzFTM1MxUCgP4AAQD/AAIA/gCAgIACgICAgICAAwCAgICAAAAAAgAAAAACAAOAAAsADwAAMzUzESM1IRUjETMVATUhFYCAgAGAgID+AAEAgAGAgID+gIADAICAAAACAIAAAAKAA4AACwAPAAAzNTMRIzUhFSMRMxUDNSEVgICAAYCAgIABAIABgICA/oCAAwCAgAAAAAQAAAAAAoADgAALAA8AEwAXAAAzNTMRIzUhFSMRMxUBNTMVITUzFSU1IRWAgIABgICA/gCAAYCA/gABgIABgICA/oCAAoCAgICAgICAAAAAAwAAAAABgAOAAAsADwATAAAxNTMRIzUhFSMRMxUBNTMVMzUzFYCAAYCAgP6AgICAgAGAgID+gIADAICAgIAAAAIAAAAAAwADgAADABMAACURMxEFESM1MxEhFSERMxUjESEVAoCA/YCAgAIA/oCAgAGAgAKA/YCAAYCAAYCA/wCA/wCAAAAAAAUAAAAAAwADgAADAAsAFQAZAB0AAAE1MxUBETMRMxUjESE1IzUzESM1IREBNSEVITUzFQEAgP6AgICAAYCAgIABAP4AAQABAIABAICA/wADAP8AgP6AgIABgID9AAMAgICAgAAFAAAAAAKAA4AAAwAHAAsADwATAAAzNSEVJREzESERMxEBNSEVATUhFYABgP4AgAGAgP4AAYD+AAEAgICAAYD+gAGA/oABgICAAQCAgAAAAAUAAAAAAoADgAADAAcACwAPABMAADM1IRUlETMRIREzEQE1IRUDNSEVgAGA/gCAAYCA/gABgIABAICAgAGA/oABgP6AAYCAgAEAgIAAAAAABwAAAAACgAOAAAMABwALAA8AEwAXABsAADM1IRUlETMRIREzEQE1IRUlNTMVITUzFSU1IRWAAYD+AIABgID+AAGA/gCAAYCA/gABgICAgAGA/oABgP6AAYCAgICAgICAgICAAAcAAAAAAwADgAADAAcACwAPABcAGwAfAAAzNSEVJREzESERMxEBNTMdATUhNSEVIxUBNSEVITUzFYABgP4AgAGAgP2AgAEAAQCA/oABAAEAgICAgAGA/oABgP6AAgCAgICAgICAAQCAgICAAAYAAAAAAoADgAADAAcACwAPABMAFwAAMzUhFSURMxEhETMRATUhFSU1MxUhNTMVgAGA/gCAAYCA/gABgP4AgAGAgICAgAIA/gACAP4AAgCAgICAgICAAAAJAAAAgAKAAwAAAwAHAAsADwATABcAGwAfACMAAD0BMxUhNTMVJTUzFTM1MxUlNTMVJTUzFTM1MxUlNTMVITUzFYABgID+AICAgP8AgP8AgICA/gCAAYCAgICAgICAgICAgICAgICAgICAgICAgIAAAwAAAAACgAOAAAMADQAXAAABETMRATUjETMRMxUhFTURIzUhNSEVMxEBAID/AICAgAEAgP8AAYCAAQABgP6A/wCAAoD+AICAgAIAgICA/YAAAAAABAAAAAACgAOAAAMABwALAA8AADM1IRUlETMRIREzEQE1IRWAAYD+AIABgID9gAEAgICAAgD+AAIA/gACgICAAAQAAAAAAoADgAADAAcACwAPAAAzNSEVJREzESERMxEBNSEVgAGA/gCAAYCA/wABAICAgAIA/gACAP4AAoCAgAAGAAAAAAKAA4AAAwAHAAsADwATABcAADM1IRUlETMRIREzEQE1MxUhNTMVJTUhFYABgP4AgAGAgP2AgAGAgP4AAYCAgIABgP6AAYD+gAIAgICAgICAgAAABQAAAAACgAOAAAMABwALAA8AEwAAMzUhFSURMxEhETMRATUzFTM1MxWAAYD+AIABgID+AICAgICAgAIA/gACAP4AAoCAgICAAAAAAAYAAAAAAoADgAADAAcACwAPABMAFwAAIREzEQE1MxUzNTMVJTUzFSE1MxUBNSEVAQCA/wCAgID+AIABgID9gAEAAYD+gAGAgICAgICAgICAAQCAgAAAAAADAAD/gAKAAwAAAwAHABMAACURMxEBNSEVAREzETMVIxEhFSEVAgCA/oABAP4AgICAAYD+gIABgP6AAYCAgP2AA4D/AID/AICAAAAABAAAAAACgAOAAAMADQARABUAAD0BMx0BNSE1ITUhNTMRATUhFQE1IRWAAYD+gAGAgP4AAYD+AAEAgICAgICAgID+AAIAgIABAICAAAQAAAAAAoADgAADAA0AEQAVAAA9ATMdATUhNSE1ITUzEQE1IRUDNSEVgAGA/oABgID+AAGAgAEAgICAgICAgID+AAIAgIABAICAAAAGAAAAAAKAA4AAAwANABEAFQAZAB0AAD0BMx0BNSE1ITUhNTMRATUhFSU1MxUhNTMVJTUhFYABgP6AAYCA/gABgP4AgAGAgP4AAYCAgICAgICAgP4AAgCAgICAgICAgICAAAAABgAAAAADAAOAAAMADQARABkAHQAhAAA9ATMdATUhNSE1ITUzEQE1Mx0BNSE1IRUjFQE1IRUhNTMVgAGA/oABgID9gIABAAEAgP6AAQABAICAgICAgICAgP4AAoCAgICAgICAAQCAgICAAAAABQAAAAACgAOAAAMADQARABUAGQAAPQEzHQE1ITUhNSE1MxEBNSEVATUzFTM1MxWAAYD+gAGAgP4AAYD+gICAgICAgICAgICA/gACAICAAQCAgICAAAAAAAQAAAAAAoADgAADAA0AEQAVAAA9ATMdATUhNSE1ITUzEQE1IRUBNTMVgAGA/oABgID+AAGA/wCAgICAgICAgID+AAIAgIABAICAAAAEAAAAAAKAAoAAAwAVABkAHQAAPQEzHQE1MzUjNTM1MxUzNTMRIRUhFQE1MxUzNTMVgICAgICAgP8AAQD+AICAgICAgICAgICAgID/AICAAgCAgICAAAAABwAA/4ACgAMAAAMABwALAA8AEwAXABsAAAU1IRU9ATMVJTUhFT0BMxUhETMRATUzFSU1IRUBAAEAgP4AAYCA/YCAAYCA/gABgICAgICAgICAgICAgAGA/oABAICAgICAAAAAAAQAAAAAAoADgAADAA0AEQAVAAAzNSEVJREzFSE1MxEhFRE1IRUBNSEVgAIA/YCAAYCA/gABgP4AAQCAgIABgICA/wCAAYCAgAEAgIAAAAAABAAAAAACgAOAAAMADQARABUAADM1IRUlETMVITUzESEVETUhFQM1IRWAAgD9gIABgID+AAGAgAEAgICAAYCAgP8AgAGAgIABAICAAAYAAAAAAoADgAADAA0AEQAVABkAHQAAMzUhFSURMxUhNTMRIRURNSEVJTUzFSE1MxUlNSEVgAIA/YCAAYCA/gABgP4AgAGAgP4AAYCAgIABgICA/wCAAYCAgICAgICAgICAAAAFAAAAAAKAA4AAAwANABEAFQAZAAAzNSEVJREzFSE1MxEhFRE1IRUBNTMVMzUzFYACAP2AgAGAgP4AAYD+gICAgICAgAGAgID/AIABgICAAQCAgICAAAAAAgAAAAABAAOAAAMABwAAMxEzEQE1IRWAgP8AAQACgP2AAwCAgAAAAAIAAAAAAQADgAADAAcAADERMxEDNSEVgIABAAKA/YADAICAAAQAAAAAAoADgAADAAcACwAPAAAhETMRATUzFSE1MxUlNSEVAQCA/oCAAYCA/gABgAKA/YACgICAgICAgIAAAAADAIAAAAIAA4AAAwAHAAsAACERMxEBNTMVMzUzFQEAgP8AgICAAoD9gAMAgICAgAAEAAAAAAMAA4AAAwAPABMAFwAAIREzESERMxUhNSEVIxUhGQE1IRUhNTMVAgCA/YCAAQABAID+gAEAAQCAAgD+AAMAgICAgP4AAwCAgICAAAUAAAAAAoADgAADAAcACwAPABMAADM1IRUlETMRIREzEQE1IRUBNSEVgAGA/gCAAYCA/gABgP4AAQCAgIABgP6AAYD+gAGAgIABAICAAAAABQAAAAACgAOAAAMABwALAA8AEwAAMzUhFSURMxEhETMRATUhFQM1IRWAAYD+AIABgID+AAGAgAEAgICAAYD+gAGA/oABgICAAQCAgAAAAAAHAAAAAAKAA4AAAwAHAAsADwATABcAGwAAMzUhFSURMxEhETMRATUhFSU1MxUhNTMVJTUhFYABgP4AgAGAgP4AAYD+AIABgID+AAGAgICAAYD+gAGA/oABgICAgICAgICAgIAABwAAAAADAAOAAAMABwALAA8AFwAbAB8AADM1IRUlETMRIREzEQE1Mx0BNSE1IRUjFQE1IRUhNTMVgAGA/gCAAYCA/YCAAQABAID+gAEAAQCAgICAAYD+gAGA/oACAICAgICAgIABAICAgIAABgAAAAACgAOAAAMABwALAA8AEwAXAAAzNSEVJREzESERMxEBNSEVATUzFTM1MxWAAYD+AIABgID+AAGA/oCAgICAgIABgP6AAYD+gAGAgIABAICAgIAAAAMAAACAAoADAAADAAcACwAAJTUzFQE1IRUBNTMVAQCA/oACgP6AgICAgAEAgIABAICAAAADAAAAAAKAAoAAAwANABcAAAE1MxUBNSMRMxEzFSEVNREjNSE1IRUzEQEAgP8AgICAAQCA/wABgIABAICA/wCAAYD/AICAgAEAgICA/oAAAAMAAAAAAoADgAADAAkADQAANREzERU1IREzEQE1IRWAAYCA/YABAIACAP4AgIACAP2AAwCAgAAAAwAAAAACgAOAAAMACQANAAA1ETMRFTUhETMRATUhFYABgID/AAEAgAIA/gCAgAIA/YADAICAAAAFAAAAAAKAA4AAAwAJAA0AEQAVAAA1ETMRFTUhETMRATUzFSE1MxUlNSEVgAGAgP2AgAGAgP4AAYCAAYD+gICAAYD+AAKAgICAgICAgAAAAAQAAAAAAoADgAADAAkADQARAAA1ETMRFTUhETMRATUzFTM1MxWAAYCA/gCAgICAAgD+AICAAgD9gAMAgICAgAAEAAD/gAKAA4AAAwAHAA8AEwAAFzUhFQERMxEBNSE1IREzEQE1IRWAAYD+AIABgP6AAYCA/YABAICAgAGAAYD+gP8AgIABgP2AAwCAgAAAAAMAAP+AAoADgAADAAcAEwAAJREzEQE1IRUBETMRMxUjESEVIRUCAID+gAEA/gCAgIABgP6AgAGA/oABgICA/YAEAP6AgP8AgIAAAAAFAAD/gAKAA4AAAwAHAA8AEwAXAAAXNSEVAREzEQE1ITUhETMRATUzFTM1MxWAAYD+AIABgP6AAYCA/gCAgICAgIABgAGA/oD/AICAAYD9gAMAgICAgAAAAgAAAAACgAOAAAMAEwAANREzERU1MxEjNSEVIRUzFSMRIRWAgIACAP8AgIABAIACgP2AgIACgICAgID+gIAAAAUAAAAAAoACgAADAAcACwAPABsAADM1MxUzNSEVJREzGQE1MxUZATMVMzUjNSERIRWAgIABAP2AgICAgIABAP8AgICAgIABgP6AAYCAgP6AAYCAgID+gIAAAAAABwAAAAACgAOAAAMABwALAA8AEwAXABsAACERMxEBNTMVMzUzFSU1MxUhNTMVATUzFTM1MxUBAID/AICAgP4AgAGAgP4AgICAAYD+gAGAgICAgICAgICAAQCAgICAAAAAAQAAAYADAAIAAAMAABE1IRUDAAGAgIAAAgAAAgABAAOAAAMABwAAGQEzGQE1MxWAgAIAAQD/AAEAgIAAAgAAAgABAAOAAAMABwAAETUzFTURMxGAgAIAgICAAQD/AAAAAgAA/4ABAAEAAAMABwAAFTUzFTURMxGAgICAgIABAP8AAAAAAgAAAgABAAOAAAMABwAAEzUzFSURMxGAgP8AgAIAgICAAQD/AAAAAAQAAAIAAgADgAADAAcACwAPAAAZATMRMxEzEQE1MxUzNTMVgICA/wCAgIACAAEA/wABAP8AAQCAgICAAAQAAAIAAgADgAADAAcACwAPAAARNTMVMzUzFSURMxEzETMRgICA/wCAgIACAICAgICAAQD/AAEA/wAAAAQAAP+AAgABAAADAAcACwAPAAAVNTMVMzUzFSURMxEzETMRgICA/wCAgICAgICAgIABAP8AAQD/AAAAAAEAAAAAAYADAAALAAAzESM1MxEzETMVIxGAgICAgIABgIABAP8AgP6AAAAAAQAAAYABAAKAAAMAABkBIREBAAGAAQD/AAAAAAMAAAAAAoAAgAADAAcACwAAMTUzFTM1MxUzNTMVgICAgICAgICAgIAAAAAAAwAAAAABAAGAAAMABwALAAAzNTMVJTUzFT0BMxWAgP8AgICAgICAgICAgAADAAAAAAEAAYAAAwAHAAsAADE1MxU9ATMVJTUzFYCA/wCAgICAgICAgIAAAAMAAAAAAoADgAADABcAGwAAITUhFSU1IzUzNSM1MzUzFSEVIRUhFSEVETUhFQEAAYD+AICAgICAAQD/AAEA/wABgICAgICAgICAgICAgIACgICAAAIAAAIABIADgAAHABMAABMRIzUhFSMRIREhESMRIxUjNSMRgIABgIABAAKAgICAgAIAAQCAgP8AAYD+gAEAgID/AAAAAAAiAZ4AAQAAAAAAAAAZAAAAAQAAAAAAAQAJAIYAAQAAAAAAAgAHADcAAQAAAAAAAwAUABkAAQAAAAAABAARAC0AAQAAAAAABQALAD4AAQAAAAAABgAJAIYAAQAAAAAABwA8AEkAAQAAAAAACAAeAMIAAQAAAAAACQAKAAoAAQAAAAAACgAmAIUAAQAAAAAACwAXAKsAAQAAAAAADAA5AMIAAQAAAAAADQAoAPsAAQAAAAAADgAuASMAAQAAAAAAEwApAVEAAQAAAAABAAAIAXoAAwABBAkAAAJKAqwAAwABBAkAAQASArgAAwABBAkAAgAOAZYAAwABBAkAAwAiAYIAAwABBAkABAAiAYIAAwABBAkABQAWAaQAAwABBAkABgASArgAAwABBAkABwDGAboAAwABBAkACAAsAoAAAwABBAkACQAKAyQAAwABBAkACgJKAqwAAwABBAkACwA+BPYAAwABBAkADAAiBTQAAwABBAkADQBQBVYAAwABBAkADgBcBaYAAwABBAkAEwA2BgIAAwABBAkBAAAQBjhDb3B5cmlnaHQgYm9iZ3JhdHRvbiAyMDEwRm9udFN0cnVjdCBNaW5lY3JhZnRNaW5lY3JhZnQgUmVndWxhclZlcnNpb24gMS4wRm9udFN0cnVjdCBpcyBhIHRyYWRlbWFyayBvZiBGU0kgRm9udFNob3AgSW50ZXJuYXRpb25hbCBHbWJIHE1pbmVjcmFmdB0gd2FzIGJ1aWx0IHdpdGggRm9udFN0cnVjdApodHRwOi8vd3d3LmZvbnRzaG9wLmNvbWh0dHA6Ly9mb250c3RydWN0LmZvbnRzaG9wLmNvbS9mb250c3RydWN0aW9ucy9zaG93LzM5NDEzM0NyZWF0aXZlIENvbW1vbnMgQXR0cmlidXRpb24gU2hhcmUgQWxpa2VodHRwOi8vY3JlYXRpdmVjb21tb25zLm9yZy9saWNlbnNlcy9ieS1zYS8zLjAvRml2ZSBiaWcgcXVhY2tpbmcgemVwaHlycyBqb2x0IG15IHdheCBiZWRBUUFNZEZwbgBNAGkAbgBlAGMAcgBhAGYAdAAgAFIAZQBnAHUAbABhAHIAVgBlAHIAcwBpAG8AbgAgADEALgAwAFQAaABlACAAIgBEAGoARABDAEgAIgAgAG4AYQBtAGUAIABpAHMAIABvAHcAbgAgAGIAeQAgAG0AZQAgACgAZABqAGQAYwBoAC4AYwBvAG0AKQAuAA0ACgANAAoAVABoAGUAIAAiAE0AaQBuAGUAYwByAGEAZgB0ACIAIABnAGEAbQBlACAAaQBzACAAbwB3AG4AIABiAHkAIABNAG8AagBhAG4AZwAgAFMAcABlAGMAaQBmAGkAYwBhAHQAaQBvAG4AcwAuAEYAbwBuAHQAcwB0AHIAdQBjAHQAIABiAHkAIABGAG8AbgB0AFMAaABvAHAAVABoAGkAcwAgACIATQBpAG4AZQBjAHIAYQBmAHQAIgAgAGYAbwBuAHQAIAB3AGEAcwAgAGEAZABhAHAAdABlAGQAIABpAG4AdABvACAAVAByAHUAZQBUAHkAcABlACAAZgBpAGwAZQAgAGIAeQAgAG0AZQAgACgARABqAEQAQwBIACkALgANAAoADQAKAFQAaABpAHMAIAAiAE0AaQBuAGUAYwByAGEAZgB0ACIAIABmAG8AbgB0ACAAaQBzACAAdQBuAGQAZQByACAAQwByAGUAYQB0AGkAdgBlACAAQwBvAG0AbQBvAG4AcwAgAEwAaQBjAGUAbgBzAGUAIAAoAFMAaABhAHIAZQAgAEEAbABpAGsAZQApAC4ADQAKAA0ACgBUAGgAZQAgACIARABqAEQAQwBIACIAIABuAGEAbQBlACAAaQBzACAAbwB3AG4AIABiAHkAIABtAGUAIAAoAGQAagBkAGMAaAAuAGMAbwBtACkALgANAAoADQAKAFQAaABlACAAIgBNAGkAbgBlAGMAcgBhAGYAdAAiACAAZgBvAG4AdAAgAHMAdAB5AGwAZQAgAHcAYQBzACAAbQBhAGQAZQAgAGIAeQAgAE4AbwB0AGMAaAAuAA0ACgANAAoAVABoAGUAIAAiAE0AaQBuAGUAYwByAGEAZgB0ACIAIABnAGEAbQBlACAAaQBzACAAbwB3AG4AIABiAHkAIABNAG8AagBhAG4AZwAgAFMAcABlAGMAaQBmAGkAYwBhAHQAaQBvAG4AcwAuAGgAdAB0AHAAOgAvAC8AZgBvAG4AdABzAHQAcgB1AGMAdAAuAGYAbwBuAHQAcwBoAG8AcAAuAGMAbwBtAC8AaAB0AHQAcAA6AC8ALwBkAGoAZABjAGgALgBjAG8AbQAvAEMAcgBlAGEAdABpAHYAZQAgAEMAbwBtAG0AbwBuAHMAIABBAHQAdAByAGkAYgB1AHQAaQBvAG4AIABTAGgAYQByAGUAIABBAGwAaQBrAGUAaAB0AHQAcAA6AC8ALwBjAHIAZQBhAHQAaQB2AGUAYwBvAG0AbQBvAG4AcwAuAG8AcgBnAC8AbABpAGMAZQBuAHMAZQBzAC8AYgB5AC0AcwBhAC8AMwAuADAALwBNAGkAbgBlAGMAcgBhAGYAdAAgAGkAcwAgAGoAdQBzAHQAIABhAHcAZQBzAG8AbQBlACAAIQBBAFEAQQBNAGQARgBwAG4AAAADAAAAAAAAAGYAMwAAAAAAAAAAAAAAAAAAAAAAAAAA ";
+var mcpeFont;
+
 var path = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang/minecraftpe/mods";
-var mcpeFontString = " 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GeYaBBoiGkAaVhpkGnoakBqmGtAa8gAAAAUAAAAAA4ADgAADAAcACwASABYAACU1IxUlNSEVNzUjFSU1IyIHBhUBESERAcCPAR3+44+PAR2OPCkq/s8DgH+OjqaPj6aPj6eNKSo6/Y4DgPyAAAIAAAAAAIADgAADAAcAADE1MxUDETMRgICAgIABAAKA/YAAAAIAAAIAAYADgAADAAcAABkBMxEzETMRgICAAgABgP6AAYD+gAAAAAACAAAAAAKAA4AAAwAfAAABNSMVAxEjNTM1IzUzETMRMxEzETMVIxUzFSMRIxEjEQGAgICAgICAgICAgICAgICAAYCAgP6AAQCAgIABAP8AAQD/AICAgP8AAQD/AAAAAAAFAAAAAAKAA4AABwALAA8AEwAbAAAhNSE1IRUjFRM1MxUlNSEVJTUzFT0BMzUzFSEVAQD/AAIAgICA/gABgP4AgICAAQCAgICAAQCAgICAgICAgICAgICAAAAAAAcAAAAAAoADgAADAAcACwAPABMAFwAbAAAxNTMVIREzESURMxkBNTMVNREzESURMxElNTMVgAGAgP4AgICA/gCAAYCAgIABAP8AgAEA/wABAICAgAEA/wCAAQD/AICAgAAAAAAIAAAAAAKAA4AAAwAHAAsADwAbAB8AIwAnAAAzNSEVMzUzFSURMxEBNTMVATUjNSM1MzUzETMRATUzFTM1MxUlNTMVgAEAgID9gIABgID/AICAgICA/oCAgID/AICAgICAgAEA/wABAICA/wCAgICA/wD/AAIAgICAgICAgAAAAAEAAAIAAIADgAADAAAZATMRgAIAAYD+gAAAAAAFAAAAAAIAA4AAAwAHAAsADwATAAAhNSEVJTUzFSURMxkBNTMVPQEhFQEAAQD+gID/AICAAQCAgICAgIABgP6AAYCAgICAgAAFAAAAAAIAA4AAAwAHAAsADwATAAAxNSEVPQEzFTURMxEBNTMVJTUhFQEAgID/AID+gAEAgICAgICAAYD+gAGAgICAgIAAAAAFAAABAAIAAoAAAwAHAAsADwATAAARNTMVITUzFSU1IRUlNTMVITUzFYABAID+gAEA/oCAAQCAAQCAgICAgICAgICAgIAAAAABAAAAgAKAAwAACwAAJREhNSERMxEhFSERAQD/AAEAgAEA/wCAAQCAAQD/AID/AAABAAD/gACAAQAAAwAAFREzEYCAAYD+gAABAAABgAKAAgAAAwAAETUhFQKAAYCAgAABAAAAAACAAQAAAwAAMREzEYABAP8AAAAFAAAAAAKAA4AAAwAHAAsADwATAAAxNTMVNREzGQE1MxU1ETMZATUzFYCAgICAgICAAQD/AAEAgICAAQD/AAEAgIAAAAUAAAAAAoADgAADAAcADwAXABsAADM1IRUBNTMVAREzETMVIxUhESM1MzUzEQE1IRWAAYD/AID+gICAgAGAgICA/gABgICAAYCAgP8AAoD+gICAAYCAgP2AAoCAgAAAAAEAAAAAAoADgAALAAAxNSERIzUzNTMRIRUBAICAgAEAgAIAgID9AIAAAAAABgAAAAACgAOAAAcACwAPABMAFwAbAAAxETMVITUzEQE1MxU9ASEVATUzFQURMxEBNSEVgAGAgP4AgAEA/gCAAYCA/gABgAEAgID/AAEAgICAgIABAICAgAEA/wABAICAAAAAAAcAAAAAAoADgAADAAcACwAPABMAFwAbAAAzNSEVJTUzFSERMxEBNSEVATUzFQURMxEBNSEVgAGA/gCAAYCA/oABAP4AgAGAgP4AAYCAgICAgAEA/wABAICAAQCAgIABAP8AAQCAgAAAAwAAAAACgAOAAAMABwATAAATNTMVPQEzFRMRIREzFSERIzUhEYCAgID+AIABgIABAAIAgICAgID9gAEAAQCAAYCA/IAAAAAABAAAAAACgAOAAAMABwALABMAADM1IRUlNTMVIREzEQERIRUhFSEVgAGA/gCAAYCA/YACgP4AAYCAgICAgAGA/oABgAGAgICAAAAAAAUAAAAAAoADgAADAAcADwATABcAADM1IRU1ETMRIREzFSEVIRkBNTMVPQEhFYABgID9gIABgP6AgAEAgICAAQD/AAIAgID/AAIAgICAgIAAAwAAAAACgAOAAAMABwAPAAAhETMZATUzFTURIRUjESERAQCAgP6AgAKAAYD+gAGAgICAAQCAAQD+gAAABwAAAAACgAOAAAMABwALAA8AEwAXABsAADM1IRUlETMRIREzEQE1IRUlETMRIREzEQE1IRWAAYD+AIABgID+AAGA/gCAAYCA/gABgICAgAEA/wABAP8AAQCAgIABAP8AAQD/AAEAgIAAAAAABQAAAAACgAOAAAMABwALABMAFwAAMzUhFT0BMxUBETMRATUhNSERMxEBNSEVgAEAgP4AgAGA/oABgID+AAGAgICAgIABgAEA/wD/AICAAQD+AAIAgIAAAAIAAAAAAIACgAADAAcAADERMxEDETMRgICAAQD/AAGAAQD/AAAAAAACAAD/gACAAoAAAwAHAAAVETMRAxEzEYCAgIABgP6AAgABAP8AAAAABwAAAAACAAOAAAMABwALAA8AEwAXABsAACE1MxUlNTMVJTUzFSU1MxU9ATMVPQEzFT0BMxUBgID/AID/AID/AICAgICAgICAgICAgICAgICAgICAgICAgAAAAAACAAAAgAKAAgAAAwAHAAA9ASEVATUhFQKA/YACgICAgAEAgIAAAAAABwAAAAACAAOAAAMABwALAA8AEwAXABsAADE1MxU9ATMVPQEzFT0BMxUlNTMVJTUzFSU1MxWAgICA/wCA/wCA/wCAgICAgICAgICAgICAgICAgICAgIAAAAYAAAAAAoADgAADAAcACwAPABMAFwAAITUzFQM1MxU9ATMVATUzFQURMxEBNSEVAQCAgICA/gCAAYCA/gABgICAAQCAgICAgAEAgICAAQD/AAEAgIAAAAAEAAAAAAMAA4AAAwAHAA8AEwAAMzUhFSURMxE3ESERMxEzEQE1IRWAAgD9gICAAQCAgP2AAgCAgIACgP2AgAGA/wABgP4AAgCAgAAAAgAAAAACgAOAAAsADwAAMREzFSE1MxEjESEZATUhFYABgICA/oABgAMAgID9AAIA/gADAICAAAADAAAAAAKAA4AAAwAHABMAACURMxEDNTMVAREhFSEVIRUhESEVAgCAgID9gAIA/oABgP6AAYCAAYD+gAIAgID9gAOAgICA/oCAAAAABQAAAAACgAOAAAMABwALAA8AEwAAMzUhFT0BMxUhETMRATUzFSU1IRWAAYCA/YCAAYCA/gABgICAgICAAoD9gAIAgICAgIAAAgAAAAACgAOAAAMACwAAJREzEQURIRUhESEVAgCA/YACAP6AAYCAAoD9gIADgID9gIAAAAEAAAAAAoADgAALAAAxESEVIRUhFSERIRUCgP4AAQD/AAIAA4CAgID+gIAAAQAAAAACgAOAAAkAADERIRUhFSEVIRECgP4AAQD/AAOAgICA/gAAAAQAAAAAAoADgAADAAkADQARAAAzNSEVNREjNSERIREzGQE1IRWAAYCAAQD9gIACAICAgAGAgP4AAoD9gAKAgIAAAAAAAQAAAAACgAOAAAsAADERMxEhETMRIxEhEYABgICA/oADgP8AAQD8gAIA/gAAAAAAAQAAAAABgAOAAAsAADE1MxEjNSEVIxEzFYCAAYCAgIACgICA/YCAAAMAAAAAAoADgAADAAcACwAAMzUhFSU1MxUhETMRgAGA/gCAAYCAgICAgIADAP0AAAUAAAAAAoADgAADAAcACwATABcAACERMxEBNTMVAzUzFQERMxEhFSERATUzFQIAgP8AgICA/gCAAQD/AAGAgAGA/oABgICAAQCAgP2AA4D/AID+AAMAgIAAAAAAAQAAAAACgAOAAAUAADERMxEhFYACAAOA/QCAAAMAAAAAAoADgAADAAsAEwAAATUzFQERMxUzFSMRIREjNTM1MxEBAID+gICAgAGAgICAAgCAgP4AA4CAgP2AAoCAgPyAAAAAAAMAAAAAAoADgAADAAsAEwAAATUzFQERMxUzFSMRIREjNTMRMxEBAID+gICAgAGAgICAAgCAgP4AA4CAgP2AAYCAAYD8gAAAAAQAAAAAAoADgAADAAcACwAPAAAzNSEVJREzESERMxEBNSEVgAGA/gCAAYCA/gABgICAgAKA/YACgP2AAoCAgAACAAAAAAKAA4AAAwANAAABNTMVAREhFSEVIRUhEQIAgP2AAgD+gAGA/oACgICA/YADgICAgP4AAAYAAAAAAoADgAADAAcACwAPABMAFwAAMzUhFTM1MxUlNTMVIREzESURMxEBNSEVgAEAgID/AID+AIABgID+AAGAgICAgICAgAKA/YCAAgD+AAIAgIAAAAADAAAAAAKAA4AAAwAHABEAACERMxEDNTMVAREhFSEVIRUhEQIAgICA/YACAP6AAYD+gAIA/gACgICA/YADgICAgP4AAAYAAAAAAoADgAADAAcACwAPABMAFwAAMzUhFSU1MxUhETMRATUhFSU1MxU9ASEVgAGA/gCAAYCA/gABgP4AgAIAgICAgIABgP6AAYCAgICAgICAgAAAAAABAAAAAAKAA4AABwAAIREhNSEVIREBAP8AAoD/AAMAgID9AAADAAAAAAKAA4AAAwAHAAsAADM1IRUlETMRIREzEYABgP4AgAGAgICAgAMA/QADAP0AAAAABQAAAAACgAOAAAMABwALAA8AEwAAITUzFSURMxEzETMRAREzESERMxEBAID/AICAgP4AgAGAgICAgAEA/wABAP8AAQACAP4AAgD+AAAAAAADAAAAAAKAA4AAAwALABMAAAE1MxUBETMRMxUjFSE1IzUzETMRAQCA/oCAgIABgICAgAEAgID/AAOA/YCAgICAAoD8gAAAAAAJAAAAAAKAA4AAAwAHAAsADwATABcAGwAfACMAADERMxEhETMRATUzFTM1MxUlNTMVJTUzFTM1MxUlNTMVITUzFYABgID+AICAgP8AgP8AgICA/gCAAYCAAYD+gAGA/oABgICAgICAgICAgICAgICAgICAAAUAAAAAAoADgAADAAcACwAPABMAACERMxEBNTMVMzUzFSU1MxUhNTMVAQCA/wCAgID+AIABgIACgP2AAoCAgICAgICAgIAAAAUAAAAAAoADgAAFAAkADQARABcAADERMxUhFQE1MxU9ATMVPQEzFT0BITUhEYACAP4AgICA/gACgAEAgIABAICAgICAgICAgICA/wAAAAAAAQAAAAABgAOAAAcAADERIRUhESEVAYD/AAEAA4CA/YCAAAAABQAAAAACgAOAAAMABwALAA8AEwAAITUzFSURMxEBNTMVJREzEQE1MxUCAID/AID/AID/AID/AICAgIABAP8AAQCAgIABAP8AAQCAgAAAAAABAAAAAAGAA4AABwAAMTUhESE1IREBAP8AAYCAAoCA/IAAAAAFAAACAAKAA4AAAwAHAAsADwATAAARNTMVITUzFSU1MxUzNTMVJTUzFYABgID+AICAgP8AgAIAgICAgICAgICAgICAAAEAAP+AAoAAAAADAAAVNSEVAoCAgIAAAAEAAAMAAQADgAADAAARNSEVAQADAICAAAMAAAAAAoACgAADAA0AEQAAPQEzHQE1ITUhNSE1MxEBNSEVgAGA/oABgID+AAGAgICAgICAgID+AAIAgIAAAAADAAAAAAKAA4AAAwAHABEAACURMxEBNSEVAREzETMVIxEhFQIAgP6AAQD+AICAgAGAgAGA/oABgICA/gADgP6AgP8AgAAAAAAFAAAAAAKAAoAAAwAHAAsADwATAAAzNSEVPQEzFSERMxEBNTMVJTUhFYABgID9gIABgID+AAGAgICAgIABgP6AAQCAgICAgAADAAAAAAKAA4AAAwAHABEAADURMxkBNSEVATUhESM1MxEzEYABAP8AAYCAgICAAYD+gAGAgID+AIABAIABgPyAAAAAAAMAAAAAAoACgAADAA0AEQAAMzUhFSURMxUhNTMRIRURNSEVgAIA/YCAAYCA/gABgICAgAGAgID/AIABgICAAAACAAAAAAIAA4AACwAPAAAzESM1MzUzFSEVIRkBNSEVgICAgAEA/wABAAIAgICAgP4AAwCAgAAAAAMAAP+AAoACgAADAAcAEQAAFTUhFQERMxEBNSE1IREhNSERAgD+AIABgP6AAYD+gAIAgICAAYABAP8A/wCAgAEAgP2AAAAAAAMAAAAAAoADgAADAAcADwAAIREzEQE1IRUBETMRMxUjEQIAgP6AAQD+AICAgAIA/gACAICA/gADgP6AgP6AAAACAAAAAACAA4AAAwAHAAAxETMRAzUzFYCAgAKA/YADAICAAAAEAAD/gAKAAwAAAwAHAAsADwAAFzUhFSURMxEhETMRAzUzFYABgP4AgAGAgICAgICAgAEA/wACAP4AAoCAgAAABQAAAAACAAOAAAMABwALAA8AFwAAITUzFSU1MxUDNTMVPQEzFQERMxEzFSMRAYCA/wCAgICA/gCAgICAgICAgAEAgICAgID+AAOA/gCA/wAAAAAAAgAAAAABAAOAAAMABwAAMzUzFSURMxGAgP8AgICAgAMA/QAABAAAAAACgAKAAAMABwANABEAAAERMxETETMRIREhFSMRATUzFQEAgICA/YABAIABAIABAAEA/wD/AAIA/gACgID+AAIAgIAAAgAAAAACgAKAAAMACQAAIREzESERIRUhEQIAgP2AAgD+gAIA/gACgID+AAAEAAAAAAKAAoAAAwAHAAsADwAAMzUhFSURMxEhETMRATUhFYABgP4AgAGAgP4AAYCAgIABgP6AAYD+gAGAgIAAAwAA/4ACgAKAAAMADwATAAABETMRAREzFTMVIxUhFSEREzUhFQIAgP2AgICAAYD+gIABAAEAAQD/AP6AAwCAgICA/wACgICAAAAAAAMAAP+AAoACgAADAAcAEwAAGQEzGQE1IRUTESE1ITUjNTM1MxGAAQCA/oABgICAgAEAAQD/AAEAgID9gAEAgICAgP0AAAAAAAMAAAAAAoACgAADAAsADwAAATUzFQERMxUzFSMREzUhFQIAgP2AgICAgAEAAYCAgP6AAoCAgP6AAgCAgAAAAAAFAAAAAAKAAoAAAwAHAAsADwATAAAxNSEVPQEzFSU1IRUlNTMVPQEhFQIAgP4AAYD+AIACAICAgICAgICAgICAgICAAAIAAAAAAYADgAADAA8AACE1MxUlESM1MxEzETMVIxEBAID/AICAgICAgICAAYCAAQD/AID+gAAAAgAAAAACgAKAAAMACQAANREzERU1IREzEYABgICAAgD+AICAAgD9gAAAAAAFAAAAAAKAAoAAAwAHAAsADwATAAAhNTMVJTUzFTM1MxUlETMRIREzEQEAgP8AgICA/gCAAYCAgICAgICAgIABgP6AAYD+gAACAAAAAAKAAoAAAwANAAA1ETMRFTUzETMRMxEzEYCAgICAgAIA/gCAgAEA/wACAP2AAAAACQAAAAACgAKAAAMABwALAA8AEwAXABsAHwAjAAAxNTMVITUzFSU1MxUzNTMVJTUzFSU1MxUzNTMVJTUzFSE1MxWAAYCA/gCAgID/AID/AICAgP4AgAGAgICAgICAgICAgICAgICAgICAgICAgIAAAAMAAP+AAoACgAADAAcADwAAFzUhFQERMxEBNSE1IREzEYABgP4AgAGA/oABgICAgIABgAGA/oD/AICAAYD9gAADAAAAAAKAAoAABwALABMAADE1MzUzFSEVATUzFT0BITUhFSMVgIABgP6AgP6AAoCAgICAgAEAgICAgICAgAAABQAAAAACAAOAAAMABwALAA8AEwAAITUhFSURMxEBNTMVNREzGQE1IRUBAAEA/oCA/wCAgAEAgICAAQD/AAEAgICAAQD/AAEAgIAAAAEAAAAAAIADgAADAAAxETMRgAOA/IAAAAUAAAAAAgADgAADAAcACwAPABMAADE1IRU1ETMZATUzFSURMxEBNSEVAQCAgP8AgP6AAQCAgIABAP8AAQCAgIABAP8AAQCAgAAAAAAEAAACgAMAA4AAAwAHAAsADwAAETUzFSE1IRUlNSEVITUzFYABAAEA/gABAAEAgAKAgICAgICAgICAAAACAAAAAACAA4AAAwAHAAAxETMRAzUzFYCAgAKA/YADAICAAAADAAAAAAIAAwAAAwAHAAsAADM1IRUlETMZATUhFYABgP4AgAGAgICAAgD+AAIAgIAAAAAAAgAAAAACAAMAAA8AEwAAMTUzESM1MzUzFTMVIxEhFQE1MxWAgICAgIABAP8AgIABAICAgID/AIACgICAAAAAAAUAAAEAAYACgAADAAcACwAPABMAABE1MxUzNTMVJTUzFSU1MxUzNTMVgICA/wCA/wCAgIABAICAgICAgICAgICAgAAABQAAAAACgAOAABMAFwAbAB8AIwAAITUjNTM1IzUzNTMVMxUjFTMVIxUBNTMVMzUzFSU1MxUhNTMVAQCAgICAgICAgID/AICAgP4AgAGAgICAgICAgICAgIACgICAgICAgICAgAAAAAACAAAAAACAA4AAAwAHAAAxETMRAxEzEYCAgAGA/oACAAGA/oAAAAAABQAA/4ACgAMAAAcACwAPABMAGwAABTUjNSEVIxUTNTMVIREzEQE1MxUlNTM1MxUzFQEAgAGAgICA/YCAAYCA/gCAgICAgICAgAEAgIABgP6AAQCAgICAgICAAAADAAAAAAMAA4AABwALAA8AAAERIRUjFTMVFxEhEQcRIREBAAEAgICA/gCAAwABAAGAgICAgAKA/YCAA4D8gAAAAQAAAQABgAMAAAcAABkBITUhNSERAQD/AAGAAQABAICA/gAACgAAAAACgAKAAAMABwALAA8AEwAXABsAHwAjACcAACE1MxUzNTMVJTUzFTM1MxUlNTMVMzUzFSU1MxUzNTMVJTUzFTM1MxUBAICAgP4AgICA/gCAgID/AICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAEAAACAAoABgAAFAAAlNSE1IRECAP4AAoCAgID/AAAAAQCAAQACAAGAAAMAABM1IRWAAYABAICAAAAAAAMAAAAAAwADgAAFAA0AEQAAAREhESMVBTUjNTMRIREHESERAQABAIABAICA/gCAAwABAAGA/wCAgICAAYD9gIADgPyAAAAAAAEAAAMAAoADgAADAAARNSEVAoADAICAAAIAAAIAAYADgAADAAcAAAE1IxUHESERAQCAgAGAAoCAgIABgP6AAAACAAD/gAKAAwAAAwAPAAAVNSEVAREhNSERMxEhFSERAoD+gP8AAQCAAQD/AICAgAEAAQCAAQD/AID/AAACAAACAAEAA4AABQAJAAAZATMVMxUDNTMVgICAgAIAAQCAgAEAgIAAAQAAAgABAAOAAAcAABE1MzUjNSERgIABAAIAgICA/oAAAAAAAQGAAwACgAOAAAMAAAE1IRUBgAEAAwCAgAAAAAEAAP+AAoADAAAJAAAVETMRIREzESEVgAGAgP4AgAOA/YACgP0AgAADAAAAAAKAAwAAAwANABEAABE1MxUTESM1MzUjNSERMxEzEYCAgICAAQCAgAIAgID+AAGAgICA/QADAP0AAAAAAQAAAYAAgAIAAAMAABE1MxWAAYCAgAAAAgCA/4ACAACAAAMABwAAFzUhFT0BMxWAAQCAgICAgICAAAAAAQAAAoAAgAOAAAMAABkBMxGAAoABAP8AAAAAAAIAAAIAAYADgAADAAcAAAE1IxUHESERAQCAgAGAAoCAgIABgP6AAAAKAAAAAAKAAoAAAwAHAAsADwATABcAGwAfACMAJwAAMTUzFTM1MxUlNTMVMzUzFSU1MxUzNTMVJTUzFTM1MxUlNTMVMzUzFYCAgP8AgICA/wCAgID+AICAgP4AgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAIAAAAAAKAA4AAAwAJAA0AEQAVABkAHQAhAAAxNTMVIREzFTMVJREzESU1MxUlNTMVNREzESURMxElNTMVgAEAgID+AIABAID+gICA/gCAAYCAgIABAICAgAEA/wCAgICAgICAAQD/AIABAP8AgICAAAAAAAcAAAAAAoADgAADAAcADQARABUAGQAdAAAxNTMVNREzEQU1IxEhEQE1MxU1ETMRJREzESU1MxWAgAEAgAEA/oCAgP4AgAGAgICAgAEA/wCAgAEA/oABgICAgAEA/wCAAQD/AICAgAAABwAAAAACgAOAAAMABwANABEAFQAdACEAADE1MxU1ETMRBTUjESERATUzFTURMxEhNTM1IzUhEQE1MxWAgAEAgAEA/oCAgP4AgIABAAEAgICAgAEA/wCAgAEA/oABgICAgAEA/wCAgID+gAEAgIAAAAYAAAAAAoADgAADAAcACwAPABMAFwAAMzUhFT0BMxUhETMZATUzFT0BMxUDNTMVgAGAgP2AgICAgICAgICAgAEA/wABAICAgICAAQCAgAAAAwAAAAACgAOAAAsADwATAAAxETMVITUzESMRIRkBNSEVATUhFYABgICA/oABgP4AAQACAICA/gABAP8AAgCAgAEAgIAAAAAAAwAAAAACgAOAAAsADwATAAAxETMVITUzESMRIRkBNSEVAzUhFYABgICA/oABgIABAAIAgID+AAEA/wACAICAAQCAgAAFAAAAAAKAA4AACwAPABMAFwAbAAAxETMVITUzESMRIRkBNSEVJTUzFSE1MxUlNSEVgAGAgID+gAGA/gCAAYCA/gABgAIAgID+AAEA/wACAICAgICAgICAgIAAAAUAAAAAAwADgAALAA8AFwAbAB8AADERMxUhNTMRIxEhEQM1Mx0BNSE1IRUjFQE1IRUhNTMVgAGAgID+gICAAQABAID+gAEAAQCAAgCAgP4AAQD/AAKAgICAgICAgAEAgICAgAAEAAAAAAKAA4AACwAPABMAFwAAMREzFSE1MxEjESEZATUhFQE1MxUzNTMVgAGAgID+gAGA/oCAgIACAICA/gABAP8AAgCAgAEAgICAgAAAAAMAAAAAAoADgAALAA8AEwAAMREzFSE1MxEjESEZATUhFQE1MxWAAYCAgP6AAYD/AIACAICA/gABAP8AAgCAgAEAgIAAAQAAAAACgAOAABUAADERMxUzNSM1IRUhFTMVIxEhFSERIxGAgIACAP8AgIABAP6AgAMAgICAgICA/oCAAgD+AAAAAAAHAAD/gAKAA4AAAwAHAAsADwATABcAGwAABTUhFT0BMxUlNSEVPQEzFSERMxEBNTMVJTUhFQEAAQCA/gABgID9gIABgID+AAGAgICAgICAgICAgICAAgD+AAGAgICAgIAAAAAAAgAAAAACgAOAAAsADwAAMREhFSEVIRUhFSEVATUhFQKA/gABAP8AAgD9gAEAAoCAgICAgAMAgIAAAAAAAgAAAAACgAOAAAsADwAAMREhFSEVIRUhFSEVATUhFQKA/gABAP8AAgD/AAEAAoCAgICAgAMAgIAAAAAABQAAAAACgAOAAAkADQARABUAGQAAMREzFSEVIRUhFQE1IRUlNTMVITUzFSU1IRWAAQD/AAIA/gABgP4AgAGAgP4AAYACAICAgIACAICAgICAgICAgIAAAAMAAAAAAoADgAALAA8AEwAAMREhFSEVIRUhFSEVATUzFTM1MxUCgP4AAQD/AAIA/gCAgIACgICAgICAAwCAgICAAAAAAgAAAAACAAOAAAsADwAAMzUzESM1IRUjETMVATUhFYCAgAGAgID+AAEAgAGAgID+gIADAICAAAACAIAAAAKAA4AACwAPAAAzNTMRIzUhFSMRMxUDNSEVgICAAYCAgIABAIABgICA/oCAAwCAgAAAAAQAAAAAAoADgAALAA8AEwAXAAAzNTMRIzUhFSMRMxUBNTMVITUzFSU1IRWAgIABgICA/gCAAYCA/gABgIABgICA/oCAAoCAgICAgICAAAAAAwAAAAABgAOAAAsADwATAAAxNTMRIzUhFSMRMxUBNTMVMzUzFYCAAYCAgP6AgICAgAGAgID+gIADAICAgIAAAAIAAAAAAwADgAADABMAACURMxEFESM1MxEhFSERMxUjESEVAoCA/YCAgAIA/oCAgAGAgAKA/YCAAYCAAYCA/wCA/wCAAAAAAAUAAAAAAwADgAADAAsAFQAZAB0AAAE1MxUBETMRMxUjESE1IzUzESM1IREBNSEVITUzFQEAgP6AgICAAYCAgIABAP4AAQABAIABAICA/wADAP8AgP6AgIABgID9AAMAgICAgAAFAAAAAAKAA4AAAwAHAAsADwATAAAzNSEVJREzESERMxEBNSEVATUhFYABgP4AgAGAgP4AAYD+AAEAgICAAYD+gAGA/oABgICAAQCAgAAAAAUAAAAAAoADgAADAAcACwAPABMAADM1IRUlETMRIREzEQE1IRUDNSEVgAGA/gCAAYCA/gABgIABAICAgAGA/oABgP6AAYCAgAEAgIAAAAAABwAAAAACgAOAAAMABwALAA8AEwAXABsAADM1IRUlETMRIREzEQE1IRUlNTMVITUzFSU1IRWAAYD+AIABgID+AAGA/gCAAYCA/gABgICAgAGA/oABgP6AAYCAgICAgICAgICAAAcAAAAAAwADgAADAAcACwAPABcAGwAfAAAzNSEVJREzESERMxEBNTMdATUhNSEVIxUBNSEVITUzFYABgP4AgAGAgP2AgAEAAQCA/oABAAEAgICAgAGA/oABgP6AAgCAgICAgICAAQCAgICAAAYAAAAAAoADgAADAAcACwAPABMAFwAAMzUhFSURMxEhETMRATUhFSU1MxUhNTMVgAGA/gCAAYCA/gABgP4AgAGAgICAgAIA/gACAP4AAgCAgICAgICAAAAJAAAAgAKAAwAAAwAHAAsADwATABcAGwAfACMAAD0BMxUhNTMVJTUzFTM1MxUlNTMVJTUzFTM1MxUlNTMVITUzFYABgID+AICAgP8AgP8AgICA/gCAAYCAgICAgICAgICAgICAgICAgICAgICAgIAAAwAAAAACgAOAAAMADQAXAAABETMRATUjETMRMxUhFTURIzUhNSEVMxEBAID/AICAgAEAgP8AAYCAAQABgP6A/wCAAoD+AICAgAIAgICA/YAAAAAABAAAAAACgAOAAAMABwALAA8AADM1IRUlETMRIREzEQE1IRWAAYD+AIABgID9gAEAgICAAgD+AAIA/gACgICAAAQAAAAAAoADgAADAAcACwAPAAAzNSEVJREzESERMxEBNSEVgAGA/gCAAYCA/wABAICAgAIA/gACAP4AAoCAgAAGAAAAAAKAA4AAAwAHAAsADwATABcAADM1IRUlETMRIREzEQE1MxUhNTMVJTUhFYABgP4AgAGAgP2AgAGAgP4AAYCAgIABgP6AAYD+gAIAgICAgICAgAAABQAAAAACgAOAAAMABwALAA8AEwAAMzUhFSURMxEhETMRATUzFTM1MxWAAYD+AIABgID+AICAgICAgAIA/gACAP4AAoCAgICAAAAAAAYAAAAAAoADgAADAAcACwAPABMAFwAAIREzEQE1MxUzNTMVJTUzFSE1MxUBNSEVAQCA/wCAgID+AIABgID9gAEAAYD+gAGAgICAgICAgICAAQCAgAAAAAADAAD/gAKAAwAAAwAHABMAACURMxEBNSEVAREzETMVIxEhFSEVAgCA/oABAP4AgICAAYD+gIABgP6AAYCAgP2AA4D/AID/AICAAAAABAAAAAACgAOAAAMADQARABUAAD0BMx0BNSE1ITUhNTMRATUhFQE1IRWAAYD+gAGAgP4AAYD+AAEAgICAgICAgID+AAIAgIABAICAAAQAAAAAAoADgAADAA0AEQAVAAA9ATMdATUhNSE1ITUzEQE1IRUDNSEVgAGA/oABgID+AAGAgAEAgICAgICAgID+AAIAgIABAICAAAAGAAAAAAKAA4AAAwANABEAFQAZAB0AAD0BMx0BNSE1ITUhNTMRATUhFSU1MxUhNTMVJTUhFYABgP6AAYCA/gABgP4AgAGAgP4AAYCAgICAgICAgP4AAgCAgICAgICAgICAAAAABgAAAAADAAOAAAMADQARABkAHQAhAAA9ATMdATUhNSE1ITUzEQE1Mx0BNSE1IRUjFQE1IRUhNTMVgAGA/oABgID9gIABAAEAgP6AAQABAICAgICAgICAgP4AAoCAgICAgICAAQCAgICAAAAABQAAAAACgAOAAAMADQARABUAGQAAPQEzHQE1ITUhNSE1MxEBNSEVATUzFTM1MxWAAYD+gAGAgP4AAYD+gICAgICAgICAgICA/gACAICAAQCAgICAAAAAAAQAAAAAAoADgAADAA0AEQAVAAA9ATMdATUhNSE1ITUzEQE1IRUBNTMVgAGA/oABgID+AAGA/wCAgICAgICAgID+AAIAgIABAICAAAAEAAAAAAKAAoAAAwAVABkAHQAAPQEzHQE1MzUjNTM1MxUzNTMRIRUhFQE1MxUzNTMVgICAgICAgP8AAQD+AICAgICAgICAgICAgID/AICAAgCAgICAAAAABwAA/4ACgAMAAAMABwALAA8AEwAXABsAAAU1IRU9ATMVJTUhFT0BMxUhETMRATUzFSU1IRUBAAEAgP4AAYCA/YCAAYCA/gABgICAgICAgICAgICAgAGA/oABAICAgICAAAAAAAQAAAAAAoADgAADAA0AEQAVAAAzNSEVJREzFSE1MxEhFRE1IRUBNSEVgAIA/YCAAYCA/gABgP4AAQCAgIABgICA/wCAAYCAgAEAgIAAAAAABAAAAAACgAOAAAMADQARABUAADM1IRUlETMVITUzESEVETUhFQM1IRWAAgD9gIABgID+AAGAgAEAgICAAYCAgP8AgAGAgIABAICAAAYAAAAAAoADgAADAA0AEQAVABkAHQAAMzUhFSURMxUhNTMRIRURNSEVJTUzFSE1MxUlNSEVgAIA/YCAAYCA/gABgP4AgAGAgP4AAYCAgIABgICA/wCAAYCAgICAgICAgICAAAAFAAAAAAKAA4AAAwANABEAFQAZAAAzNSEVJREzFSE1MxEhFRE1IRUBNTMVMzUzFYACAP2AgAGAgP4AAYD+gICAgICAgAGAgID/AIABgICAAQCAgICAAAAAAgAAAAABAAOAAAMABwAAMxEzEQE1IRWAgP8AAQACgP2AAwCAgAAAAAIAAAAAAQADgAADAAcAADERMxEDNSEVgIABAAKA/YADAICAAAQAAAAAAoADgAADAAcACwAPAAAhETMRATUzFSE1MxUlNSEVAQCA/oCAAYCA/gABgAKA/YACgICAgICAgIAAAAADAIAAAAIAA4AAAwAHAAsAACERMxEBNTMVMzUzFQEAgP8AgICAAoD9gAMAgICAgAAEAAAAAAMAA4AAAwAPABMAFwAAIREzESERMxUhNSEVIxUhGQE1IRUhNTMVAgCA/YCAAQABAID+gAEAAQCAAgD+AAMAgICAgP4AAwCAgICAAAUAAAAAAoADgAADAAcACwAPABMAADM1IRUlETMRIREzEQE1IRUBNSEVgAGA/gCAAYCA/gABgP4AAQCAgIABgP6AAYD+gAGAgIABAICAAAAABQAAAAACgAOAAAMABwALAA8AEwAAMzUhFSURMxEhETMRATUhFQM1IRWAAYD+AIABgID+AAGAgAEAgICAAYD+gAGA/oABgICAAQCAgAAAAAAHAAAAAAKAA4AAAwAHAAsADwATABcAGwAAMzUhFSURMxEhETMRATUhFSU1MxUhNTMVJTUhFYABgP4AgAGAgP4AAYD+AIABgID+AAGAgICAAYD+gAGA/oABgICAgICAgICAgIAABwAAAAADAAOAAAMABwALAA8AFwAbAB8AADM1IRUlETMRIREzEQE1Mx0BNSE1IRUjFQE1IRUhNTMVgAGA/gCAAYCA/YCAAQABAID+gAEAAQCAgICAAYD+gAGA/oACAICAgICAgIABAICAgIAABgAAAAACgAOAAAMABwALAA8AEwAXAAAzNSEVJREzESERMxEBNSEVATUzFTM1MxWAAYD+AIABgID+AAGA/oCAgICAgIABgP6AAYD+gAGAgIABAICAgIAAAAMAAACAAoADAAADAAcACwAAJTUzFQE1IRUBNTMVAQCA/oACgP6AgICAgAEAgIABAICAAAADAAAAAAKAAoAAAwANABcAAAE1MxUBNSMRMxEzFSEVNREjNSE1IRUzEQEAgP8AgICAAQCA/wABgIABAICA/wCAAYD/AICAgAEAgICA/oAAAAMAAAAAAoADgAADAAkADQAANREzERU1IREzEQE1IRWAAYCA/YABAIACAP4AgIACAP2AAwCAgAAAAwAAAAACgAOAAAMACQANAAA1ETMRFTUhETMRATUhFYABgID/AAEAgAIA/gCAgAIA/YADAICAAAAFAAAAAAKAA4AAAwAJAA0AEQAVAAA1ETMRFTUhETMRATUzFSE1MxUlNSEVgAGAgP2AgAGAgP4AAYCAAYD+gICAAYD+AAKAgICAgICAgAAAAAQAAAAAAoADgAADAAkADQARAAA1ETMRFTUhETMRATUzFTM1MxWAAYCA/gCAgICAAgD+AICAAgD9gAMAgICAgAAEAAD/gAKAA4AAAwAHAA8AEwAAFzUhFQERMxEBNSE1IREzEQE1IRWAAYD+AIABgP6AAYCA/YABAICAgAGAAYD+gP8AgIABgP2AAwCAgAAAAAMAAP+AAoADgAADAAcAEwAAJREzEQE1IRUBETMRMxUjESEVIRUCAID+gAEA/gCAgIABgP6AgAGA/oABgICA/YAEAP6AgP8AgIAAAAAFAAD/gAKAA4AAAwAHAA8AEwAXAAAXNSEVAREzEQE1ITUhETMRATUzFTM1MxWAAYD+AIABgP6AAYCA/gCAgICAgIABgAGA/oD/AICAAYD9gAMAgICAgAAAAgAAAAACgAOAAAMAEwAANREzERU1MxEjNSEVIRUzFSMRIRWAgIACAP8AgIABAIACgP2AgIACgICAgID+gIAAAAUAAAAAAoACgAADAAcACwAPABsAADM1MxUzNSEVJREzGQE1MxUZATMVMzUjNSERIRWAgIABAP2AgICAgIABAP8AgICAgIABgP6AAYCAgP6AAYCAgID+gIAAAAAABwAAAAACgAOAAAMABwALAA8AEwAXABsAACERMxEBNTMVMzUzFSU1MxUhNTMVATUzFTM1MxUBAID/AICAgP4AgAGAgP4AgICAAYD+gAGAgICAgICAgICAAQCAgICAAAAAAQAAAYADAAIAAAMAABE1IRUDAAGAgIAAAgAAAgABAAOAAAMABwAAGQEzGQE1MxWAgAIAAQD/AAEAgIAAAgAAAgABAAOAAAMABwAAETUzFTURMxGAgAIAgICAAQD/AAAAAgAA/4ABAAEAAAMABwAAFTUzFTURMxGAgICAgIABAP8AAAAAAgAAAgABAAOAAAMABwAAEzUzFSURMxGAgP8AgAIAgICAAQD/AAAAAAQAAAIAAgADgAADAAcACwAPAAAZATMRMxEzEQE1MxUzNTMVgICA/wCAgIACAAEA/wABAP8AAQCAgICAAAQAAAIAAgADgAADAAcACwAPAAARNTMVMzUzFSURMxEzETMRgICA/wCAgIACAICAgICAAQD/AAEA/wAAAAQAAP+AAgABAAADAAcACwAPAAAVNTMVMzUzFSURMxEzETMRgICA/wCAgICAgICAgIABAP8AAQD/AAAAAAEAAAAAAYADAAALAAAzESM1MxEzETMVIxGAgICAgIABgIABAP8AgP6AAAAAAQAAAYABAAKAAAMAABkBIREBAAGAAQD/AAAAAAMAAAAAAoAAgAADAAcACwAAMTUzFTM1MxUzNTMVgICAgICAgICAgIAAAAAAAwAAAAABAAGAAAMABwALAAAzNTMVJTUzFT0BMxWAgP8AgICAgICAgICAgAADAAAAAAEAAYAAAwAHAAsAADE1MxU9ATMVJTUzFYCA/wCAgICAgICAgIAAAAMAAAAAAoADgAADABcAGwAAITUhFSU1IzUzNSM1MzUzFSEVIRUhFSEVETUhFQEAAYD+AICAgICAAQD/AAEA/wABgICAgICAgICAgICAgIACgICAAAIAAAIABIADgAAHABMAABMRIzUhFSMRIREhESMRIxUjNSMRgIABgIABAAKAgICAgAIAAQCAgP8AAYD+gAEAgID/AAAAAAAiAZ4AAQAAAAAAAAAZAAAAAQAAAAAAAQAJAIYAAQAAAAAAAgAHADcAAQAAAAAAAwAUABkAAQAAAAAABAARAC0AAQAAAAAABQALAD4AAQAAAAAABgAJAIYAAQAAAAAABwA8AEkAAQAAAAAACAAeAMIAAQAAAAAACQAKAAoAAQAAAAAACgAmAIUAAQAAAAAACwAXAKsAAQAAAAAADAA5AMIAAQAAAAAADQAoAPsAAQAAAAAADgAuASMAAQAAAAAAEwApAVEAAQAAAAABAAAIAXoAAwABBAkAAAJKAqwAAwABBAkAAQASArgAAwABBAkAAgAOAZYAAwABBAkAAwAiAYIAAwABBAkABAAiAYIAAwABBAkABQAWAaQAAwABBAkABgASArgAAwABBAkABwDGAboAAwABBAkACAAsAoAAAwABBAkACQAKAyQAAwABBAkACgJKAqwAAwABBAkACwA+BPYAAwABBAkADAAiBTQAAwABBAkADQBQBVYAAwABBAkADgBcBaYAAwABBAkAEwA2BgIAAwABBAkBAAAQBjhDb3B5cmlnaHQgYm9iZ3JhdHRvbiAyMDEwRm9udFN0cnVjdCBNaW5lY3JhZnRNaW5lY3JhZnQgUmVndWxhclZlcnNpb24gMS4wRm9udFN0cnVjdCBpcyBhIHRyYWRlbWFyayBvZiBGU0kgRm9udFNob3AgSW50ZXJuYXRpb25hbCBHbWJIHE1pbmVjcmFmdB0gd2FzIGJ1aWx0IHdpdGggRm9udFN0cnVjdApodHRwOi8vd3d3LmZvbnRzaG9wLmNvbWh0dHA6Ly9mb250c3RydWN0LmZvbnRzaG9wLmNvbS9mb250c3RydWN0aW9ucy9zaG93LzM5NDEzM0NyZWF0aXZlIENvbW1vbnMgQXR0cmlidXRpb24gU2hhcmUgQWxpa2VodHRwOi8vY3JlYXRpdmVjb21tb25zLm9yZy9saWNlbnNlcy9ieS1zYS8zLjAvRml2ZSBiaWcgcXVhY2tpbmcgemVwaHlycyBqb2x0IG15IHdheCBiZWRBUUFNZEZwbgBNAGkAbgBlAGMAcgBhAGYAdAAgAFIAZQBnAHUAbABhAHIAVgBlAHIAcwBpAG8AbgAgADEALgAwAFQAaABlACAAIgBEAGoARABDAEgAIgAgAG4AYQBtAGUAIABpAHMAIABvAHcAbgAgAGIAeQAgAG0AZQAgACgAZABqAGQAYwBoAC4AYwBvAG0AKQAuAA0ACgANAAoAVABoAGUAIAAiAE0AaQBuAGUAYwByAGEAZgB0ACIAIABnAGEAbQBlACAAaQBzACAAbwB3AG4AIABiAHkAIABNAG8AagBhAG4AZwAgAFMAcABlAGMAaQBmAGkAYwBhAHQAaQBvAG4AcwAuAEYAbwBuAHQAcwB0AHIAdQBjAHQAIABiAHkAIABGAG8AbgB0AFMAaABvAHAAVABoAGkAcwAgACIATQBpAG4AZQBjAHIAYQBmAHQAIgAgAGYAbwBuAHQAIAB3AGEAcwAgAGEAZABhAHAAdABlAGQAIABpAG4AdABvACAAVAByAHUAZQBUAHkAcABlACAAZgBpAGwAZQAgAGIAeQAgAG0AZQAgACgARABqAEQAQwBIACkALgANAAoADQAKAFQAaABpAHMAIAAiAE0AaQBuAGUAYwByAGEAZgB0ACIAIABmAG8AbgB0ACAAaQBzACAAdQBuAGQAZQByACAAQwByAGUAYQB0AGkAdgBlACAAQwBvAG0AbQBvAG4AcwAgAEwAaQBjAGUAbgBzAGUAIAAoAFMAaABhAHIAZQAgAEEAbABpAGsAZQApAC4ADQAKAA0ACgBUAGgAZQAgACIARABqAEQAQwBIACIAIABuAGEAbQBlACAAaQBzACAAbwB3AG4AIABiAHkAIABtAGUAIAAoAGQAagBkAGMAaAAuAGMAbwBtACkALgANAAoADQAKAFQAaABlACAAIgBNAGkAbgBlAGMAcgBhAGYAdAAiACAAZgBvAG4AdAAgAHMAdAB5AGwAZQAgAHcAYQBzACAAbQBhAGQAZQAgAGIAeQAgAE4AbwB0AGMAaAAuAA0ACgANAAoAVABoAGUAIAAiAE0AaQBuAGUAYwByAGEAZgB0ACIAIABnAGEAbQBlACAAaQBzACAAbwB3AG4AIABiAHkAIABNAG8AagBhAG4AZwAgAFMAcABlAGMAaQBmAGkAYwBhAHQAaQBvAG4AcwAuAGgAdAB0AHAAOgAvAC8AZgBvAG4AdABzAHQAcgB1AGMAdAAuAGYAbwBuAHQAcwBoAG8AcAAuAGMAbwBtAC8AaAB0AHQAcAA6AC8ALwBkAGoAZABjAGgALgBjAG8AbQAvAEMAcgBlAGEAdABpAHYAZQAgAEMAbwBtAG0AbwBuAHMAIABBAHQAdAByAGkAYgB1AHQAaQBvAG4AIABTAGgAYQByAGUAIABBAGwAaQBrAGUAaAB0AHQAcAA6AC8ALwBjAHIAZQBhAHQAaQB2AGUAYwBvAG0AbQBvAG4AcwAuAG8AcgBnAC8AbABpAGMAZQBuAHMAZQBzAC8AYgB5AC0AcwBhAC8AMwAuADAALwBNAGkAbgBlAGMAcgBhAGYAdAAgAGkAcwAgAGoAdQBzAHQAIABhAHcAZQBzAG8AbQBlACAAIQBBAFEAQQBNAGQARgBwAG4AAAADAAAAAAAAAGYAMwAAAAAAAAAAAAAAAAAAAAAAAAAA ";
 //var settingsIcon = " iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAIAAADZrBkAAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuNWWFMmUAAAFCSURBVDhPlY7/SsJQFMfvq+zeu102386BN/slxtpIW39EQaRoYCWK0JaVlQQhPoCB/qUPEdQDdO7OtihoLvbh8N0557MzMn0arhZvyHIxW85naVZ1rjrYT6e+7ysN+B7gduKsooDgDjimsMj0WWmNupsTUxRMA7To2q9ZBkpT1xKtGXUzKgY4ZYnCv67tQwUHDpLJYzgZhY2ac15zsisCf6iuvT4EwJlXzYkwLKGb5GU4AE6cyqlT+fx4B7KzMITQDTIOeuOgf1zdBnD8Z95TWeeGwQUZDbrA0U45F7tlTnXOdHLX69z3O/XN0nq2VKWUM8ZJeN2+7V4cbNi5kDbVOKOcBFetm8uWWyrmhGmMajTWPFn0pJ1dUQMHTKUB6cfWkl5rSynxhVEG4WemaYagMmrNQxffsRXvJUtpPw7wQNDoF3gj74+Vc8xUAAAAAElFTkSuQmCC ";
 var settingsIcon = " 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 ";
 var mcpeButtonOldIcon = " iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuNWWFMmUAAABhSURBVEhLY9izcTVNEW0tKExNB1kwta2RRkhDXYvGFqhpDnUf0N6C0SAigEZTEUE0mooIotFURBCNpiKCaDQVEUSjqYggGk1FBBEoFRWlpgNDCsgCIy0EwhTErwyrrLoWAI4KV9f/jHdkAAAAAElFTkSuQmCC ";
 var blackIconTransparent = " iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGElEQVR42mNkYGCoZyABMDGQCEY1jBQNAD+jAJe/Rx5TAAAAAElFTkSuQmCC ";
 var mcpeExitButtonIcon = " iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuNWWFMmUAAAHMSURBVDhPjZDbSgJRFIb3qzgHx3oE38nCySxRyvJQGIFk2IUJBuLUdDQC6XBfN3XVCxgk5Eus1loza9weggY+9t7/+te/1x71fOfD5/tbwEe4/snrAu0NqtUqcNBL/3Kh4T9QSMJZAkUhL30fjsvbTCNcdUgTZj0JZ5kJJ/LnzEylONcomkDTJOI8kQ8UFpiC4s/3kOGz1jgeDWGMun4hhfBEFETP4wI2SkgUFjbQnoJEj4LkaU+35/CIHJW2oIGIURrHo68pTXTxR08bXHswuO5BfbcA9Z08JJPJ6aaZlSAP+xHHTjDqwe8CcbiVi5AwvVnOVNO9ju0w6t7rQL/XgYPCBlMrZHmV/0FPY8KwWj47Ab1xywHbioO66baB2NvMMPu5TBigTRKG8R4hj3gt0wbLsEFdnbXgstOCStaF8no6aoxCFpxprWTT7DcMi1EX7RM4R0prq7Drrga3a830Twh9QoK8hBGzwESUd9oED4OK6RQjP1pCiu4KbC/QSSu6KTANk1Fem4KaXBDIKOagYRI2radwIgMnwqAeT9RkUYpi1Bsm+yCU9wiFBBNhkOu6QTIKcgOPjOusrp91TdEXNYbNUtSNs7qOGTPhF1U7V2AcJE8CAAAAAElFTkSuQmCC "
-    //var mcpeExitButtonPressedIcon = " iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABh0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC41ZYUyZQAAAYpJREFUOE+dkN1OwkAQRtc34IWQ0AKKoFQo8S8hUhMCwaiUIkHUhKhcwo1eeY+JJPKI485sZ7uFmqhNTnZ39pvTacXLXQDvr3PFW7j+yCyhNgfXdYFE0/EgMfAbSCIECJRMxwF41X2iGa4mWGPWM0JsKdREwUaYqB1sNHKNoWlQhBKUqZC6/PpcEHQ2GlfLBaxk3XyhnghF+Hl0IRtZomVhA+5RxPUN0fPIhyfJ+WEZmhIOcuNq+RGrcZ3z+tMmwx5MhjfQcPagUSlCKpWKN62tCGYoL1EiyWNwBchZeUfDMrOZz3hnZrXowe/Cfa8Lp6UCcVLK08r/Az+NCGWc46wWja7bgBzt5ojjYi4UGJOEMtpLMMNZLRpetuC224J6wQI3n9WNWpJwxrVeyFJeiwadCwgkNTsDVSuj3m404z9BzAkRzCJa1G970JciJ5sm+EezxLG2oZJQx5pjpQ1RB0UeXTAY5LBqiGTxuiHyaSKPinzJQbMh2isp7SXRRFJk23ZU+D/0JF38AQHf5C2bwVq5FZkAAAAASUVORK5CYII="
+var reloadButtonIcon = " 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 ";
+var closeButtonIcon = " iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURQAAAAEBAQICAgMDAwQEBAUFBQYGBgcHBwgICAkJCQoKCgsLCwwMDA0NDQ4ODg8PDxERERISEhMTExQUFBUVFRYWFhcXFxgYGBkZGRsbGxwcHB0dHR4eHiAgICQkJCUlJSYmJicnJykpKSoqKisrKywsLC0tLS4uLi8vLzAwMDExMTIyMjMzMzU1NTc3Nzg4ODk5OTs7Ozw8PD09PT4+Pj8/P0BAQEFBQUJCQkREREZGRkdHR05OTlNTU1RUVFVVVVZWVldXV1hYWFlZWVxcXF1dXWBgYGRkZGVlZWlpaWpqamtra21tbXFxcXJycnx8fI2NjY6OjpCQkJKSkpOTk5WVlZeXl5iYmJqampubm5ycnJ2dnZ6enp+fn6GhoaOjo6ioqKmpqbq6uru7u7y8vL29vb6+vr+/v8DAwMLCwsPDw8TExMbGxsjIyMnJycrKytDQ0NHR0dLS0tPT09TU1NbW1tjY2Nvb29zc3N3d3d7e3t/f3+Dg4OHh4eLi4uPj4+Tk5Ofn5+rq6uvr6+3t7QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAi956kAAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAQXRFWHRDb21tZW50AENSRUFUT1I6IGdkLWpwZWcgdjEuMCAodXNpbmcgSUpHIEpQRUcgdjgwKSwgcXVhbGl0eSA9IDkwCn1U2t0AAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuNvyMY98AAAqgSURBVHhexVuLfxRFEq55byBweAaCKAh5mYAG5Y16AQni2/gKp4iveHqo+H5dUATU/zv3fdW1u7M7M7szy+bXXwjZqe7p+rq6urq6d0a2RsLmV1fXVpamJ9Mozianl1bWrn61aUUN0ZzAT28/s0ckFCCM8CcI+TnAf3ueefsnq1QfzQjcfu8QtKpu6ORf/U+CgAREQOjQe7etcj00ILC5NpmqxiBxHFzPKVAaUcKPIunkWoPhqE3g+nRGfU6XhLhof3b6MzWBCbPp63bbUNQjcO9F7bm08BtEEXWoEYIophvgQ6xXKHGV8O/Fe3bzYNQh8PN56lAtqrZjfZpf/4bot8qASGIVi5z/2RoYhOEE/jiDtmLaGT/oaFuRItCJ0AHLoB4/AW4ROfOHNVKNoQSeb8HjY5121n1hxyNe0NRqbnftZgIv8Otuaj1vzVRiCIFrQcLm6H+YAXHKNkMJ8Rn6nDN0/qYoINsUfWcF3BRJElyzpiowkMCtZbQTJuwjLc1fHXb2WpXS5M4feKlFlIAyfnGZsGz5ljVXikEErrM9tB+gL+gdLJCxVTICNCBRHf6YI1BfIBkdheKMnknGg+bkAALLHGBqQRP0/xiK0RydSw69du3TXMdufXrttUOUw1mhOdHqziSwRCDLVq8ElQS+maTuOEg17NEJ0CI+JnL6owqb3vroNIpZiSR5S5SkGiGiyW+sTgFVBN7J2Jb2FpOPFsbnXdK6ctMq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 "
+//var mcpeExitButtonPressedIcon = " iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABh0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC41ZYUyZQAAAYpJREFUOE+dkN1OwkAQRtc34IWQ0AKKoFQo8S8hUhMCwaiUIkHUhKhcwo1eeY+JJPKI485sZ7uFmqhNTnZ39pvTacXLXQDvr3PFW7j+yCyhNgfXdYFE0/EgMfAbSCIECJRMxwF41X2iGa4mWGPWM0JsKdREwUaYqB1sNHKNoWlQhBKUqZC6/PpcEHQ2GlfLBaxk3XyhnghF+Hl0IRtZomVhA+5RxPUN0fPIhyfJ+WEZmhIOcuNq+RGrcZ3z+tMmwx5MhjfQcPagUSlCKpWKN62tCGYoL1EiyWNwBchZeUfDMrOZz3hnZrXowe/Cfa8Lp6UCcVLK08r/Az+NCGWc46wWja7bgBzt5ojjYi4UGJOEMtpLMMNZLRpetuC224J6wQI3n9WNWpJwxrVeyFJeiwadCwgkNTsDVSuj3m404z9BzAkRzCJa1G970JciJ5sm+EezxLG2oZJQx5pjpQ1RB0UeXTAY5LBqiGTxuiHyaSKPinzJQbMh2isp7SXRRFJk23ZU+D/0JF38AQHf5C2bwVq5FZkAAAAASUVORK5CYII="
 var mcpeBackground = " iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABh0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC41ZYUyZQAAAtZJREFUeF7tmMGJXEEMRDedTcHgm0++G2xwCHP0xQGYyWBzcXRrXjOvqdV8B1DQByGppFJDMd2f0cvfPz/f325fl/3+9mnZFfbj8+uHur6d/0JAYzaQ3+/3jTkw69SsN/PXL8ACQObYzCWKt/NfUON2u20g1QQjVz29uFgzfwlgkQJkMXEHctDE2vnrDZAk0QYNzD5jjAPFW/nrDcgCj0c2eEjGeVA7fz+CNgDaYBMHXOFYO3+/AYLpVdZm+2ZNrJG/BMAELGaeptLEcpv5W4BZxDt4kjDvWjv/6Qpg2cynQxyMgVdxK//DZ/BqyP+Muj3N/P1fwMKv71+WdxAxB9CMJyfOejN/XwGbjNNrmTugnb8FSFXIeSTMxZJIzEDjVv7ZBxDQmA3kKCjmwKxTs97MP/sA1OBbKZBqgpGrnl5crJm/H0E8Bchi4g7koIm1888+QNUEeTyywUMyzoPa+WcfMMH0KmuzfbMm1shfAmACFjNPU2liuc38LcAs4h08SZh3rZ3/dAWwbObTIQ7GwKu4lX/2ASSSsbMPeMTptcwd0M7fAqQq5DwS5mJJJGagcSv/7AMIaMwGchQUc2DWqVlv5p99AGrwrRRINcHIVU8vLtbM348gngJkMXEHctDE2vlnH6Bqgjwe2eAhGedB7fyzD5hgepW12b5ZE2vkLwEwAYuZp6k0sdxm/hZgFvEOniTMu9bOf7oCWDbz6RAHY+BV3Mo/+wASydjZBzzi9FrmDmjnbwFSFXIeCXOxJBIz0LiVf/YBBDRmAzkKijkw69SsN/PPPgA1+FYKpJpg5KqnFxdr5u9HEE8Bspi4AzloYu38sw9QNUEej2zwkIzzoHb+2QdMML3K2mzfrIk18pcAmIDFzNNUmlhuM38LMIt4B08S5l1r5z9dASyb+XSIgzHwKm7ln30AiWTs7AMecXotcwe087cAqQo5j4S5WBKJGWjcyX99/wcRaXxvqKBwrwAAAABJRU5ErkJggg== "
 var logoImage = " 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 ";
 var dividerImage = " iVBORw0KGgoAAAANSUhEUgAAAgAAAAADCAIAAABqESAqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuNWWFMmUAAAAtSURBVFhH7dUxEQAwCASw91DBddEVURjqjgVyFw/JqwZgoeRcADYaIQCwQvUH6c9EiHECEccAAAAASUVORK5CYII= ";
-Base64Decode(android.util.Base64.decode(mcpeFontString, 0), path + "/minecraft.ttf");
+var playButtonIcon = " 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 ";
+var playButtonClickedIcon = " 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 ";
+var splashTwitterButtonIcon = " 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 ";
+var splashTwitterButtonClickedIcon = " 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 ";
+Base64Decode(android.util.Base64.decode(fontFont, 0), pathFont + "/minecraft-moreoptionspe.ttf");
 Base64Decode(android.util.Base64.decode(settingsIcon, 0), path + "/settings.png");
 Base64Decode(android.util.Base64.decode(mcpeButtonOldIcon, 0), path + "/mcpebutton.png");
 Base64Decode(android.util.Base64.decode(blackIconTransparent, 0), path + "/blackt.png");
 Base64Decode(android.util.Base64.decode(mcpeExitButtonIcon, 0), path + "/mcpeexitbutton.png");
+Base64Decode(android.util.Base64.decode(reloadButtonIcon, 0), path + "/reloadbutton.png");
+Base64Decode(android.util.Base64.decode(closeButtonIcon, 0), path + "/closebutton.png");
+Base64Decode(android.util.Base64.decode(playButtonIcon, 0), path + "/playbutton.png");
+Base64Decode(android.util.Base64.decode(playButtonClickedIcon, 0), pathFont + "/play_button_clicked.png");
+Base64Decode(android.util.Base64.decode(splashTwitterButtonIcon, 0), path + "/splashtwitterbutton.png");
+Base64Decode(android.util.Base64.decode(splashTwitterButtonClickedIcon, 0), pathFont + "/twitter_button_clicked.png");
 //Base64Decode(android.util.Base64.decode(mcpeExitButtonPressedIcon, 0), path + "/mcpeexitbuttonpressed.png");
 //Base64Decode(android.util.Base64.decode(mcpeBackground, 0), path + "/mcpebackground.png");
 
@@ -1428,6 +2029,7 @@ function Base64Decode(byteArray, Path) {
             Stream.write(byteArray);
             Stream.close();
         }
+		mcpeFont = new android.graphics.Typeface.createFromFile(pathFont + "/minecraft-moreoptionspe.ttf");
     } catch(err) {
         print(err);
     }
@@ -1437,18 +2039,28 @@ var GUI;
 var menu;
 var exitUI;
 
-var mcpeFont = new android.graphics.Typeface.createFromFile(path + "/minecraft.ttf");
-
 var sBtn = new android.graphics.BitmapFactory.decodeFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang/minecraftpe/mods/settings.png");
 var mcpeBtnOld = new android.graphics.BitmapFactory.decodeFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang/minecraftpe/mods/mcpebutton.png");
 var blackTBtn = new android.graphics.BitmapFactory.decodeFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang/minecraftpe/mods/blackt.png");
 var mcpeExitBtn = new android.graphics.BitmapFactory.decodeFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang/minecraftpe/mods/mcpeexitbutton.png");
+var reloadBtn = new android.graphics.BitmapFactory.decodeFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang/minecraftpe/mods/reloadbutton.png");
+var closeBtn = new android.graphics.BitmapFactory.decodeFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang/minecraftpe/mods/closebutton.png");
+var playBtn = new android.graphics.BitmapFactory.decodeFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang/minecraftpe/mods/playbutton.png");
+var playBtnClicked = new android.graphics.BitmapFactory.decodeFile("mnt/sdcard/games/com.mojang/play_button_clicked.png");
+var splashTwitterBtn = new android.graphics.BitmapFactory.decodeFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang/minecraftpe/mods/splashtwitterbutton.png");
+var splashTwitterBtnClicked = new android.graphics.BitmapFactory.decodeFile("mnt/sdcard/games/com.mojang/twitter_button_clicked.png");
 //var mcpeBckgrnd = new android.graphics.BitmapFactory.decodeFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang/minecraftpe/mods/mcpebackground.png");
 
 var settingsButton = new android.graphics.drawable.BitmapDrawable(sBtn);
 var mcpeButtonOldImage = new android.graphics.drawable.BitmapDrawable(mcpeBtnOld);
 var blackTImage = new android.graphics.drawable.BitmapDrawable(blackTBtn);
 var mcpeExitButtonImage = new android.graphics.drawable.BitmapDrawable(mcpeExitBtn);
+var reloadButtonImage = new android.graphics.drawable.BitmapDrawable(reloadBtn);
+var closeButtonImage = new android.graphics.drawable.BitmapDrawable(closeBtn);
+var playButtonImage = new android.graphics.drawable.BitmapDrawable(playBtn);
+var playButtonClickedImage = new android.graphics.drawable.BitmapDrawable(playBtnClicked);
+var splashTwitterButtonImage = new android.graphics.drawable.BitmapDrawable(splashTwitterBtn);
+var splashTwitterButtonClickedImage = new android.graphics.drawable.BitmapDrawable(splashTwitterBtnClicked);
 //var mcpeExitButtonPressedImage = new android.graphics.drawable.BitmapDrawable(mcpeExitBtn);
 //var mcpeBackgroundImage = new android.graphics.drawable.BitmapDrawable(mcpeBckgrnd);*/
 
@@ -1486,6 +2098,9 @@ var State22 = false;
 var State23 = false;
 var State24 = false;
 var State25 = false;
+var State26 = false;
+var State27 = false;
+var State28 = false;
 var StateTwerk = false;
 var StateDerp = false;
 
@@ -1758,6 +2373,9 @@ function leaveGame() {
     State23 = false;
     State24 = false;
     State25 = false;
+    State26 = false;
+    State27 = false;
+	State28 = false;
     StateTwerk = false;
     StateDerp = false;
     closeMenu();
@@ -1771,7 +2389,6 @@ function leaveGame() {
     HomeX = null;
     HomeY = null;
     HomeZ = null;
-	showMainMenuList();
 }
 
 function dip2px(dips) {
@@ -1780,7 +2397,7 @@ function dip2px(dips) {
 }
 //Add menu button
 var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
-ctx.runOnUiThread(new java.lang.Runnable({
+/*ctx.runOnUiThread(new java.lang.Runnable({
     run: function() {
         try {
             MoreOptionsPE.loadMainSettings();
@@ -1808,6 +2425,7 @@ ctx.runOnUiThread(new java.lang.Runnable({
             menuBtn.setOnClickListener(new android.view.View.OnClickListener({
                 onClick: function(viewarg) {
                     Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+					closeHacksList();
                     mainMenu();
                     exit();
                 }
@@ -1823,7 +2441,7 @@ ctx.runOnUiThread(new java.lang.Runnable({
             print('An error occured: ' + err);
         }
     }
-}));
+}));*/
 
 /*function showHacksStates() {
     var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
@@ -1838,7 +2456,7 @@ ctx.runOnUiThread(new java.lang.Runnable({
                 var State1Text = "";
                 StatesText.setTextSize(10);
                 if (State == true) {
-                    StateText = "Walk through blocks | ";
+                    StateText = Texts.walk_through_blocks + " | ";
                 } else if (State == false) {
                     StateText = "";
                 } else if (State1 == true) {
@@ -1900,151 +2518,169 @@ function showHacksList() {
                     var State23Text = "";
                     var State24Text = "";
                     var State25Text = "";
+                    var State26Text = "";
+                    var State27Text = "";
+                    var State28Text = "";
                     var StateTwerkText = "";
                     var StateDerpText = "";
 					var MoreOptionsHacksListText =  "AgameR MoreOptions PE v" + CURRENT_VERSION;
                     if(State == true) {
-                        StateText = " [Walk through blocks] ";
+                        StateText = " [" + Texts.walk_through_blocks + "] ";
                     } else if(State == false) {
                         StateText = "";
                     }
                     if(State1 == true) {
-                        State1Text = " [InstaHeal] ";
+                        State1Text = " [" + Texts.instaheal + "] ";
                     } else if(State1 == false) {
                         State1Text = "";
                     }
                     if(State2 == true) {
-                        State2Text = " [Fly] ";
+                        State2Text = " [" + Texts.fly + "] ";
                     } else if(State2 == false) {
                         State2Text = "";
                     }
                     if(State3 == true) {
-                        State3Text = " [Set entities on fire] ";
+                        State3Text = " [" + Texts.set_entities_on_fire + "] ";
                     } else if(State3 == false) {
                         State3Text = "";
                     }
                     if(State4 == true) {
-                        State4Text = " [Gamespeed x" + gameSpeedHackSetting + "] ";
+                        State4Text = " [" + Texts.gamespeed + " x" + gameSpeedHackSetting + "] ";
                     } else if(State4 == false) {
                         State4Text = "";
                     }
                     if(State5 == true) {
-                        State5Text = " [TapSpammer] ";
+                        State5Text = " [" + Texts.tapspammer + "] ";
                     } else if(State5 == false) {
                         State5Text = "";
                     }
                     if(State6 == true) {
-                        State6Text = " [Sneaking] ";
+                        State6Text = " [" + Texts.sneaking + "] ";
                     } else if(State6 == false) {
                         State6Text = "";
                     }
                     if(State7 == true) {
-                        State7Text = " [Zoom] ";
+                        State7Text = " [" + Texts.zoom + "] ";
                     } else if(State7 == false) {
                         State7Text = "";
                     }
                     if(State8 == true) {
-                        State8Text = " [Show coords] ";
+                        State8Text = " [" + Texts.show_coords + "] ";
                     } else if(State8 == false) {
                         State8Text = "";
                     }
                     if(State9 == true) {
-                        State9Text = " [InstaMine] ";
+                        State9Text = " [" + Texts.instamine + "] ";
                     } else if(State9 == false) {
                         State9Text = "";
                     }
                     if(State10 == true) {
-                        State10Text = " [Knockback] ";
+                        State10Text = " [" + Texts.knockback + "] ";
                     } else if(State10 == false) {
                         State10Text = "";
                     }
                     if(State11 == true) {
-                        State11Text = " [X-Ray] ";
+                        State11Text = " [" + Texts.xray + "] ";
                     } else if(State11 == false) {
                         State11Text = "";
                     }
                     if(State12 == true) {
-                        State12Text = " [Always day] ";
+                        State12Text = " [" + Texts.always_day + "] ";
                     } else if(State12 == false) {
                         State12Text = "";
                     }
                     if(State13 == true) {
-                        State13Text = "Saddle Up | ";
+                        State13Text = " [" + Texts.saddle_up + "] ";
                     } else if(State13 == false) {
                         State13Text = "";
                     }
                     if(State14 == true) {
-                        State14Text = " [StackDrop] ";
+                        State14Text = " [" + Texts.stackdrop + "] ";
                     } else if(State14 == false) {
                         State14Text = "";
                     }
                     if(State15 == true) {
-                        State15Text = " [TapTeleporter] ";
+                        State15Text = " [" + Texts.teleporter + "] ";
                     } else if(State15 == false) {
                         State15Text = "";
                     }
                     if(State16 == true) {
-                        State16Text = " [InstaKill] ";
+                        State16Text = " [" + Texts.instakill + "] ";
                     } else if(State16 == false) {
                         State16Text = "";
                     }
                     if(State17 == true) {
-                        State17Text = " [SignEditor (EXPERIMENTAL)] ";
+                        State17Text = " [" + Texts.signeditor + " (EXPERIMENTAL)] ";
                     } else if(State17 == false) {
                         State17Text = "";
                     }
                     if(State18 == true) {
-                        State18Text = " [All items eatable] ";
+                        State18Text = " [" + Texts.all_items_eatable + "] ";
                     } else if(State18 == false) {
                         State18Text = "";
                     }
                     if(State19 == true) {
-                        State19Text = " [Sprinting] ";
+                        State19Text = " [" + Texts.sprinting + "] ";
                     } else if(State19 == false) {
                         State19Text = "";
                     }
                     if(State20 == true) {
-                        State20Text = " [JetPack] ";
+                        State20Text = " [" + Texts.jetpack + "] ";
                     } else if(State20 == false) {
                         State20Text = "";
                     }
                     if(State21 == true) {
-                        State21Text = " [HighJump] ";
+                        State21Text = " [" + Texts.highjump + "] ";
                     } else if(State21 == false) {
                         State21Text = "";
                     }
                     if(State22 == true) {
-                        State22Text = " [Drone] ";
+                        State22Text = " [" + Texts.drone + "] ";
                     } else if(State22 == false) {
                         State22Text = "";
                     }
                     if(State23 == true) {
-                        State23Text = " [Parachute] ";
+                        State23Text = " [" + Texts.parachute + "] ";
                     } else if(State23 == false) {
                         State23Text = "";
                     }
                     if(State24 == true) {
-                        State24Text = " [TapNuker] ";
+                        State24Text = " [" + Texts.tapnuker + "] ";
                     } else if(State24 == false) {
                         State24Text = "";
                     }
                     if(State25 == true) {
-                        State25Text = " [Walk on Liquids (EXPERIMENTAL)] ";
+                        State25Text = " [" + Texts.walk_on_liquids + "] ";
                     } else if(State25 == false) {
                         State25Text = "";
                     }
+					if(State26 == true) {
+                        State26Text = " [" + Texts.autospammer + "] ";
+                    } else if(State26 == false) {
+                        State26Text = "";
+                    }
+					if(State27 == true) {
+                        State27Text = " [" + Texts.autoleave + "] ";
+                    } else if(State27 == false) {
+                        State27Text = "";
+                    }
+					if(State28 == true) {
+                        State28Text = " [" + Texts.instafood + "] ";
+                    } else if(State28 == false) {
+                        State28Text = "";
+                    }
                     if(StateTwerk == true) {
-                        StateTwerkText = " [Twerk] ";
+                        StateTwerkText = " [" + Texts.twerk + "] ";
                     } else if(StateTwerk == false) {
                         StateTwerkText = "";
                     }
                     if(StateDerp == true) {
-                        StateDerpText = " [Derp] ";
+                        StateDerpText = " [" + Texts.derp + "] ";
                     } else if(StateDerp == false) {
                         StateDerpText = "";
                     }
                     var MoreOptionsHacksListTextView = minecraftText(MoreOptionsHacksListText);
-					var StatesText = minecraftText(StateText + State1Text + State2Text + State3Text + State4Text + State5Text + State6Text + State7Text + State8Text + State9Text + State10Text + State11Text + State12Text + State13Text + State14Text + State15Text + State16Text + State17Text + State18Text + State19Text + State20Text + State21Text + State22Text + State23Text + State24Text + State25Text + StateTwerkText + StateDerpText);
+					var StatesText = minecraftText(StateText + State1Text + State2Text + State3Text + State4Text + State5Text + State6Text + State7Text + State8Text + State9Text + State10Text + State11Text + State12Text + State13Text + State14Text + State15Text + State16Text + State17Text + State18Text + State19Text + State20Text + State21Text + State22Text + State23Text + State24Text + State25Text + State26Text + State27Text + State28Text + StateTwerkText + StateDerpText);
                     MoreOptionsHacksListTextView.setTextSize(15);
 					MoreOptionsHacksListTextView.setTextColor(android.graphics.Color.parseColor("#0099FF"));
                     StatesText.setTextSize(15);
@@ -2095,12 +2731,15 @@ function reloadHacksList() {
 }
 
 function showMainMenuList() {
+	var display = new android.util.DisplayMetrics();
+	com.mojang.minecraftpe.MainActivity.currentMainActivity.get().getWindowManager().getDefaultDisplay().getMetrics(display);
     var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
         ctx.runOnUiThread(new java.lang.Runnable({
             run: function() {
                 try {
                     var mainMenuListLayout = new android.widget.LinearLayout(ctx);
                     mainMenuListLayout.setOrientation(1);
+                    mainMenuListLayout.setGravity(android.view.Gravity.CENTER_HORIZONTAL);
                     //--------Add Buttons-------//
                     /*var newLineText = new android.widget.TextView(ctx);
                     var authorText = new android.widget.TextView(ctx);
@@ -2109,21 +2748,90 @@ function showMainMenuList() {
                     var MCPEVersionText = new android.widget.TextView(ctx);
                     var newLine2Text = new android.widget.TextView(ctx);
                     var btn = new android.widget.Button(ctx);*/
-					var MoreOptionsMainMenuText = "AgameR MoreOptions PE v" + CURRENT_VERSION;
+					var MoreOptionsMainMenuText = "<font color='#0099FF'>AgameR MoreOptions PE v" + CURRENT_VERSION + "</font>";
                     var MoreOptionsMainMenuTextTextView = minecraftText(MoreOptionsMainMenuText);
-					var ChangelogText = minecraftText(MOD_CHANGELOG);
+					var text = MoreOptionsMainMenuText + " - " + MOD_CHANGELOG;
+					var ChangelogText = minecraftText(android.text.Html.fromHtml(text), android.widget.TextView.BufferType.SPANNABLE);
                     MoreOptionsMainMenuTextTextView.setTextSize(15);
 					MoreOptionsMainMenuTextTextView.setTextColor(android.graphics.Color.parseColor("#0099FF"));
 					MoreOptionsMainMenuTextTextView.setGravity(android.view.Gravity.CENTER);
                     ChangelogText.setTextSize(15);
+					ChangelogText.setGravity(android.view.Gravity.CENTER);
 					ChangelogText.setEllipsize(android.text.TextUtils.TruncateAt.MARQUEE);
 					ChangelogText.setMarqueeRepeatLimit(-1);
 					ChangelogText.setSingleLine();
 					ChangelogText.setHorizontallyScrolling(true);
 					ChangelogText.setSelected(true);
+					var newLineText = minecraftText("\n\n\n\n\n");
+					var playButton = new android.widget.Button(ctx);
+					playButton.setBackground(playButtonImage);
+					playButton.setGravity(android.view.Gravity.CENTER);
+					playButton.setLayoutParams(new android.widget.LinearLayout.LayoutParams(display.heightPixels / 3, display.heightPixels / 3));
+					playButton.setOnTouchListener(new android.view.View.OnTouchListener() {
+						onTouch: function(v, event) {
+							playButton.setSoundEffectsEnabled(false);
+							var action = event.getActionMasked();
+							if(action == android.view.MotionEvent.ACTION_CANCEL || action == android.view.MotionEvent.ACTION_UP) {
+								var bNP = playButtonImage;
+								bNP.setFilterBitmap(false);
+								bNP.setAntiAlias(false);
+								playButton.setBackgroundDrawable(bNP);
+								playButton.setPadding(0, 0, 0, 0);
+							} else {
+								var bNP = playButtonClickedImage;
+								bNP.setFilterBitmap(false);
+								bNP.setAntiAlias(false);
+								playButton.setBackgroundDrawable(bNP);
+								playButton.setPadding(0, Math.round(playButton.getLineHeight() / 8), 0, 0);
+							}
+							return false;
+						}
+					});
+					var newLineText2 = new android.widget.TextView(ctx);
+					newLineText2.setText("\n");
+					var splashTwitterButton = new android.widget.Button(ctx);
+					splashTwitterButton.setBackgroundDrawable(splashTwitterButtonImage);
+					splashTwitterButton.setGravity(android.view.Gravity.CENTER);
+					splashTwitterButton.setLayoutParams(new android.widget.LinearLayout.LayoutParams(display.heightPixels / 5, display.heightPixels / 5));
+					splashTwitterButton.setOnTouchListener(new android.view.View.OnTouchListener() {
+						onTouch: function(v, event) {
+							splashTwitterButton.setSoundEffectsEnabled(false);
+							var action = event.getActionMasked();
+							if(action == android.view.MotionEvent.ACTION_CANCEL || action == android.view.MotionEvent.ACTION_UP) {
+								var bNP = splashTwitterButtonImage;
+								bNP.setFilterBitmap(false);
+								bNP.setAntiAlias(false);
+								splashTwitterButton.setBackgroundDrawable(bNP);
+								splashTwitterButton.setPadding(0, 0, 0, 0);
+							} else {
+								var bNP = splashTwitterButtonClickedImage;
+								bNP.setFilterBitmap(false);
+								bNP.setAntiAlias(false);
+								splashTwitterButton.setBackgroundDrawable(bNP);
+								splashTwitterButton.setPadding(0, Math.round(splashTwitterButton.getLineHeight() / 8), 0, 0);
+							}
+							return false;
+						}
+					});
+					
+					playButton.setOnClickListener(new android.view.View.OnClickListener({
+						onClick: function(viewarg) {
+							mainMenuTextList.dismiss();
+							MoreOptionsPE.showMainButton();
+					}}));
+					splashTwitterButton.setOnClickListener(new android.view.View.OnClickListener({
+						onClick: function(viewarg) {
+							mainMenuTextList.dismiss();
+							MoreOptionsPE.showMainButton();
+							ModPE.goToUrl("https://twitter.com/AgameR_Modder");
+					}}))
                     //ChangelogText.setText(StateText + State1Text); //Title
-                    mainMenuListLayout.addView(MoreOptionsMainMenuTextTextView);
+                    //mainMenuListLayout.addView(MoreOptionsMainMenuTextTextView);
                     mainMenuListLayout.addView(ChangelogText);
+                    mainMenuListLayout.addView(newLineText);
+                    mainMenuListLayout.addView(playButton);
+                    mainMenuListLayout.addView(newLineText2);
+                    mainMenuListLayout.addView(splashTwitterButton);
                     //var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16*GuiSize, 16*GuiSize, false);
                     /*newLineText.setText("\n");
 					authorText.setText("Author : " + MOD_AUTHOR);
@@ -2134,10 +2842,10 @@ function showMainMenuList() {
                     //btn.setText("Ok");*/
 
                     //More buttons...
-                    mainMenuTextList = new android.widget.PopupWindow(mainMenuListLayout, ctx.getWindowManager().getDefaultDisplay().getWidth(), ctx.getWindowManager().getDefaultDisplay().getHeight() / 1.75);
+                    mainMenuTextList = new android.widget.PopupWindow(mainMenuListLayout, ctx.getWindowManager().getDefaultDisplay().getWidth(), ctx.getWindowManager().getDefaultDisplay().getHeight());
                     //mainMenuTextList.setBackgroundDrawable(getStretchedImage(spritesheet, 4*GuiSize, 4*GuiSize, 8*GuiSize, 8*GuiSize,getContext().getScreenWidth()/2, getContext().getScreenHeight()));
-                    mainMenuTextList.setTouchable(false);
-                    mainMenuTextList.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.LEFT | android.view.Gravity.BOTTOM, 0, 0);
+                    mainMenuTextList.setBackgroundDrawable(blackTImage);
+                    mainMenuTextList.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.LEFT | android.view.Gravity.TOP, 0, 0);
                 } catch(error) {
                     print('An error occured: ' + error);
                 }
@@ -2259,19 +2967,19 @@ function settingsScreen() {
 
                 var fullScreenButton = new android.widget.Button(ctx);
                 if(theme == "Alternative" && fullScreen == "off") {
-                    fullScreenButton = minecraftButton("Fullscreen | OFF");
+                    fullScreenButton = minecraftButton("Fullscreen | " + Texts.off);
                 } else if(theme == "Alternative" && fullScreen == "on") {
-                    fullScreenButton = minecraftButton("Fullscreen | ON");
+                    fullScreenButton = minecraftButton("Fullscreen | " + Texts.on);
                 } else if(theme == "MCPE" && fullScreen == "off") {
-                    fullScreenButton = minecraftButton("Fullscreen | OFF");
+                    fullScreenButton = minecraftButton("Fullscreen | " + Texts.off);
                     //fullScreenButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "MCPE" && fullScreen == "on") {
-                    fullScreenButton = minecraftButton("Fullscreen | ON");
+                    fullScreenButton = minecraftButton("Fullscreen | " + Texts.on);
                     //fullScreenButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue" && fullScreen == "off") {
-                    fullScreenButton = minecraftButton("Fullscreen | OFF");
+                    fullScreenButton = minecraftButton("Fullscreen | " + Texts.off);
                 } else if(theme == "Blue" && fullScreen == "on") {
-                    fullScreenButton = minecraftButton("Fullscreen | ON");
+                    fullScreenButton = minecraftButton("Fullscreen | " + Texts.on);
                 }
                 fullScreenButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
@@ -2279,34 +2987,34 @@ function settingsScreen() {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             fullScreen = "on";
                             MoreOptionsPE.saveMainSettings();
-                            fullScreenButton.setText("Fullscreen | ON");
+                            fullScreenButton.setText("Fullscreen | " + Texts.on);
                         } else if(theme == "Alternative" && fullScreen == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             fullScreen = "off";
                             MoreOptionsPE.saveMainSettings();
-                            fullScreenButton.setText("Fullscreen | OFF");
+                            fullScreenButton.setText("Fullscreen | " + Texts.off);
                         } else if(theme == "MCPE" && fullScreen == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             fullScreen = "on";
                             MoreOptionsPE.saveMainSettings();
-                            fullScreenButton.setText("Fullscreen | ON");
+                            fullScreenButton.setText("Fullscreen | " + Texts.on);
                             //fullScreenButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "MCPE" && fullScreen == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             fullScreen = "off";
                             MoreOptionsPE.saveMainSettings();
-                            fullScreenButton.setText("Fullscreen | OFF");
+                            fullScreenButton.setText("Fullscreen | " + Texts.off);
                             //fullScreenButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue" && fullScreen == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             fullScreen = "on";
                             MoreOptionsPE.saveMainSettings();
-                            fullScreenButton.setText("Fullscreen | ON");
+                            fullScreenButton.setText("Fullscreen | " + Texts.on);
                         } else if(theme == "Blue" && fullScreen == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             fullScreen = "off";
                             MoreOptionsPE.saveMainSettings();
-                            fullScreenButton.setText("Fullscreen | OFF");
+                            fullScreenButton.setText("Fullscreen | " + Texts.off);
                         }
                     }
                 }));
@@ -2314,19 +3022,19 @@ function settingsScreen() {
 
                 var hacksListButton = new android.widget.Button(ctx);
                 if(theme == "Alternative" && showList == "off") {
-                    hacksListButton = minecraftButton("Show hack list | OFF");
+                    hacksListButton = minecraftButton("Show hack list | " + Texts.off);
                 } else if(theme == "Alternative" && showList == "on") {
-                    hacksListButton = minecraftButton("Show hack list | ON");
+                    hacksListButton = minecraftButton("Show hack list | " + Texts.on);
                 } else if(theme == "MCPE" && showList == "off") {
-                    hacksListButton = minecraftButton("Show hack list | OFF");
+                    hacksListButton = minecraftButton("Show hack list | " + Texts.off);
                     //hacksListButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "MCPE" && showList == "on") {
-                    hacksListButton = minecraftButton("Show hack list | ON");
+                    hacksListButton = minecraftButton("Show hack list | " + Texts.on);
                     //hacksListButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue" && showList == "off") {
-                    hacksListButton = minecraftButton("Show hack list | OFF");
+                    hacksListButton = minecraftButton("Show hack list | " + Texts.off);
                 } else if(theme == "Blue" && showList == "on") {
-                    hacksListButton = minecraftButton("Show hack list | ON");
+                    hacksListButton = minecraftButton("Show hack list | " + Texts.on);
                 }
                 hacksListButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
@@ -2334,40 +3042,34 @@ function settingsScreen() {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             showList = "on";
                             MoreOptionsPE.saveMainSettings();
-                            showHacksList();
-                            hacksListButton.setText("Show hack list | ON");
+                            hacksListButton.setText("Show hack list | " + Texts.on);
                         } else if(theme == "Alternative" && showList == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             showList = "off";
                             MoreOptionsPE.saveMainSettings();
-                            hacksList.dismiss();
-                            hacksListButton.setText("Show hack list | OFF");
+                            hacksListButton.setText("Show hack list | " + Texts.off);
                         } else if(theme == "MCPE" && showList == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             showList = "on";
                             MoreOptionsPE.saveMainSettings();
-                            showHacksList();
-                            hacksListButton.setText("Show hack list | ON");
+                            hacksListButton.setText("Show hack list | " + Texts.on);
                             //hacksListButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "MCPE" && showList == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             showList = "off";
                             MoreOptionsPE.saveMainSettings();
-                            hacksList.dismiss();
-                            hacksListButton.setText("Show hack list | OFF");
+                            hacksListButton.setText("Show hack list | " + Texts.off);
                             //hacksListButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue" && showList == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             showList = "on";
                             MoreOptionsPE.saveMainSettings();
-                            showHacksList();
-                            hacksListButton.setText("Show hack list | ON");
+                            hacksListButton.setText("Show hack list | " + Texts.on);
                         } else if(theme == "Blue" && showList == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             showList = "off";
                             MoreOptionsPE.saveMainSettings();
-                            hacksList.dismiss();
-                            hacksListButton.setText("Show hack list | OFF");
+                            hacksListButton.setText("Show hack list | " + Texts.off);
                         }
                     }
                 }));
@@ -2375,19 +3077,19 @@ function settingsScreen() {
 
                 var oldIconButton = new android.widget.Button(ctx);
                 if(theme == "Alternative" && useOldIcon == "off") {
-                    oldIconButton = minecraftButton("Use old icon | OFF");
+                    oldIconButton = minecraftButton("Use old icon | " + Texts.off);
                 } else if(theme == "Alternative" && useOldIcon == "on") {
-                    oldIconButton = minecraftButton("Use old icon | ON");
+                    oldIconButton = minecraftButton("Use old icon | " + Texts.on);
                 } else if(theme == "MCPE" && useOldIcon == "off") {
-                    oldIconButton = minecraftButton("Use old icon | OFF");
+                    oldIconButton = minecraftButton("Use old icon | " + Texts.off);
                     //oldIconButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "MCPE" && useOldIcon == "on") {
-                    oldIconButton = minecraftButton("Use old icon | ON");
+                    oldIconButton = minecraftButton("Use old icon | " + Texts.on);
                     //oldIconButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue" && useOldIcon == "off") {
-                    oldIconButton = minecraftButton("Use old icon | OFF");
+                    oldIconButton = minecraftButton("Use old icon | " + Texts.off);
                 } else if(theme == "Blue" && useOldIcon == "on") {
-                    oldIconButton = minecraftButton("Use old icon | ON");
+                    oldIconButton = minecraftButton("Use old icon | " + Texts.on);
                 }
                 oldIconButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
@@ -2395,34 +3097,34 @@ function settingsScreen() {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             useOldIcon = "on";
                             MoreOptionsPE.saveMainSettings();
-                            oldIconButton.setText("Use old icon | ON");
+                            oldIconButton.setText("Use old icon | " + Texts.on);
                         } else if(theme == "Alternative" && useOldIcon == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             useOldIcon = "off";
                             MoreOptionsPE.saveMainSettings();
-                            oldIconButton.setText("Use old icon | OFF");
+                            oldIconButton.setText("Use old icon | " + Texts.off);
                         } else if(theme == "MCPE" && useOldIcon == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             useOldIcon = "on";
                             MoreOptionsPE.saveMainSettings();
-                            oldIconButton.setText("Use old icon | ON");
+                            oldIconButton.setText("Use old icon | " + Texts.on);
                             //oldIconButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "MCPE" && useOldIcon == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             useOldIcon = "off";
                             MoreOptionsPE.saveMainSettings();
-                            oldIconButton.setText("Use old icon | OFF");
+                            oldIconButton.setText("Use old icon | " + Texts.off);
                             //oldIconButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue" && useOldIcon == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             useOldIcon = "on";
                             MoreOptionsPE.saveMainSettings();
-                            oldIconButton.setText("Use old icon | ON");
+                            oldIconButton.setText("Use old icon | " + Texts.on);
                         } else if(theme == "Blue" && useOldIcon == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             useOldIcon = "off";
                             MoreOptionsPE.saveMainSettings();
-                            oldIconButton.setText("Use old icon | OFF");
+                            oldIconButton.setText("Use old icon | " + Texts.off);
                         }
                     }
                 }));
@@ -2430,19 +3132,19 @@ function settingsScreen() {
 
                 var showMainButtonButton = new android.widget.Button(ctx);
                 if(theme == "Alternative" && showMainButton == "off") {
-                    showMainButtonButton = minecraftButton("Show main button | OFF");
+                    showMainButtonButton = minecraftButton("Show main button | " + Texts.off);
                 } else if(theme == "Alternative" && showMainButton == "on") {
-                    showMainButtonButton = minecraftButton("Show main button | ON");
+                    showMainButtonButton = minecraftButton("Show main button | " + Texts.on);
                 } else if(theme == "MCPE" && showMainButton == "off") {
-                    showMainButtonButton = minecraftButton("Show main button | OFF");
+                    showMainButtonButton = minecraftButton("Show main button | " + Texts.off);
                     //showMainButtonButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "MCPE" && showMainButton == "on") {
-                    showMainButtonButton = minecraftButton("Show main button | ON");
+                    showMainButtonButton = minecraftButton("Show main button | " + Texts.on);
                     //showMainButtonButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue" && showMainButton == "off") {
-                    showMainButtonButton = minecraftButton("Show main button | OFF");
+                    showMainButtonButton = minecraftButton("Show main button | " + Texts.off);
                 } else if(theme == "Blue" && showMainButton == "on") {
-                    showMainButtonButton = minecraftButton("Show main button | ON");
+                    showMainButtonButton = minecraftButton("Show main button | " + Texts.on);
                 }
                 showMainButtonButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
@@ -2450,34 +3152,34 @@ function settingsScreen() {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             showMainButton = "on";
                             MoreOptionsPE.saveMainSettings();
-                            showMainButtonButton.setText("Show main button | ON");
+                            showMainButtonButton.setText("Show main button | " + Texts.on);
                         } else if(theme == "Alternative" && showMainButton == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             showMainButton = "off";
                             MoreOptionsPE.saveMainSettings();
-                            showMainButtonButton.setText("Show main button | OFF");
+                            showMainButtonButton.setText("Show main button | " + Texts.off);
                         } else if(theme == "MCPE" && showMainButton == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             showMainButton = "on";
                             MoreOptionsPE.saveMainSettings();
-                            showMainButtonButton.setText("Show main button | ON");
+                            showMainButtonButton.setText("Show main button | " + Texts.on);
                             //showMainButtonButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "MCPE" && showMainButton == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             showMainButton = "off";
                             MoreOptionsPE.saveMainSettings();
-                            showMainButtonButton.setText("Show main button | OFF");
+                            showMainButtonButton.setText("Show main button | " + Texts.off);
                             //showMainButtonButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue" && showMainButton == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             showMainButton = "on";
                             MoreOptionsPE.saveMainSettings();
-                            showMainButtonButton.setText("Show main button | ON");
+                            showMainButtonButton.setText("Show main button | " + Texts.on);
                         } else if(theme == "Blue" && showMainButton == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             showMainButton = "off";
                             MoreOptionsPE.saveMainSettings();
-                            showMainButtonButton.setText("Show main button | OFF");
+                            showMainButtonButton.setText("Show main button | " + Texts.off);
                         }
                     }
                 }));
@@ -2494,24 +3196,24 @@ function settingsScreen() {
 
                 var spamMessageButton = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
-                    spamMessageButton = minecraftButton("Change TapSpammer Message...");
+                    spamMessageButton = minecraftButton("Change TapSpammer / AutoSpammer Message...");
                 } else if(theme == "MCPE") {
-                    spamMessageButton = minecraftButton("Change TapSpammer Message...");
+                    spamMessageButton = minecraftButton("Change TapSpammer / AutoSpammer Message...");
                     //spamMessageButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
-                    spamMessageButton = minecraftButton("Change TapSpammer Message...");
+                    spamMessageButton = minecraftButton("Change TapSpammer / AutoSpammer Message...");
                 }
                 spamMessageButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
-                            openMenu("tapspammersetting");
+                            openMenu(Texts.tapspammer+ "setting");
                         } else if(theme == "MCPE") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
-                            openMenu("tapspammersetting");
+                            openMenu(Texts.tapspammer+ "setting");
                         } else if(theme == "Blue") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
-                            openMenu("tapspammersetting");
+                            openMenu(Texts.tapspammer+ "setting");
                         }
                     }
                 }));
@@ -2557,7 +3259,7 @@ function settingsScreen() {
                 } else if(theme == "Alternative" && betterGrass == "fast") {
                     betterGrassButton = minecraftButton("Better Grass | FAST");
                 } else if(theme == "Alternative" && betterGrass == "off") {
-                    betterGrassButton = minecraftButton("Better Grass | OFF");
+                    betterGrassButton = minecraftButton("Better Grass | " + Texts.off);
                 } else if(theme == "MCPE" && betterGrass == "normal") {
                     betterGrassButton = minecraftButton("Better Grass | NORMAL");
                     //betterGrassButton.setBackgroundDrawable(mcpeButtonOldImage);
@@ -2565,14 +3267,14 @@ function settingsScreen() {
                     betterGrassButton = minecraftButton("Better Grass | FAST");
                     //betterGrassButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "MCPE" && betterGrass == "off") {
-                    betterGrassButton = minecraftButton("Better Grass | OFF");
+                    betterGrassButton = minecraftButton("Better Grass | " + Texts.off);
                     //betterGrassButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue" && betterGrass == "normal") {
                     betterGrassButton = minecraftButton("Better Grass | NORMAL");
                 } else if(theme == "Blue" && betterGrass == "fast") {
                     betterGrassButton = minecraftButton("Better Grass | FAST");
                 } else if(theme == "Blue" && betterGrass == "off") {
-                    betterGrassButton = minecraftButton("Better Grass | OFF");
+                    betterGrassButton = minecraftButton("Better Grass | " + Texts.off);
                 }
                 betterGrassButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
@@ -2587,7 +3289,7 @@ function settingsScreen() {
                             betterGrass = "off";
                             MoreOptionsPE.initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
-                            betterGrassButton.setText("Better Grass | OFF");
+                            betterGrassButton.setText("Better Grass | " + Texts.off);
                         } else if(theme == "Alternative" && betterGrass == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             betterGrass = "normal";
@@ -2605,7 +3307,7 @@ function settingsScreen() {
                             betterGrass = "off";
                             MoreOptionsPE.initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
-                            betterGrassButton.setText("Better Grass | OFF");
+                            betterGrassButton.setText("Better Grass | " + Texts.off);
                         } else if(theme == "MCPE" && betterGrass == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             betterGrass = "normal";
@@ -2623,7 +3325,7 @@ function settingsScreen() {
                             betterGrass = "off";
                             MoreOptionsPE.initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
-                            betterGrassButton.setText("Better Grass | OFF");
+                            betterGrassButton.setText("Better Grass | " + Texts.off);
                         } else if(theme == "Blue" && betterGrass == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             betterGrass = "normal";
@@ -2637,19 +3339,19 @@ function settingsScreen() {
 
                 var betterGlassButton = new android.widget.Button(ctx);
                 if(theme == "Alternative" && betterGlass == "on") {
-                    betterGlassButton = minecraftButton("Better Glass | ON");
+                    betterGlassButton = minecraftButton("Better Glass | " + Texts.on);
                 } else if(theme == "Alternative" && betterGlass == "off") {
-                    betterGlassButton = minecraftButton("Better Glass | OFF");
+                    betterGlassButton = minecraftButton("Better Glass | " + Texts.off);
                 } else if(theme == "MCPE" && betterGlass == "on") {
-                    betterGlassButton = minecraftButton("Better Glass | ON");
+                    betterGlassButton = minecraftButton("Better Glass | " + Texts.on);
                     //betterGlassButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "MCPE" && betterGlass == "off") {
-                    betterGlassButton = minecraftButton("Better Glass | OFF");
+                    betterGlassButton = minecraftButton("Better Glass | " + Texts.off);
                     //betterGlassButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue" && betterGlass == "on") {
-                    betterGlassButton = minecraftButton("Better Glass | ON");
+                    betterGlassButton = minecraftButton("Better Glass | " + Texts.on);
                 } else if(theme == "Blue" && betterGlass == "off") {
-                    betterGlassButton = minecraftButton("Better Glass | OFF");
+                    betterGlassButton = minecraftButton("Better Glass | " + Texts.off);
                 }
                 betterGlassButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
@@ -2658,37 +3360,37 @@ function settingsScreen() {
                             betterGlass = "off";
                             initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
-                            betterGlassButton.setText("Better Glass | OFF");
+                            betterGlassButton.setText("Better Glass | " + Texts.off);
                         } else if(theme == "Alternative" && betterGlass == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             betterGlass = "on";
                             initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
-                            betterGlassButton.setText("Better Glass | ON");
+                            betterGlassButton.setText("Better Glass | " + Texts.on);
                         } else if(theme == "MCPE" && betterGlass == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             betterGlass = "off";
                             initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
-                            betterGlassButton.setText("Better Glass | OFF");
+                            betterGlassButton.setText("Better Glass | " + Texts.off);
                         } else if(theme == "MCPE" && betterGlass == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             betterGlass = "on";
                             initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
-                            betterGlassButton.setText("Better Glass | ON");
+                            betterGlassButton.setText("Better Glass | " + Texts.on);
                         } else if(theme == "Blue" && betterGlass == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             betterGlass = "off";
                             initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
-                            betterGlassButton.setText("Better Glass | OFF");
+                            betterGlassButton.setText("Better Glass | " + Texts.off);
                         } else if(theme == "Blue" && betterGlass == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             betterGlass = "on";
                             initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
-                            betterGlassButton.setText("Better Glass | ON");
+                            betterGlassButton.setText("Better Glass | " + Texts.on);
                         }
                     }
                 }));
@@ -2705,19 +3407,19 @@ function settingsScreen() {
 
                 var experimentalFeaturesButton = new android.widget.Button(ctx);
                 if(theme == "Alternative" && experimentalFeatures == "off") {
-                    experimentalFeaturesButton = minecraftButton("Experimental Features | OFF");
+                    experimentalFeaturesButton = minecraftButton("Experimental Features | " + Texts.off);
                 } else if(theme == "Alternative" && experimentalFeatures == "on") {
-                    experimentalFeaturesButton = minecraftButton("Experimental Features | ON");
+                    experimentalFeaturesButton = minecraftButton("Experimental Features | " + Texts.on);
                 } else if(theme == "MCPE" && experimentalFeatures == "off") {
-                    experimentalFeaturesButton = minecraftButton("Experimental Features | OFF");
+                    experimentalFeaturesButton = minecraftButton("Experimental Features | " + Texts.off);
                     //experimentalFeaturesButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "MCPE" && experimentalFeatures == "on") {
-                    experimentalFeaturesButton = minecraftButton("Experimental Features | ON");
+                    experimentalFeaturesButton = minecraftButton("Experimental Features | " + Texts.on);
                     //experimentalFeaturesButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue" && experimentalFeatures == "off") {
-                    experimentalFeaturesButton = minecraftButton("Experimental Features | OFF");
+                    experimentalFeaturesButton = minecraftButton("Experimental Features | " + Texts.off);
                 } else if(theme == "Blue" && experimentalFeatures == "on") {
-                    experimentalFeaturesButton = minecraftButton("Experimental Features | ON");
+                    experimentalFeaturesButton = minecraftButton("Experimental Features | " + Texts.on);
                 }
                 experimentalFeaturesButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
@@ -2725,38 +3427,67 @@ function settingsScreen() {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             experimentalFeatures = "on";
                             MoreOptionsPE.saveMainSettings();
-                            experimentalFeaturesButton.setText("Experimental Features | ON");
+                            experimentalFeaturesButton.setText("Experimental Features | " + Texts.on);
                         } else if(theme == "Alternative" && experimentalFeatures == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             experimentalFeatures = "off";
                             MoreOptionsPE.saveMainSettings();
-                            experimentalFeaturesButton.setText("Experimental Features | OFF");
+                            experimentalFeaturesButton.setText("Experimental Features | " + Texts.off);
                         } else if(theme == "MCPE" && experimentalFeatures == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             experimentalFeatures = "on";
                             MoreOptionsPE.saveMainSettings();
-                            experimentalFeaturesButton.setText("Experimental Features | ON");
+                            experimentalFeaturesButton.setText("Experimental Features | " + Texts.on);
                             //experimentalFeaturesButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "MCPE" && experimentalFeatures == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             experimentalFeatures = "off";
                             MoreOptionsPE.saveMainSettings();
-                            experimentalFeaturesButton.setText("Experimental Features | OFF");
+                            experimentalFeaturesButton.setText("Experimental Features | " + Texts.off);
                             //experimentalFeaturesButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue" && experimentalFeatures == "off") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             experimentalFeatures = "on";
                             MoreOptionsPE.saveMainSettings();
-                            experimentalFeaturesButton.setText("Experimental Features | ON");
+                            experimentalFeaturesButton.setText("Experimental Features | " + Texts.on);
                         } else if(theme == "Blue" && experimentalFeatures == "on") {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             experimentalFeatures = "off";
                             MoreOptionsPE.saveMainSettings();
-                            experimentalFeaturesButton.setText("Experimental Features | OFF");
+                            experimentalFeaturesButton.setText("Experimental Features | " + Texts.off);
                         }
                     }
                 }));
                 settingsMenuLayout.addView(experimentalFeaturesButton);
+				
+				var defaultUrlButton = new android.widget.Button(ctx);
+                if(theme == "Alternative") {
+                    defaultUrlButton = minecraftButton("Change default Webbrowser URL...");
+                } else if(theme == "MCPE") {
+                    defaultUrlButton = minecraftButton("Change default Webbrowser URL...");
+                    //defaultUrlButton.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(theme == "Blue") {
+                    defaultUrlButton = minecraftButton("Change default Webbrowser URL...");
+                }
+                defaultUrlButton.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        if(theme == "Alternative") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            openMenu("defaulturlsetting");
+                            defaultUrlButton.setText("Change default Webbrowser URL..");
+                        } else if(theme == "MCPE") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            openMenu("defaulturlsetting");
+                            defaultUrlButton.setText("Change default Webbrowser URL...");
+                            //defaultUrlButton.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(theme == "Blue") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            openMenu("defaulturlsetting");
+                            defaultUrlButton.setText("Change default Webbrowser URL...");
+                        }
+                    }
+                }));
+                settingsMenuLayout.addView(defaultUrlButton);
 
                 //More buttons...
                 settingsMenu = new android.widget.PopupWindow(settingsMenuLayout1, ctx.getWindowManager().getDefaultDisplay().getWidth(), ctx.getWindowManager().getDefaultDisplay().getHeight());
@@ -2823,6 +3554,8 @@ function aboutScreen() {
                     onClick: function(view) {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         aboutMenu.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
 
@@ -2832,6 +3565,263 @@ function aboutScreen() {
                 aboutMenu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.CENTER | android.view.Gravity.TOP, 0, 0);
             } catch(error) {
                 print('An error occured: ' + error);
+            }
+        }
+    }));
+}
+
+function onlinePlayersListScreen() {
+    var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+    ctx.runOnUiThread(new java.lang.Runnable({
+        run: function() {
+            try {
+                var onlinePlayersListLayout = new android.widget.LinearLayout(ctx);
+                var onlinePlayersListScroll = new android.widget.ScrollView(ctx);
+                var onlinePlayersListLayout1 = new android.widget.LinearLayout(ctx);
+                onlinePlayersListLayout.setOrientation(1);
+                onlinePlayersListLayout1.setOrientation(1);
+                onlinePlayersListScroll.addView(onlinePlayersListLayout);
+                onlinePlayersListLayout1.addView(onlinePlayersListScroll);
+                //--------Add Buttons-------//
+                /*var newLineText = new android.widget.TextView(ctx);
+                var authorText = new android.widget.TextView(ctx);
+                var currentModVersionText = new android.widget.TextView(ctx);
+                var targetMCPEVersionText = new android.widget.TextView(ctx);
+                var MCPEVersionText = new android.widget.TextView(ctx);
+                var newLine2Text = new android.widget.TextView(ctx);
+                var aboutOkBtn = new android.widget.Button(ctx);*/
+                var newLineText = minecraftText("\n");
+                var i;
+				var onlinePlayers = Server.getAllPlayerNames();
+				var playersListText;
+				for(i = 0; i < onlinePlayers.length(); i++){
+					playersListText = minecraftText(onlinePlayers[i]);
+					playersListText.setGravity(android.view.Gravity.CENTER);
+					onlinePlayersListLayout.addView(playersListText);
+				}
+                var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
+				var comingSoonTextView = minecraftText(Texts.coming_soon + "!");
+				comingSoonTextView.setGravity(android.view.Gravity.CENTER);
+				
+				onlinePlayersListLayout.addView(newLineText);
+				onlinePlayersListLayout.addView(comingSoonTextView);
+                /*newLineText.setText("\n");
+					authorText.setText("Author : " + MOD_AUTHOR);
+					currentModVersionText.setText("Current mod version : v" + CURRENT_VERSION);
+					targetMCPEVersionText.setText("Target MCPE version : v" + targetMCPEVersion);
+					MCPEVersionText.setText("Current MCPE version : v" + mcpeVersion);
+					newLine2Text.setText("\n");
+                    //btn.setText("Ok");*/
+                /*aboutOkBtn.setOnClickListener(new android.view.View.OnClickListener() {
+                    onClick: function(view) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        onlinePlayersListMenu.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
+                    }
+                });*/
+
+                //More buttons...
+                onlinePlayersListMenu = new android.widget.PopupWindow(onlinePlayersListLayout1, ctx.getWindowManager().getDefaultDisplay().getWidth(), ctx.getWindowManager().getDefaultDisplay().getHeight());
+                onlinePlayersListMenu.setBackgroundDrawable(getStretchedImage(spritesheet, 4 * GuiSize, 4 * GuiSize, 8 * GuiSize, 8 * GuiSize, getContext().getScreenWidth() / 2, getContext().getScreenHeight()));
+                onlinePlayersListMenu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.CENTER | android.view.Gravity.TOP, 0, 0);
+            } catch(error) {
+                print('An error occured: ' + error);
+            }
+        }
+    }));
+}
+
+var inputText;
+
+function consoleScreen() {
+    var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+    ctx.runOnUiThread(new java.lang.Runnable({
+        run: function() {
+            try {
+                var consoleMenuLayout = new android.widget.LinearLayout(ctx);
+                var consoleMenuScroll = new android.widget.ScrollView(ctx);
+                var consoleMenuLayout1 = new android.widget.LinearLayout(ctx);
+                consoleMenuLayout.setOrientation(1);
+                consoleMenuLayout1.setOrientation(1);
+                consoleMenuScroll.addView(consoleMenuLayout);
+                consoleMenuLayout1.addView(consoleMenuScroll);
+                //--------Add Buttons-------//
+                /*var newLineText = new android.widget.TextView(ctx);
+                var authorText = new android.widget.TextView(ctx);
+                var currentModVersionText = new android.widget.TextView(ctx);
+                var targetMCPEVersionText = new android.widget.TextView(ctx);
+                var MCPEVersionText = new android.widget.TextView(ctx);
+                var newLine2Text = new android.widget.TextView(ctx);
+                var consoleSendBtn = new android.widget.Button(ctx);*/
+				var consoleOutputText = minecraftText("Welcome to the console! Use .help for a list of commands!");
+                var consoleInput = minecraftEditText();
+                var consoleSendBtn = minecraftButton("Send");
+                var dialogLayout = new android.widget.LinearLayout(ctx);
+                var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
+                consoleMenuLayout.addView(consoleOutputText);
+                consoleMenuLayout.addView(consoleInput);
+                consoleMenuLayout.addView(consoleSendBtn);
+                /*newLineText.setText("\n");
+					authorText.setText("Author : " + MOD_AUTHOR);
+					currentModVersionText.setText("Current mod version : v" + CURRENT_VERSION);
+					targetMCPEVersionText.setText("Target MCPE version : v" + targetMCPEVersion);
+					MCPEVersionText.setText("Current MCPE version : v" + mcpeVersion);
+					newLine2Text.setText("\n");
+                    //btn.setText("Ok");*/
+                consoleSendBtn.setOnClickListener(new android.view.View.OnClickListener() {
+                    onClick: function(view) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+						inputText = consoleInput.getText().toString().split(" ");
+						    if(inputText[0] == ".help" || inputText[0] == ".?") {
+								if(inputText[1] == null || inputText[1] == "1") {
+									clientMessage(ChatColor.GREEN + "--- Showing AgameR MoreOptions PE commands help page 1 of 2 (.help <page>) ---");
+									clientMessage(" > .help <page> - Shows a list of availabe commands");
+									clientMessage(" > .menu - Opens the AgameR MoreOptions PE menu");
+									clientMessage(" > .panic - Disables all hacks");
+									clientMessage(" > .getpos - Returns your position (x, y, z)");
+									clientMessage(" > .tp <x> <y> <z> - Teleports your player to the given position (x, y, z)");
+									clientMessage(" > .sethome - Sets your home at the current player location");
+									clientMessage(" > .home - Teleports your player to your current set home location");
+									clientMessage(" > .leave - Leaves the world");
+								} else if(inputText[1] == "2") {
+									clientMessage(ChatColor.GREEN + "Showing AgameR MoreOptions PE commands help page 2 of 2");
+									clientMessage(" > .version - Tells the current AgameR MoreOptions PE version");
+									clientMessage(" > .about - Opens the AgameR MoreOptions PE about screen");
+									clientMessage(" > .settings - Opens the AgameR MoreOptions PE settings screen");
+									clientMessage(" > .update - Checks for updates");
+								} else {
+									clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.RED + "Usage: .help <page>");
+								}
+							}
+							if(inputText[0] == ".menu") {
+								closeHacksList();
+								mainMenu();
+								exit();
+							}
+							if(inputText[0] == ".panic") {
+								disableHacks();
+								reloadHacksList();
+							}
+							if(inputText[0] == ".getpos") {
+								clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "X: " + parseInt(Entity.getX(getPlayerEnt())) + " Y: " + parseInt(Entity.getY(getPlayerEnt())) + " Z: " + parseInt(Entity.getZ(getPlayerEnt())));
+							}
+							if(inputText[0] == ".tp") {
+								if(parseInt(inputText[1]) == null || parseInt(inputText[2]) == null || parseInt(inputText) == null) {
+									clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.RED + "Usage: .tp <x> <y> <z>");
+								} else {
+									Entity.setPosition(getPlayerEnt(), parseInt(inputText[1]), parseInt(inputText[2]), parseInt(inputText[3]));
+									clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "Successfully teleported player to X: " + parseInt(inputText[1]) + " Y: " + parseInt(inputText[2]) + " Z: " + parseInt(commandText[3]));
+								}
+							}
+							if(inputText[0] == ".sethome") {
+								HomeX = Entity.getX(getPlayerEnt());
+								HomeY = Entity.getY(getPlayerEnt());
+								HomeZ = Entity.getZ(getPlayerEnt());
+								MoreOptionsPE.savePerWorldSettings();
+								MoreOptionsPE.loadPerWorldSettings();
+								clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "Home successfully set!");
+							}
+							if(inputText[0] == ".home") {
+								MoreOptionsPE.loadPerWorldSettings();
+								if(HomeX == null || HomeY == null || HomeZ == null) {
+									clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "You need to set your home using .sethome first!");
+								} else {
+									Entity.setPosition(getPlayerEnt(), HomeX, HomeY, HomeZ);
+									clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "Succesfully teleported player to the current home location!");
+								}
+							}
+							if(inputText[0] == ".leave") {
+								ModPE.leaveGame();
+							}
+							if(inputText[0] == ".version") {
+								clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "Current version: " + CURRENT_VERSION);
+							}
+							if(inputText[0] == ".about") {
+								consoleMenu.dismiss();
+								aboutScreen();
+							}
+							if(inputText[0] == ".settings") {
+								consoleMenu.dismiss();
+								settingsScreen();
+								exitSettings();
+							}
+							if(inputText[0] == ".update") {
+								//Check for updates
+								consoleMenu.dismiss();
+								new java.lang.Thread(new java.lang.Runnable() {
+									run: function() {
+										MoreOptionsPE.getLatestVersion();
+										if(latestVersion != CURRENT_VERSION && latestVersion != undefined) {
+											clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE]" + ChatColor.WHITE + " There is a new version available (v" + latestVersion + " for Minecraft Pocket Edition v" + latestPocketEditionVersion + ")!");
+											MoreOptionsPE.showMessage("update", "There is a new version available (v" + latestVersion + " for Minecraft Pocket Edition v" + latestPocketEditionVersion + ")!");
+										} else {
+											currentActivity.runOnUiThread(new java.lang.Runnable() {
+												run: function() {
+													android.widget.Toast.makeText(currentActivity, new android.text.Html.fromHtml("<b>AgameR MoreOptions PE</b> You have the latest version"), 0).show();
+												}
+											});
+										}
+									}
+								}).start();
+							}
+							if(commandText[0] == ".easteregg") {
+								consoleMenu.dismiss();
+								ModPE.goToURL("http://peacestorm.github.io/easter-egg/");
+							}
+						//consoleOutputText.setText(consoleOutputText.getText() + "\n" + inputText);
+                        /*consoleMenu.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();*/
+                    }
+                });
+
+                //More buttons...
+                consoleMenu = new android.widget.PopupWindow(consoleMenuLayout1, ctx.getWindowManager().getDefaultDisplay().getWidth(), ctx.getWindowManager().getDefaultDisplay().getHeight());
+                consoleMenu.setBackgroundDrawable(blackTImage);
+                consoleMenu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.CENTER | android.view.Gravity.TOP, 0, 0);
+            } catch(error) {
+                print('An error occured: ' + error);
+            }
+        }
+    }));
+}
+
+function exitConsole() {
+    var ctxe = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+    ctxe.runOnUiThread(new java.lang.Runnable({
+        run: function() {
+            try {
+                var xConsoleLayout = new android.widget.LinearLayout(ctxe);
+                var xConsoleButton = new android.widget.Button(ctxe);
+                if(theme == "Alternative") {
+                    xConsoleButton = minecraftButtonX("X");
+                } else if(theme == "MCPE") {
+                    xConsoleButton = minecraftButtonX("X");
+                } else if(theme == "Blue") {
+                    xConsoleButton = minecraftButtonX("X");
+                }
+                /*xButton.setOnTouchListener(new android.view.View.OnTouchListener({
+                    onClick: function(viewarg) {
+						if(theme == "MCPE"){
+						xButton.setBackgroundDrawable(mcpeExitButtonPressedImage);
+                    }
+                }}));*/
+                xConsoleButton.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        exitConsoleUI.dismiss(); //Close
+                        consoleMenu.dismiss(); //Close
+						showHacksList();
+						MoreOptionsPE.showMainButton();
+                    }
+                }));
+                xConsoleLayout.addView(xConsoleButton);
+                exitConsoleUI = new android.widget.PopupWindow(xConsoleLayout, dip2px(40), dip2px(40));
+                exitConsoleUI.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                exitConsoleUI.showAtLocation(ctxe.getWindow().getDecorView(), android.view.Gravity.RIGHT | android.view.Gravity.TOP, 0, 0);
+            } catch(exception) {
+                print(exception);
             }
         }
     }));
@@ -2890,12 +3880,12 @@ function playerCustomizerScreen() {
                 var layoutParams = new android.widget.LinearLayout.LayoutParams(750, 750);
                 skinViewer.setLayoutParams(layoutParams);
                 var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
-                var trailsBtn = minecraftButton("Trails | OFF");
+                var trailsBtn = minecraftButton("Trails | " + Texts.off);
                 if(StateTrails == true) {
-                    trailsBtn.setText("Trails | ON");
+                    trailsBtn.setText("Trails | " + Texts.on);
                 }
                 if(StateTrails == false) {
-                    trailsBtn.setText("Trails | OFF");
+                    trailsBtn.setText("Trails | " + Texts.off);
                 }
                 var btn = minecraftButton("TNT");
                 var btn1 = minecraftButton("Chicken");
@@ -2917,6 +3907,7 @@ function playerCustomizerScreen() {
                 var btn17 = minecraftButton("Arrow");
                 var btn18 = minecraftButton("Boat");
                 var btn19 = minecraftButton("Ghast");
+                var btn20 = minecraftButton("Squid");
                 var btnCircular = new android.widget.Button(ctx);
                 /*circularDrawable = new android.graphics.drawable.GradientDrawable();
                 circularDrawable.setColor(android.graphics.Color.TRANSPARENT);
@@ -2938,7 +3929,7 @@ function playerCustomizerScreen() {
                 playerCustomizerMenuRightLayout.addView(btn5);
                 playerCustomizerMenuRightLayout.addView(btn6);
                 playerCustomizerMenuRightLayout.addView(btn7);
-                //playerCustomizerMenuRightLayout.addView(btn8);
+                playerCustomizerMenuRightLayout.addView(btn8);
                 playerCustomizerMenuRightLayout.addView(btn9);
                 playerCustomizerMenuRightLayout.addView(btn10);
                 playerCustomizerMenuRightLayout.addView(btn11);
@@ -2950,6 +3941,7 @@ function playerCustomizerScreen() {
                 //playerCustomizerMenuRightLayout.addView(btn17);
                 playerCustomizerMenuRightLayout.addView(btn18);
                 playerCustomizerMenuRightLayout.addView(btn19);
+                playerCustomizerMenuRightLayout.addView(btn20);
                 //playerCustomizerMenuRightLayout.addView(btnCircular);
                 /*newLineText.setText("\n");
 					authorText.setText("Author : " + MOD_AUTHOR);
@@ -2963,10 +3955,10 @@ function playerCustomizerScreen() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(StateTrails == false) {
                             StateTrails = true;
-                            trailsBtn.setText("Trails | ON");
+                            trailsBtn.setText("Trails | " + Texts.on);
                         } else if(StateTrails == true) {
                             StateTrails = false;
-                            trailsBtn.setText("Trails | OFF");
+                            trailsBtn.setText("Trails | " + Texts.off);
                         }
                     }
                 });
@@ -2977,6 +3969,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn1.setOnClickListener(new android.view.View.OnClickListener() {
@@ -2987,6 +3981,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn2.setOnClickListener(new android.view.View.OnClickListener() {
@@ -2997,6 +3993,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn3.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3007,6 +4005,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn4.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3017,6 +4017,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn5.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3027,6 +4029,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn6.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3037,6 +4041,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn7.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3047,16 +4053,20 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn8.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.spider);
-                        Entity.setMobSkin(Player.getEntity(), "mob/spider.png");
+                        Entity.setMobSkin(Player.getEntity(), "mob/spider.tga");
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn9.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3067,6 +4077,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn10.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3077,16 +4089,20 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn11.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
-                        Entity.setRenderType(Player.getEntity(), EntityRenderType.enderMan);
+                        Entity.setRenderType(Player.getEntity(), EntityRenderType.enderman);
                         Entity.setMobSkin(Player.getEntity(), "mob/enderman.tga");
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn12.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3097,6 +4113,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn13.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3107,6 +4125,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn14.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3117,17 +4137,21 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn15.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
-                        Entity.setRenderType(Player.getEntity(), GolemRenderType.renderType);
-                        Entity.setMobSkin(Player.getEntity(), "mob/MoreOptionsPE/IronGolem.png");
+                        Entity.setRenderType(Player.getEntity(), EntityRenderType.ironGolem);
+                        Entity.setMobSkin(Player.getEntity(), "mob/iron_golem.png");
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
-                    }
+						showHacksList();
+						MoreOptionsPE.showMainButton();
+					}
                 });
                 btn16.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
@@ -3137,6 +4161,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn17.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3147,6 +4173,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn18.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3157,6 +4185,8 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
                 btn19.setOnClickListener(new android.view.View.OnClickListener() {
@@ -3167,6 +4197,20 @@ function playerCustomizerScreen() {
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
 						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
+                    }
+                });
+				btn20.setOnClickListener(new android.view.View.OnClickListener() {
+                    onClick: function(view) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Entity.setRenderType(Player.getEntity(), EntityRenderType.squid);
+                        Entity.setMobSkin(Player.getEntity(), "mob/squid.png");
+                        playerCustomizerMenu.dismiss();
+                        exitPlayerCustomizerUI.dismiss();
+						headerGUI.dismiss();
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 });
 				
@@ -3217,6 +4261,13 @@ function disableHacks() {
     State21 = false;
     State22 = false;
     State23 = false;
+    State24 = false;
+    State25 = false;
+    State26 = false;
+    State27 = false;
+    State28 = false;
+	StateTwerk = false;
+	StateDerp = false;
 }
 
 function mainMenu() {
@@ -3293,17 +4344,17 @@ function mainMenu() {
                 var panicButton = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     panicButton = new android.widget.Button(ctx);
-                    panicButton.setText("Panic");
+                    panicButton.setText(Texts.panic);
                     panicButton.setTextColor(android.graphics.Color.RED);
                     panicButton.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    panicButton = minecraftButtonRed("Panic");
+                    panicButton = minecraftButtonRed(Texts.panic);
                     panicButton.setTextColor(android.graphics.Color.RED);
                     //panicButton.setTypeface(mcpeFont);
                     //panicButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     panicButton = new android.widget.Button(ctx);
-                    panicButton.setText("Panic");
+                    panicButton.setText(Texts.panic);
                     panicButton.setTextColor(android.graphics.Color.RED);
                     panicButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     panicButton.setTypeface(mcpeFont);
@@ -3316,17 +4367,17 @@ function mainMenu() {
                         exitUI.dismiss();
                         mainMenu();
                         exit();
-                        reloadHacksList();
+                        
                         if(theme == "Alternative") {
-                            panicButton.setText("Panic");
+                            panicButton.setText(Texts.panic);
                             panicButton.setTextColor(android.graphics.Color.RED);
                             panicButton.setBackgroundColor(android.graphics.Color.GRAY);
                         } else if(theme == "MCPE") {
-                            panicButton.setText("Panic");
+                            panicButton.setText(Texts.panic);
                             //panicButton.setTypeface(mcpeFont);
                             //panicButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue") {
-                            panicButton.setText("Panic");
+                            panicButton.setText(Texts.panic);
                             panicButton.setTextColor(android.graphics.Color.RED);
                             panicButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             panicButton.setTypeface(mcpeFont);
@@ -3340,13 +4391,13 @@ function mainMenu() {
 					if(Level.getGameMode() == 1 && spectator == "on") {
 						button = new android.widget.Button(ctx);
 						Entity.setCollisionSize(Player.getEntity(), 0, 0);
-						button.setText("Walk through blocks | ON");
+						button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 						button.setBackgroundColor(android.graphics.Color.GREEN);
 						State = true;
 					}else {
 						button = new android.widget.Button(ctx);
 						Entity.setCollisionSize(Player.getEntity(), 0.6, 1.8);
-						button.setText("Walk through blocks | OFF");
+						button.setText(Texts.walk_through_blocks + " | " + Texts.off);
 						button.setBackgroundColor(android.graphics.Color.RED);
 						State = false;
 					}
@@ -3354,25 +4405,25 @@ function mainMenu() {
 					if(Level.getGameMode() == 1 && spectator == "on") {
 						button = new android.widget.Button(ctx);
 						Entity.setCollisionSize(Player.getEntity(), 0, 0);
-						button.setText("Walk through blocks | ON");
+						button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 						button.setBackgroundColor(android.graphics.Color.GREEN);
 						State = true;
 					}else {
 						button = new android.widget.Button(ctx);
 						Entity.setCollisionSize(Player.getEntity(), 0, 0);
-						button.setText("Walk through blocks | ON");
+						button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 						button.setBackgroundColor(android.graphics.Color.GREEN);
 						State = true;
 					}
                 } else if(State == false && theme == "MCPE") {
 					if(Level.getGameMode() == 1 && spectator == "on") {
-						button = minecraftButton("Walk through blocks | ON");
+						button = minecraftButton(Texts.walk_through_blocks + " | " + Texts.on);
 						Entity.setCollisionSize(Player.getEntity(), 0, 0);
 						State = true;
 						//button.setTypeface(mcpeFont);
 						//button.setBackgroundDrawable(mcpeButtonOldImage);
 					}else {
-						button = minecraftButton("Walk through blocks | OFF");
+						button = minecraftButton(Texts.walk_through_blocks + " | " + Texts.off);
 						Entity.setCollisionSize(Player.getEntity(), 0.6, 1.8);
 						State = false;
 						//button.setTypeface(mcpeFont);
@@ -3380,13 +4431,13 @@ function mainMenu() {
 					}
                 } else if(State == true && theme == "MCPE") {
 					if(Level.getGameMode() == 1 && spectator == "on") {
-						button = minecraftButton("Walk through blocks | ON");
+						button = minecraftButton(Texts.walk_through_blocks + " | " + Texts.on);
 						Entity.setCollisionSize(Player.getEntity(), 0, 0);
 						State = true;
 						//button.setTypeface(mcpeFont);
 						//button.setBackgroundDrawable(mcpeButtonOldImage);
 					}else {
-						button = minecraftButton("Walk through blocks | ON");
+						button = minecraftButton(Texts.walk_through_blocks + " | " + Texts.on);
 						Entity.setCollisionSize(Player.getEntity(), 0, 0);
 						State = true;
 						//button.setTypeface(mcpeFont);
@@ -3396,7 +4447,7 @@ function mainMenu() {
 					if(Level.getGameMode() == 1 && spectator == "on") {
 						button = new android.widget.Button(ctx);
 						Entity.setCollisionSize(Player.getEntity(), 0, 0);
-						button.setText("Walk through blocks | ON");
+						button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 						button.setTextColor(android.graphics.Color.BLUE);
 						button.setBackgroundColor(android.graphics.Color.TRANSPARENT);
 						button.setTypeface(mcpeFont);
@@ -3404,7 +4455,7 @@ function mainMenu() {
 					}else {
 						button = new android.widget.Button(ctx);
 						Entity.setCollisionSize(Player.getEntity(), 0.6, 1.8);
-						button.setText("Walk through blocks | OFF");
+						button.setText(Texts.walk_through_blocks + " | " + Texts.off);
 						button.setTextColor(android.graphics.Color.WHITE);
 						button.setBackgroundColor(android.graphics.Color.TRANSPARENT);
 						button.setTypeface(mcpeFont);
@@ -3414,7 +4465,7 @@ function mainMenu() {
                     if(Level.getGameMode() == 1 && spectator == "on") {
 						button = new android.widget.Button(ctx);
 						Entity.setCollisionSize(Player.getEntity(), 0, 0);
-						button.setText("Walk through blocks | ON");
+						button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 						button.setTextColor(android.graphics.Color.BLUE);
 						button.setBackgroundColor(android.graphics.Color.TRANSPARENT);
 						button.setTypeface(mcpeFont);
@@ -3422,7 +4473,7 @@ function mainMenu() {
 					}else {
 						button = new android.widget.Button(ctx);
 						Entity.setCollisionSize(Player.getEntity(), 0, 0);
-						button.setText("Walk through blocks | ON");
+						button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 						button.setTextColor(android.graphics.Color.BLUE);
 						button.setBackgroundColor(android.graphics.Color.TRANSPARENT);
 						button.setTypeface(mcpeFont);
@@ -3436,77 +4487,77 @@ function mainMenu() {
                         if(State == false && theme == "Alternative") {
 							if(Level.getGameMode() == 1 && spectator == "on") {
 								State = true;
-								reloadHacksList();
+								
 								Entity.setCollisionSize(Player.getEntity(), 0, 0);
-								button.setText("Walk through blocks | ON");
+								button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 								button.setBackgroundColor(android.graphics.Color.GREEN);
 							}else {
 								State = true;
-								reloadHacksList();
+								
 								Entity.setCollisionSize(Player.getEntity(), 0, 0);
-								button.setText("Walk through blocks | ON");
+								button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 								button.setBackgroundColor(android.graphics.Color.GREEN);
 							}
                         } else if(State == true && theme == "Alternative") {
 							if(Level.getGameMode() == 1 && spectator == "on") {
 								State = true;
-								reloadHacksList();
+								
 								Entity.setCollisionSize(Player.getEntity(), 0, 0);
-								button.setText("Walk through blocks | ON");
+								button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 								button.setBackgroundColor(android.graphics.Color.GREEN);
 							}else {
 								State = false;
-								reloadHacksList();
+								
 								Entity.setCollisionSize(Player.getEntity(), 0.6, 1.8);
-								button.setText("Walk through blocks | OFF");
+								button.setText(Texts.walk_through_blocks + " | " + Texts.off);
 								button.setBackgroundColor(android.graphics.Color.RED);
 							}
                         } else if(State == false && theme == "MCPE") {
 							if(Level.getGameMode() == 1 && spectator == "on") {
 								State = true;
-								reloadHacksList();
+								
 								Entity.setCollisionSize(Player.getEntity(), 0, 0);
-								button.setText("Walk through blocks | ON");
+								button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 								//button.setTypeface(mcpeFont);
 								//button.setBackgroundDrawable(mcpeButtonOldImage);
 							}else {
 								State = true;
-								reloadHacksList();
+								
 								Entity.setCollisionSize(Player.getEntity(), 0, 0);
-								button.setText("Walk through blocks | ON");
+								button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 								//button.setTypeface(mcpeFont);
 								//button.setBackgroundDrawable(mcpeButtonOldImage);
 							}
                         } else if(State == true && theme == "MCPE") {
 							if(Level.getGameMode() == 1 && spectator == "on") {
 								State = true;
-								reloadHacksList();
+								
 								Entity.setCollisionSize(Player.getEntity(), 0, 0);
-								button.setText("Walk through blocks | ON");
+								button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 								//button.setTypeface(mcpeFont);
 								//button.setBackgroundDrawable(mcpeButtonOldImage);
 							}else {
 								State = false;
-								reloadHacksList();
+								
 								Entity.setCollisionSize(Player.getEntity(), 0.6, 1.8);
-								button.setText("Walk through blocks | OFF");
+								button.setText(Texts.walk_through_blocks + " | " + Texts.off);
 								//button.setTypeface(mcpeFont);
 								//button.setBackgroundDrawable(mcpeButtonOldImage);
 							}
                         } else if(State == false && theme == "Blue") {
 							if(Level.getGameMode() == 1 && spectator == "on") {
 								State = true;
-								reloadHacksList();
+								
 								Entity.setCollisionSize(Player.getEntity(), 0, 0);
-								button.setText("Walk through blocks | ON");
+								button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 								button.setTextColor(android.graphics.Color.BLUE);
 								button.setBackgroundColor(android.graphics.Color.TRANSPARENT);
 								button.setTypeface(mcpeFont);
 							}else {
 								State = true;
-								reloadHacksList();
+								
 								Entity.setCollisionSize(Player.getEntity(), 0, 0);
-								button.setText("Walk through blocks | ON");
+								button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 								button.setTextColor(android.graphics.Color.BLUE);
 								button.setBackgroundColor(android.graphics.Color.TRANSPARENT);
 								button.setTypeface(mcpeFont);
@@ -3514,17 +4565,17 @@ function mainMenu() {
                         } else if(State == true && theme == "Blue") {
 							if(Level.getGameMode() == 1 && spectator == "on") {
 								State = true;
-								reloadHacksList();
+								
 								Entity.setCollisionSize(Player.getEntity(), 0, 0);
-								button.setText("Walk through blocks | ON");
+								button.setText(Texts.walk_through_blocks + " | " + Texts.on);
 								button.setTextColor(android.graphics.Color.BLUE);
 								button.setBackgroundColor(android.graphics.Color.TRANSPARENT);
 								button.setTypeface(mcpeFont);
 							}else {
 								State = false;
-								reloadHacksList();
+								
 								Entity.setCollisionSize(Player.getEntity(), 0.6, 1.8);
-								button.setText("Walk through blocks | OFF");
+								button.setText(Texts.walk_through_blocks + " | " + Texts.off);
 								button.setTextColor(android.graphics.Color.WHITE);
 								button.setBackgroundColor(android.graphics.Color.TRANSPARENT);
 								button.setTypeface(mcpeFont);
@@ -3537,29 +4588,29 @@ function mainMenu() {
                 var button1 = new android.widget.Button(ctx);
                 if(State1 == false && theme == "Alternative") {
                     button1 = new android.widget.Button(ctx);
-                    button1.setText("InstaHeal | OFF");
+                    button1.setText(Texts.instaheal + " | " + Texts.off);
                     button1.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State1 == true && theme == "Alternative") {
                     button1 = new android.widget.Button(ctx);
-                    button1.setText("InstaHeal | ON");
+                    button1.setText(Texts.instaheal + " | " + Texts.on);
                     button1.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State1 == false && theme == "MCPE") {
-                    button1 = minecraftButton("InstaHeal | OFF");
+                    button1 = minecraftButton(Texts.instaheal + " | " + Texts.off);
                     //button1.setTypeface(mcpeFont);
                     //button1.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State1 == true && theme == "MCPE") {
-                    button1 = minecraftButton("InstaHeal | ON");
+                    button1 = minecraftButton(Texts.instaheal + " | " + Texts.on);
                     //button1.setTypeface(mcpeFont);
                     //button1.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State1 == false && theme == "Blue") {
                     button1 = new android.widget.Button(ctx);
-                    button1.setText("InstaHeal | OFF");
+                    button1.setText(Texts.instaheal + " | " + Texts.off);
                     button1.setTextColor(android.graphics.Color.WHITE);
                     button1.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button1.setTypeface(mcpeFont);
                 } else if(State1 == true && theme == "Blue") {
                     button1 = new android.widget.Button(ctx);
-                    button1.setText("InstaHeal | ON");
+                    button1.setText(Texts.instaheal + " | " + Texts.on);
                     button1.setTextColor(android.graphics.Color.BLUE);
                     button1.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button1.setTypeface(mcpeFont);
@@ -3570,37 +4621,37 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State1 == false && theme == "Alternative") {
                             State1 = true;
-                            reloadHacksList();
-                            button1.setText("InstaHeal | ON");
+                            
+                            button1.setText(Texts.instaheal + " | " + Texts.on);
                             button1.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State1 == true && theme == "Alternative") {
                             State1 = false;
-                            reloadHacksList();
-                            button1.setText("InstaHeal | OFF");
+                            
+                            button1.setText(Texts.instaheal + " | " + Texts.off);
                             button1.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State1 == false && theme == "MCPE") {
                             State1 = true;
-                            reloadHacksList();
-                            button1.setText("InstaHeal | ON");
+                            
+                            button1.setText(Texts.instaheal + " | " + Texts.on);
                             //button1.setTypeface(mcpeFont);
                             //button1.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State1 == true && theme == "MCPE") {
                             State1 = false;
-                            reloadHacksList();
-                            button1.setText("InstaHeal | OFF");
+                            
+                            button1.setText(Texts.instaheal + " | " + Texts.off);
                             //button1.setTypeface(mcpeFont);
                             //button1.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State1 == false && theme == "Blue") {
                             State1 = true;
-                            reloadHacksList();
-                            button1.setText("InstaHeal | ON");
+                            
+                            button1.setText(Texts.instaheal + " | " + Texts.on);
                             button1.setTextColor(android.graphics.Color.BLUE);
                             button1.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button1.setTypeface(mcpeFont);
                         } else if(State1 == true && theme == "Blue") {
                             State1 = false;
-                            reloadHacksList();
-                            button1.setText("InstaHeal | OFF");
+                            
+                            button1.setText(Texts.instaheal + " | " + Texts.off);
                             button1.setTextColor(android.graphics.Color.WHITE);
                             button1.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button1.setTypeface(mcpeFont);
@@ -3614,13 +4665,13 @@ function mainMenu() {
                     if(Level.getGameMode() == 1) {
                         button2 = new android.widget.Button(ctx);
                         State2 = true;
-                        button2.setText("Fly | ON");
+                        button2.setText(Texts.fly + " | " + Texts.on);
 						button2.setBackgroundColor(android.graphics.Color.GREEN);
                         Player.setCanFly(1);
                     } else if(Level.getGameMode() == 0) {
                         button2 = new android.widget.Button(ctx);
                         State2 = false;
-                        button2.setText("Fly | OFF");
+                        button2.setText(Texts.fly + " | " + Texts.off);
 						button2.setBackgroundColor(android.graphics.Color.RED);
                         Player.setCanFly(0);
                     }
@@ -3629,23 +4680,23 @@ function mainMenu() {
                     if(Level.getGameMode() == 1) {
                         button2 = new android.widget.Button(ctx);
                         State2 = true;
-                        button2.setText("Fly | ON");
+                        button2.setText(Texts.fly + " | " + Texts.on);
 						button2.setBackgroundColor(android.graphics.Color.GREEN);
                         Player.setCanFly(1);
                     } else if(Level.getGameMode() == 0) {
                         button2 = new android.widget.Button(ctx);
                         State2 = true;
-                        button2.setText("Fly | ON");
+                        button2.setText(Texts.fly + " | " + Texts.on);
 						button2.setBackgroundColor(android.graphics.Color.GREEN);
                         Player.setCanFly(1);
                     }
                 } else if(State2 == false && theme == "MCPE") {
                     if(Level.getGameMode() == 1) {
-                        button2 = minecraftButton("Fly | ON");
+                        button2 = minecraftButton(Texts.fly + " | " + Texts.on);
                         State2 = true;
                         Player.setCanFly(1);
                     } else if(Level.getGameMode() == 0) {
-                        button2 = minecraftButton("Fly | OFF");
+                        button2 = minecraftButton(Texts.fly + " | " + Texts.off);
                         State2 = false;
                         Player.setCanFly(0);
                     }
@@ -3653,11 +4704,11 @@ function mainMenu() {
                     //button2.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State2 == true && theme == "MCPE") {
                     if(Level.getGameMode() == 1) {
-                        button2 = minecraftButton("Fly | ON");
+                        button2 = minecraftButton(Texts.fly + " | " + Texts.on);
                         State2 = true;
                         Player.setCanFly(1);
                     } else if(Level.getGameMode() == 0) {
-                        button2 = minecraftButton("Fly | ON");
+                        button2 = minecraftButton(Texts.fly + " | " + Texts.on);
                         State2 = true;
                         Player.setCanFly(1);
                     }
@@ -3666,7 +4717,7 @@ function mainMenu() {
                 } else if(State2 == false && theme == "Blue") {
                     if(Level.getGameMode() == 1) {
                         button2 = new android.widget.Button(ctx);
-                        button2.setText("Fly | ON");
+                        button2.setText(Texts.fly + " | " + Texts.on);
                         button2.setTextColor(android.graphics.Color.BLUE);
                         button2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                         button2.setTypeface(mcpeFont);
@@ -3674,7 +4725,7 @@ function mainMenu() {
                         Player.setCanFly(1);
                     } else if(Level.getGameMode() == 0) {
                         button2 = new android.widget.Button(ctx);
-                        button2.setText("Fly | OFF");
+                        button2.setText(Texts.fly + " | " + Texts.off);
                         button2.setTextColor(android.graphics.Color.WHITE);
                         button2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                         button2.setTypeface(mcpeFont);
@@ -3686,7 +4737,7 @@ function mainMenu() {
                 } else if(State2 == true && theme == "Blue") {
                     if(Level.getGameMode() == 1) {
                         button2 = new android.widget.Button(ctx);
-                        button2.setText("Fly | ON");
+                        button2.setText(Texts.fly + " | " + Texts.on);
                         button2.setTextColor(android.graphics.Color.BLUE);
                         button2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                         button2.setTypeface(mcpeFont);
@@ -3694,7 +4745,7 @@ function mainMenu() {
                         Player.setCanFly(1);
                     } else if(Level.getGameMode() == 0) {
                         button2 = new android.widget.Button(ctx);
-                        button2.setText("Fly | ON");
+                        button2.setText(Texts.fly + " | " + Texts.on);
                         button2.setTextColor(android.graphics.Color.BLUE);
                         button2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                         button2.setTypeface(mcpeFont);
@@ -3711,41 +4762,41 @@ function mainMenu() {
                         if(State2 == false && theme == "Alternative") {
                             if(Level.getGameMode() == 1) {
                                 State2 = true;
-                                reloadHacksList();
-                                button2.setText("Fly | ON");
+                                
+                                button2.setText(Texts.fly + " | " + Texts.on);
                                 button2.setBackgroundColor(android.graphics.Color.GREEN);
                                 Player.setCanFly(1);
                             } else if(Level.getGameMode() == 0) {
                                 State2 = true;
-                                reloadHacksList();
-                                button2.setText("Fly | ON");
+                                
+                                button2.setText(Texts.fly + " | " + Texts.on);
                                 button2.setBackgroundColor(android.graphics.Color.GREEN);
                                 Player.setCanFly(1);
                             }
                         } else if(State2 == true && theme == "Alternative") {
                             if(Level.getGameMode() == 1) {
                                 State2 = true;
-                                reloadHacksList();
-                                button2.setText("Fly | ON");
+                                
+                                button2.setText(Texts.fly + " | " + Texts.on);
                                 button2.setBackgroundColor(android.graphics.Color.GREEN);
                                 Player.setCanFly(1);
                             } else if(Level.getGameMode() == 0) {
                                 State2 = false;
-                                reloadHacksList();
-                                button2.setText("Fly | OFF");
+                                
+                                button2.setText(Texts.fly + " | " + Texts.off);
                                 button2.setBackgroundColor(android.graphics.Color.RED);
                                 Player.setCanFly(0);
                             }
                         } else if(State2 == false && theme == "MCPE") {
                             if(Level.getGameMode() == 1) {
                                 State2 = true;
-                                reloadHacksList();
-                                button2.setText("Fly | ON");
+                                
+                                button2.setText(Texts.fly + " | " + Texts.on);
                                 Player.setCanFly(1);
                             } else if(Level.getGameMode() == 0) {
                                 State2 = true;
-                                reloadHacksList();
-                                button2.setText("Fly | ON");
+                                
+                                button2.setText(Texts.fly + " | " + Texts.on);
                                 Player.setCanFly(1);
                             }
                             //button2.setTypeface(mcpeFont);
@@ -3753,13 +4804,13 @@ function mainMenu() {
                         } else if(State2 == true && theme == "MCPE") {
                             if(Level.getGameMode() == 1) {
                                 State2 = true;
-                                reloadHacksList();
-                                button2.setText("Fly | ON");
+                                
+                                button2.setText(Texts.fly + " | " + Texts.on);
                                 Player.setCanFly(1);
                             } else if(Level.getGameMode() == 0) {
                                 State2 = false;
-                                reloadHacksList();
-                                button2.setText("Fly | OFF");
+                                
+                                button2.setText(Texts.fly + " | " + Texts.off);
                                 Player.setCanFly(0);
                             }
                             //button2.setTypeface(mcpeFont);
@@ -3767,16 +4818,16 @@ function mainMenu() {
                         } else if(State2 == false && theme == "Blue") {
                             if(Level.getGameMode() == 1) {
                                 State2 = true;
-                                reloadHacksList();
-                                button2.setText("Fly | ON");
+                                
+                                button2.setText(Texts.fly + " | " + Texts.on);
                                 button2.setTextColor(android.graphics.Color.BLUE);
                                 button2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                                 button2.setTypeface(mcpeFont);
                                 Player.setCanFly(1);
                             } else if(Level.getGameMode() == 0) {
                                 State2 = true;
-                                reloadHacksList();
-                                button2.setText("Fly | ON");
+                                
+                                button2.setText(Texts.fly + " | " + Texts.on);
                                 button2.setTextColor(android.graphics.Color.BLUE);
                                 button2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                                 button2.setTypeface(mcpeFont);
@@ -3787,16 +4838,16 @@ function mainMenu() {
                         } else if(State2 == true && theme == "Blue") {
                             if(Level.getGameMode() == 1) {
                                 State2 = true;
-                                reloadHacksList();
-                                button2.setText("Fly | ON");
+                                
+                                button2.setText(Texts.fly + " | " + Texts.on);
                                 button2.setTextColor(android.graphics.Color.BLUE);
                                 button2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                                 button2.setTypeface(mcpeFont);
                                 Player.setCanFly(1);
                             } else if(Level.getGameMode() == 0) {
                                 State2 = false;
-                                reloadHacksList();
-                                button2.setText("Fly | OFF");
+                                
+                                button2.setText(Texts.fly + " | " + Texts.off);
                                 button2.setTextColor(android.graphics.Color.WHITE);
                                 button2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                                 button2.setTypeface(mcpeFont);
@@ -3812,29 +4863,29 @@ function mainMenu() {
                 var button3 = new android.widget.Button(ctx);
                 if(State3 == false && theme == "Alternative") {
                     button3 = new android.widget.Button(ctx);
-                    button3.setText("Set entities on fire | OFF");
+                    button3.setText(Texts.set_entities_on_fire + " | " + Texts.off);
                     button3.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State3 == true && theme == "Alternative") {
                     button3 = new android.widget.Button(ctx);
-                    button3.setText("Set entities on fire | ON");
+                    button3.setText(Texts.set_entities_on_fire + " | " + Texts.on);
                     button3.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State3 == false && theme == "MCPE") {
-                    button3 = minecraftButton("Set entities on fire | OFF");
+                    button3 = minecraftButton(Texts.set_entities_on_fire + " | " + Texts.off);
                     //button3.setTypeface(mcpeFont);
                     //button3.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State3 == true && theme == "MCPE") {
-                    button3 = minecraftButton("Set entities on fire | ON");
+                    button3 = minecraftButton(Texts.set_entities_on_fire + " | " + Texts.on);
                     //button3.setTypeface(mcpeFont);
                     //button3.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State3 == false && theme == "Blue") {
                     button3 = new android.widget.Button(ctx);
-                    button3.setText("Set entities on fire | OFF");
+                    button3.setText(Texts.set_entities_on_fire + " | " + Texts.off);
                     button3.setTextColor(android.graphics.Color.WHITE);
                     button3.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button3.setTypeface(mcpeFont);
                 } else if(State3 == true && theme == "Blue") {
                     button3 = new android.widget.Button(ctx);
-                    button3.setText("Set entities on fire | ON");
+                    button3.setText(Texts.set_entities_on_fire + " | " + Texts.on);
                     button3.setTextColor(android.graphics.Color.BLUE);
                     button3.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button3.setTypeface(mcpeFont);
@@ -3845,37 +4896,37 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State3 == false && theme == "Alternative") {
                             State3 = true;
-                            reloadHacksList();
-                            button3.setText("Set entities on fire | ON");
+                            
+                            button3.setText(Texts.set_entities_on_fire + " | " + Texts.on);
                             button3.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State3 == true && theme == "Alternative") {
                             State3 = false;
-                            reloadHacksList();
-                            button3.setText("Set entities on fire | OFF");
+                            
+                            button3.setText(Texts.set_entities_on_fire + " | " + Texts.off);
                             button3.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State3 == false && theme == "MCPE") {
                             State3 = true;
-                            reloadHacksList();
-                            button3.setText("Set entities on fire | ON");
+                            
+                            button3.setText(Texts.set_entities_on_fire + " | " + Texts.on);
                             //button3.setTypeface(mcpeFont);
                             //button3.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State3 == true && theme == "MCPE") {
                             State3 = false;
-                            reloadHacksList();
-                            button3.setText("Set entities on fire | OFF");
+                            
+                            button3.setText(Texts.set_entities_on_fire + " | " + Texts.off);
                             //button3.setTypeface(mcpeFont);
                             //button3.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State3 == false && theme == "Blue") {
                             State3 = true;
-                            reloadHacksList();
-                            button3.setText("Set entities on fire | ON");
+                            
+                            button3.setText(Texts.set_entities_on_fire + " | " + Texts.on);
                             button3.setTextColor(android.graphics.Color.BLUE);
                             button3.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button3.setTypeface(mcpeFont);
                         } else if(State3 == true && theme == "Blue") {
                             State3 = false;
-                            reloadHacksList();
-                            button3.setText("Set entities on fire | OFF");
+                            
+                            button3.setText(Texts.set_entities_on_fire + " | " + Texts.off);
                             button3.setTextColor(android.graphics.Color.WHITE);
                             button3.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button3.setTypeface(mcpeFont);
@@ -3888,34 +4939,34 @@ function mainMenu() {
                 if(State4 == false && theme == "Alternative") {
                     button4 = new android.widget.Button(ctx);
                     ModPE.setGameSpeed(20);
-                    button4.setText("Gamespeed x" + gameSpeedHackSetting + " | OFF");
+                    button4.setText(Texts.gamespeed + " x" + gameSpeedHackSetting + " | " + Texts.off);
                     button4.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State4 == true && theme == "Alternative") {
                     button4 = new android.widget.Button(ctx);
                     ModPE.setGameSpeed(20 * gameSpeedHackSetting);
-                    button4.setText("Gamespeed x" + gameSpeedHackSetting + " | ON");
+                    button4.setText(Texts.gamespeed + " x" + gameSpeedHackSetting + " | " + Texts.on);
                     button4.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State4 == false && theme == "MCPE") {
-                    button4 = minecraftButton("Gamespeed x" + gameSpeedHackSetting + " | OFF");
+                    button4 = minecraftButton(Texts.gamespeed + " x" + gameSpeedHackSetting + " | " + Texts.off);
                     ModPE.setGameSpeed(20);
                     //button4.setTypeface(mcpeFont);
                     //button4.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State4 == true && theme == "MCPE") {
-                    button4 = minecraftButton("Gamespeed x" + gameSpeedHackSetting + " | ON");
+                    button4 = minecraftButton(Texts.gamespeed + " x" + gameSpeedHackSetting + " | " + Texts.on);
                     ModPE.setGameSpeed(20 * gameSpeedHackSetting);
                     //button4.setTypeface(mcpeFont);
                     //button4.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State4 == false && theme == "Blue") {
                     button4 = new android.widget.Button(ctx);
                     ModPE.setGameSpeed(20);
-                    button4.setText("Gamespeed x" + gameSpeedHackSetting + " | OFF");
+                    button4.setText(Texts.gamespeed + " x" + gameSpeedHackSetting + " | " + Texts.off);
                     button4.setTextColor(android.graphics.Color.WHITE);
                     button4.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button4.setTypeface(mcpeFont);
                 } else if(State4 == true && theme == "Blue") {
                     button4 = new android.widget.Button(ctx);
                     ModPE.setGameSpeed(20 * gameSpeedHackSetting);
-                    button4.setText("Gamespeed x" + gameSpeedHackSetting + " | ON");
+                    button4.setText(Texts.gamespeed + " x" + gameSpeedHackSetting + " | " + Texts.on);
                     button4.setTextColor(android.graphics.Color.BLUE);
                     button4.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button4.setTypeface(mcpeFont);
@@ -3926,42 +4977,42 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State4 == false && theme == "Alternative") {
                             State4 = true;
-                            reloadHacksList();
+                            
                             ModPE.setGameSpeed(20 * gameSpeedHackSetting);
-                            button4.setText("Gamespeed x" + gameSpeedHackSetting + " | ON");
+                            button4.setText(Texts.gamespeed + " x" + gameSpeedHackSetting + " | " + Texts.on);
                             button4.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State4 == true && theme == "Alternative") {
                             State4 = false;
-                            reloadHacksList();
+                            
                             ModPE.setGameSpeed(20);
-                            button4.setText("Gamespeed x" + gameSpeedHackSetting + " | OFF");
+                            button4.setText(Texts.gamespeed + " x" + gameSpeedHackSetting + " | " + Texts.off);
                             button4.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State4 == false && theme == "MCPE") {
                             State4 = true;
-                            reloadHacksList();
+                            
                             ModPE.setGameSpeed(20 * gameSpeedHackSetting);
-                            button4.setText("Gamespeed x" + gameSpeedHackSetting + " | ON");
+                            button4.setText(Texts.gamespeed + " x" + gameSpeedHackSetting + " | " + Texts.on);
                             //button4.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State4 == true && theme == "MCPE") {
                             State4 = false;
-                            reloadHacksList();
+                            
                             ModPE.setGameSpeed(20);
-                            button4.setText("Gamespeed x" + gameSpeedHackSetting + " | OFF");
+                            button4.setText(Texts.gamespeed + " x" + gameSpeedHackSetting + " | " + Texts.off);
                             //button4.setTypeface(mcpeFont);
                             //button4.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State4 == false && theme == "Blue") {
                             State4 = true;
-                            reloadHacksList();
+                            
                             ModPE.setGameSpeed(20 * gameSpeedHackSetting);
-                            button4.setText("Gamespeed x" + gameSpeedHackSetting + " | ON");
+                            button4.setText(Texts.gamespeed + " x" + gameSpeedHackSetting + " | " + Texts.on);
                             button4.setTextColor(android.graphics.Color.BLUE);
                             button4.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button4.setTypeface(mcpeFont);
                         } else if(State4 == true && theme == "Blue") {
                             State4 = false;
-                            reloadHacksList();
+                            
                             ModPE.setGameSpeed(20);
-                            button4.setText("Gamespeed x" + gameSpeedHackSetting + " | OFF");
+                            button4.setText(Texts.gamespeed + " x" + gameSpeedHackSetting + " | " + Texts.off);
                             button4.setTextColor(android.graphics.Color.WHITE);
                             button4.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button4.setTypeface(mcpeFont);
@@ -3973,29 +5024,29 @@ function mainMenu() {
                 var button5 = new android.widget.Button(ctx);
                 if(State5 == false && theme == "Alternative") {
                     button5 = new android.widget.Button(ctx);
-                    button5.setText("TapSpammer | OFF");
+                    button5.setText(Texts.tapspammer+ " | " + Texts.off);
                     button5.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State5 == true && theme == "Alternative") {
                     button5 = new android.widget.Button(ctx);
-                    button5.setText("TapSpammer | ON");
+                    button5.setText(Texts.tapspammer+ " | " + Texts.on);
                     button5.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State5 == false && theme == "MCPE") {
-                    button5 = minecraftButton("TapSpammer | OFF");
+                    button5 = minecraftButton(Texts.tapspammer+ " | " + Texts.off);
                     //button5.setTypeface(mcpeFont);
                     //button5.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State5 == true && theme == "MCPE") {
-                    button5 = minecraftButton("TapSpammer | ON");
+                    button5 = minecraftButton(Texts.tapspammer+ " | " + Texts.on);
                     //button5.setTypeface(mcpeFont);
                     //button5.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State5 == false && theme == "Blue") {
                     button5 = new android.widget.Button(ctx);
-                    button5.setText("TapSpammer | OFF");
+                    button5.setText(Texts.tapspammer+ " | " + Texts.off);
                     button5.setTextColor(android.graphics.Color.WHITE);
                     button5.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button5.setTypeface(mcpeFont);
                 } else if(State5 == true && theme == "Blue") {
                     button5 = new android.widget.Button(ctx);
-                    button5.setText("TapSpammer | ON");
+                    button5.setText(Texts.tapspammer+ " | " + Texts.on);
                     button5.setTextColor(android.graphics.Color.BLUE);
                     button5.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button5.setTypeface(mcpeFont);
@@ -4006,37 +5057,37 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State5 == false && theme == "Alternative") {
                             State5 = true;
-                            reloadHacksList();
-                            button5.setText("TapSpammer | ON");
+                            
+                            button5.setText(Texts.tapspammer+ " | " + Texts.on);
                             button5.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State5 == true && theme == "Alternative") {
                             State5 = false;
-                            reloadHacksList();
-                            button5.setText("TapSpammer | OFF");
+                            
+                            button5.setText(Texts.tapspammer+ " | " + Texts.off);
                             button5.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State5 == false && theme == "MCPE") {
                             State5 = true;
-                            reloadHacksList();
-                            button5.setText("TapSpammer | ON");
+                            
+                            button5.setText(Texts.tapspammer+ " | " + Texts.on);
                             //button5.setTypeface(mcpeFont);
                             //button5.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State5 == true && theme == "MCPE") {
                             State5 = false;
-                            reloadHacksList();
-                            button5.setText("TapSpammer | OFF");
+                            
+                            button5.setText(Texts.tapspammer+ " | " + Texts.off);
                             //button5.setTypeface(mcpeFont);
                             //button5.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State5 == false && theme == "Blue") {
                             State5 = true;
-                            reloadHacksList();
-                            button5.setText("TapSpammer | ON");
+                            
+                            button5.setText(Texts.tapspammer+ " | " + Texts.on);
                             button5.setTextColor(android.graphics.Color.BLUE);
                             button5.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button5.setTypeface(mcpeFont);
                         } else if(State5 == true && theme == "Blue") {
                             State5 = false;
-                            reloadHacksList();
-                            button5.setText("TapSpammer | OFF");
+                            
+                            button5.setText(Texts.tapspammer+ " | " + Texts.off);
                             button5.setTextColor(android.graphics.Color.WHITE);
                             button5.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button5.setTypeface(mcpeFont);
@@ -4048,34 +5099,34 @@ function mainMenu() {
                 var button6 = new android.widget.Button(ctx);
                 if(State6 == false && theme == "Alternative") {
                     button6 = new android.widget.Button(ctx);
-                    button6.setText("Sneaking | OFF");
+                    button6.setText(Texts.sneaking + " | " + Texts.off);
                     button6.setBackgroundColor(android.graphics.Color.RED);
                     Entity.setSneaking(Player.getEntity(), 0);
                 } else if(State6 == true && theme == "Alternative") {
                     button6 = new android.widget.Button(ctx);
-                    button6.setText("Sneaking | ON");
+                    button6.setText(Texts.sneaking + " | " + Texts.on);
                     button6.setBackgroundColor(android.graphics.Color.GREEN);
                     Entity.setSneaking(Player.getEntity(), 1);
                 } else if(State6 == false && theme == "MCPE") {
-                    button6 = minecraftButton("Sneaking | OFF");
+                    button6 = minecraftButton(Texts.sneaking + " | " + Texts.off);
                     //button6.setTypeface(mcpeFont);
                     //button6.setBackgroundDrawable(mcpeButtonOldImage);
                     Entity.setSneaking(Player.getEntity(), 0);
                 } else if(State6 == true && theme == "MCPE") {
-                    button6 = minecraftButton("Sneaking | ON");
+                    button6 = minecraftButton(Texts.sneaking + " | " + Texts.on);
                     //button6.setTypeface(mcpeFont);
                     //button6.setBackgroundDrawable(mcpeButtonOldImage);
                     Entity.setSneaking(Player.getEntity(), 1);
                 } else if(State6 == false && theme == "Blue") {
                     button6 = new android.widget.Button(ctx);
-                    button6.setText("Sneaking | OFF");
+                    button6.setText(Texts.sneaking + " | " + Texts.off);
                     button6.setTextColor(android.graphics.Color.WHITE);
                     button6.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button6.setTypeface(mcpeFont);
                     Entity.setSneaking(Player.getEntity(), 0);
                 } else if(State6 == true && theme == "Blue") {
                     button6 = new android.widget.Button(ctx);
-                    button6.setText("Sneaking | ON");
+                    button6.setText(Texts.sneaking + " | " + Texts.on);
                     button6.setTextColor(android.graphics.Color.BLUE);
                     button6.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button6.setTypeface(mcpeFont);
@@ -4087,43 +5138,43 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State6 == false && theme == "Alternative") {
                             State6 = true;
-                            reloadHacksList();
+                            
                             Entity.setSneaking(Player.getEntity(), 1);
-                            button6.setText("Sneaking | ON");
+                            button6.setText(Texts.sneaking + " | " + Texts.on);
                             button6.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State6 == true && theme == "Alternative") {
                             State6 = false;
-                            reloadHacksList();
+                            
                             Entity.setSneaking(Player.getEntity(), 0);
-                            button6.setText("Sneaking | OFF");
+                            button6.setText(Texts.sneaking + " | " + Texts.off);
                             button6.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State6 == false && theme == "MCPE") {
                             State6 = true;
-                            reloadHacksList();
+                            
                             Entity.setSneaking(Player.getEntity(), 1);
-                            button6.setText("Sneaking | ON");
+                            button6.setText(Texts.sneaking + " | " + Texts.on);
                             //button6.setTypeface(mcpeFont);
                             //button6.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State6 == true && theme == "MCPE") {
                             State6 = false;
-                            reloadHacksList();
+                            
                             Entity.setSneaking(Player.getEntity(), 0);
-                            button6.setText("Sneaking | OFF");
+                            button6.setText(Texts.sneaking + " | " + Texts.off);
                             //button6.setTypeface(mcpeFont);
                             //button6.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State6 == false && theme == "Blue") {
                             State6 = true;
-                            reloadHacksList();
+                            
                             Entity.setSneaking(Player.getEntity(), 1);
-                            button6.setText("Sneaking | ON");
+                            button6.setText(Texts.sneaking + " | " + Texts.on);
                             button6.setTextColor(android.graphics.Color.BLUE);
                             button6.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button6.setTypeface(mcpeFont);
                         } else if(State6 == true && theme == "Blue") {
                             State6 = false;
-                            reloadHacksList();
+                            
                             Entity.setSneaking(Player.getEntity(), 0);
-                            button6.setText("Sneaking | OFF");
+                            button6.setText(Texts.sneaking + " | " + Texts.off);
                             button6.setTextColor(android.graphics.Color.WHITE);
                             button6.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button6.setTypeface(mcpeFont);
@@ -4135,34 +5186,34 @@ function mainMenu() {
                 var button7 = new android.widget.Button(ctx);
                 if(State7 == false && theme == "Alternative") {
                     button7 = new android.widget.Button(ctx);
-                    button7.setText("Zoom | OFF");
+                    button7.setText(Texts.zoom + " | " + Texts.off);
                     button7.setBackgroundColor(android.graphics.Color.RED);
                     ModPE.resetFov();
                 } else if(State7 == true && theme == "Alternative") {
                     button7 = new android.widget.Button(ctx);
-                    button7.setText("Zoom | ON");
+                    button7.setText(Texts.zoom + " | " + Texts.on);
                     button7.setBackgroundColor(android.graphics.Color.GREEN);
                     ModPE.setFov(10);
                 } else if(State7 == false && theme == "MCPE") {
-                    button7 = minecraftButton("Zoom | OFF");
+                    button7 = minecraftButton(Texts.zoom + " | " + Texts.off);
                     //button7.setTypeface(mcpeFont);
                     //button7.setBackgroundDrawable(mcpeButtonOldImage);
                     ModPE.resetFov();
                 } else if(State7 == true && theme == "MCPE") {
-                    button7 = minecraftButton("Zoom | ON");
+                    button7 = minecraftButton(Texts.zoom + " | " + Texts.on);
                     //button7.setTypeface(mcpeFont);
                     //button7.setBackgroundDrawable(mcpeButtonOldImage);
                     ModPE.setFov(10);
                 } else if(State7 == false && theme == "Blue") {
                     button7 = new android.widget.Button(ctx);
-                    button7.setText("Zoom | OFF");
+                    button7.setText(Texts.zoom + " | " + Texts.off);
                     button7.setTextColor(android.graphics.Color.WHITE);
                     button7.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button7.setTypeface(mcpeFont);
                     ModPE.resetFov();
                 } else if(State7 == true && theme == "Blue") {
                     button7 = new android.widget.Button(ctx);
-                    button7.setText("Zoom | ON");
+                    button7.setText(Texts.zoom + " | " + Texts.on);
                     button7.setTextColor(android.graphics.Color.BLUE);
                     button7.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button7.setTypeface(mcpeFont);
@@ -4174,43 +5225,43 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State7 == false && theme == "Alternative") {
                             State7 = true;
-                            reloadHacksList();
+                            
                             ModPE.setFov(10);
-                            button7.setText("Zoom | ON");
+                            button7.setText(Texts.zoom + " | " + Texts.on);
                             button7.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State7 == true && theme == "Alternative") {
                             State7 = false;
-                            reloadHacksList();
+                            
                             ModPE.resetFov();
-                            button7.setText("Zoom | OFF");
+                            button7.setText(Texts.zoom + " | " + Texts.off);
                             button7.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State7 == false && theme == "MCPE") {
                             State7 = true;
-                            reloadHacksList();
+                            
                             ModPE.setFov(10);
-                            button7.setText("Zoom | ON");
+                            button7.setText(Texts.zoom + " | " + Texts.on);
                             //button7.setTypeface(mcpeFont);
                             //button7.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State7 == true && theme == "MCPE") {
                             State7 = false;
-                            reloadHacksList();
+                            
                             ModPE.resetFov();
-                            button7.setText("Zoom | OFF");
+                            button7.setText(Texts.zoom + " | " + Texts.off);
                             //button7.setTypeface(mcpeFont);
                             //button7.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State7 == false && theme == "Blue") {
                             State7 = true;
-                            reloadHacksList();
+                            
                             ModPE.setFov(10);
-                            button7.setText("Zoom | ON");
+                            button7.setText(Texts.zoom + " | " + Texts.on);
                             button7.setTextColor(android.graphics.Color.BLUE);
                             button7.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button7.setTypeface(mcpeFont);
                         } else if(State7 == true && theme == "Blue") {
                             State7 = false;
-                            reloadHacksList();
+                            
                             ModPE.resetFov();
-                            button7.setText("Zoom | OFF");
+                            button7.setText(Texts.zoom + " | " + Texts.off);
                             button7.setTextColor(android.graphics.Color.WHITE);
                             button7.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button7.setTypeface(mcpeFont);
@@ -4222,29 +5273,29 @@ function mainMenu() {
                 var button8 = new android.widget.Button(ctx);
                 if(State8 == false && theme == "Alternative") {
                     button8 = new android.widget.Button(ctx);
-                    button8.setText("Show coords | OFF");
+                    button8.setText(Texts.show_coords + " | " + Texts.off);
                     button8.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State8 == true && theme == "Alternative") {
                     button8 = new android.widget.Button(ctx);
-                    button8.setText("Show coords | ON");
+                    button8.setText(Texts.show_coords + " | " + Texts.on);
                     button8.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State8 == false && theme == "MCPE") {
-                    button8 = minecraftButton("Show coords | OFF");
+                    button8 = minecraftButton(Texts.show_coords + " | " + Texts.off);
                     //button8.setTypeface(mcpeFont);
                     //button8.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State8 == true && theme == "MCPE") {
-                    button8 = minecraftButton("Show coords | ON");
+                    button8 = minecraftButton(Texts.show_coords + " | " + Texts.on);
                     //button8.setTypeface(mcpeFont);
                     //button8.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State8 == false && theme == "Blue") {
                     button8 = new android.widget.Button(ctx);
-                    button8.setText("Show coords | OFF");
+                    button8.setText(Texts.show_coords + " | " + Texts.off);
                     button8.setTextColor(android.graphics.Color.WHITE);
                     button8.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button8.setTypeface(mcpeFont);
                 } else if(State8 == true && theme == "Blue") {
                     button8 = new android.widget.Button(ctx);
-                    button8.setText("Show coords | ON");
+                    button8.setText(Texts.show_coords + " | " + Texts.on);
                     button8.setTextColor(android.graphics.Color.BLUE);
                     button8.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button8.setTypeface(mcpeFont);
@@ -4255,37 +5306,37 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State8 == false && theme == "Alternative") {
                             State8 = true;
-                            reloadHacksList();
-                            button8.setText("Show coords | ON");
+                            
+                            button8.setText(Texts.show_coords + " | " + Texts.on);
                             button8.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State8 == true && theme == "Alternative") {
                             State8 = false;
-                            reloadHacksList();
-                            button8.setText("Show coords | OFF");
+                            
+                            button8.setText(Texts.show_coords + " | " + Texts.off);
                             button8.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State8 == false && theme == "MCPE") {
                             State8 = true;
-                            reloadHacksList();
-                            button8.setText("Show coords | ON");
+                            
+                            button8.setText(Texts.show_coords + " | " + Texts.on);
                             //button8.setTypeface(mcpeFont);
                             //button8.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State8 == true && theme == "MCPE") {
                             State8 = false;
-                            reloadHacksList();
-                            button8.setText("Show coords | OFF");
+                            
+                            button8.setText(Texts.show_coords + " | " + Texts.off);
                             //button8.setTypeface(mcpeFont);
                             //button8.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State8 == false && theme == "Blue") {
                             State8 = true;
-                            reloadHacksList();
-                            button8.setText("Show coords | ON");
+                            
+                            button8.setText(Texts.show_coords + " | " + Texts.on);
                             button8.setTextColor(android.graphics.Color.BLUE);
                             button8.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button8.setTypeface(mcpeFont);
                         } else if(State8 == true && theme == "Blue") {
                             State8 = false;
-                            reloadHacksList();
-                            button8.setText("Show coords | OFF");
+                            
+                            button8.setText(Texts.show_coords + " | " + Texts.off);
                             button8.setTextColor(android.graphics.Color.WHITE);
                             button8.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button8.setTypeface(mcpeFont);
@@ -4298,32 +5349,32 @@ function mainMenu() {
                 if(State9 == false && theme == "Alternative") {
                     button9 = new android.widget.Button(ctx);
                     Block.setDestroyTimeDefaultAll();
-                    button9.setText("InstaMine | OFF");
+                    button9.setText(Texts.instamine + " | " + Texts.off);
                     button9.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State9 == true && theme == "Alternative") {
                     button9 = new android.widget.Button(ctx);
                     Block.setDestroyTimeAll(0);
-                    button9.setText("InstaMine | ON");
+                    button9.setText(Texts.instamine + " | " + Texts.on);
                     button9.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State9 == false && theme == "MCPE") {
-                    button9 = minecraftButton("InstaMine | OFF");
+                    button9 = minecraftButton(Texts.instamine + " | " + Texts.off);
                     Block.setDestroyTimeDefaultAll();
                     //button9.setTypeface(mcpeFont);
                     //button9.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State9 == true && theme == "MCPE") {
-                    button9 = minecraftButton("InstaMine | ON");
+                    button9 = minecraftButton(Texts.instamine + " | " + Texts.on);
                     Block.setDestroyTimeAll(0);
                     //button9.setTypeface(mcpeFont);
                     //button9.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State9 == false && theme == "Blue") {
                     button9 = new android.widget.Button(ctx);
-                    button9.setText("InstaMine | OFF");
+                    button9.setText(Texts.instamine + " | " + Texts.off);
                     button9.setTextColor(android.graphics.Color.WHITE);
                     button9.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button9.setTypeface(mcpeFont);
                 } else if(State9 == true && theme == "Blue") {
                     button9 = new android.widget.Button(ctx);
-                    button9.setText("InstaMine | ON");
+                    button9.setText(Texts.instamine + " | " + Texts.on);
                     button9.setTextColor(android.graphics.Color.BLUE);
                     button9.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button9.setTypeface(mcpeFont);
@@ -4334,41 +5385,41 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State9 == false && theme == "Alternative") {
                             State9 = true;
-                            reloadHacksList();
+                            
                             Block.setDestroyTimeAll(0);
-                            button9.setText("InstaMine | ON");
+                            button9.setText(Texts.instamine + " | " + Texts.on);
                             button9.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State9 == true && theme == "Alternative") {
                             State9 = false;
-                            reloadHacksList();
+                            
                             Block.setDestroyTimeDefaultAll(0);
-                            button9.setText("InstaMine | OFF");
+                            button9.setText(Texts.instamine + " | " + Texts.off);
                             button9.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State9 == false && theme == "MCPE") {
                             State9 = true;
-                            reloadHacksList();
+                            
                             Block.setDestroyTimeAll(0);
-                            button9.setText("InstaMine | ON");
+                            button9.setText(Texts.instamine + " | " + Texts.on);
                             //button8.setTypeface(mcpeFont);
                             //button9.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State9 == true && theme == "MCPE") {
                             State9 = false;
-                            reloadHacksList();
+                            
                             Block.setDestroyTimeDefaultAll();
-                            button9.setText("InstaMine | OFF");
+                            button9.setText(Texts.instamine + " | " + Texts.off);
                             //button8.setTypeface(mcpeFont);
                             //button9.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State9 == false && theme == "Blue") {
                             State9 = true;
-                            reloadHacksList();
-                            button9.setText("InstaMine | ON");
+                            
+                            button9.setText(Texts.instamine + " | " + Texts.on);
                             button9.setTextColor(android.graphics.Color.BLUE);
                             button9.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button9.setTypeface(mcpeFont);
                         } else if(State9 == true && theme == "Blue") {
                             State9 = false;
-                            reloadHacksList();
-                            button9.setText("InstaMine | OFF");
+                            
+                            button9.setText(Texts.instamine + " | " + Texts.off);
                             button9.setTextColor(android.graphics.Color.WHITE);
                             button9.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button9.setTypeface(mcpeFont);
@@ -4380,29 +5431,29 @@ function mainMenu() {
                 var button10 = new android.widget.Button(ctx);
                 if(State10 == false && theme == "Alternative") {
                     button10 = new android.widget.Button(ctx);
-                    button10.setText("Knockback | OFF");
+                    button10.setText(Texts.knockback + " | " + Texts.off);
                     button10.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State10 == true && theme == "Alternative") {
                     button10 = new android.widget.Button(ctx);
-                    button10.setText("Knockback | ON");
+                    button10.setText(Texts.knockback + " | " + Texts.on);
                     button10.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State10 == false && theme == "MCPE") {
-                    button10 = minecraftButton("Knockback | OFF");
+                    button10 = minecraftButton(Texts.knockback + " | " + Texts.off);
                     //button10.setTypeface(mcpeFont);
                     //button10.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State10 == true && theme == "MCPE") {
-                    button10 = minecraftButton("Knockback | ON");
+                    button10 = minecraftButton(Texts.knockback + " | " + Texts.on);
                     //button10.setTypeface(mcpeFont);
                     //button10.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State10 == false && theme == "Blue") {
                     button10 = new android.widget.Button(ctx);
-                    button10.setText("Knockback | OFF");
+                    button10.setText(Texts.knockback + " | " + Texts.off);
                     button10.setTextColor(android.graphics.Color.WHITE);
                     button10.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button10.setTypeface(mcpeFont);
                 } else if(State10 == true && theme == "Blue") {
                     button10 = new android.widget.Button(ctx);
-                    button10.setText("Knockback | ON");
+                    button10.setText(Texts.knockback + " | " + Texts.on);
                     button10.setTextColor(android.graphics.Color.BLUE);
                     button10.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button10.setTypeface(mcpeFont);
@@ -4413,37 +5464,37 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State10 == false && theme == "Alternative") {
                             State10 = true;
-                            reloadHacksList();
-                            State10.setText("Knockback | ON");
+                            
+                            State10.setText(Texts.knockback + " | " + Texts.on);
                             button10.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State10 == true && theme == "Alternative") {
                             State10 = false;
-                            reloadHacksList();
-                            button10.setText("Knockback | OFF");
+                            
+                            button10.setText(Texts.knockback + " | " + Texts.off);
                             button10.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State10 == false && theme == "MCPE") {
                             State10 = true;
-                            reloadHacksList();
-                            button10.setText("Knockback | ON");
+                            
+                            button10.setText(Texts.knockback + " | " + Texts.on);
                             //button10.setTypeface(mcpeFont);
                             //button10.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State10 == true && theme == "MCPE") {
                             State10 = false;
-                            reloadHacksList();
-                            button10.setText("Knockback | OFF");
+                            
+                            button10.setText(Texts.knockback + " | " + Texts.off);
                             //button10.setTypeface(mcpeFont);
                             //button10.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State10 == false && theme == "Blue") {
                             State10 = true;
-                            reloadHacksList();
-                            button10.setText("Knockback | ON");
+                            
+                            button10.setText(Texts.knockback + " | " + Texts.on);
                             button10.setTextColor(android.graphics.Color.BLUE);
                             button10.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button10.setTypeface(mcpeFont);
                         } else if(State10 == true && theme == "Blue") {
                             State10 = false;
-                            reloadHacksList();
-                            button10.setText("Knockback | OFF");
+                            
+                            button10.setText(Texts.knockback + " | " + Texts.off);
                             button10.setTextColor(android.graphics.Color.WHITE);
                             button10.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button10.setTypeface(mcpeFont);
@@ -4456,27 +5507,27 @@ function mainMenu() {
                 if(State11 == false && theme == "Alternative") {
                     button11 = new android.widget.Button(ctx);
                     MoreOptionsPE.xRay(0);
-                    button11.setText("X-Ray | OFF");
+                    button11.setText(Texts.xray + " | " + Texts.off);
                     button11.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State11 == true && theme == "Alternative") {
                     button11 = new android.widget.Button(ctx);
                     MoreOptionsPE.xRay(1);
-                    button11.setText("X-Ray | ON");
+                    button11.setText(Texts.xray + " | " + Texts.on);
                     button11.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State11 == false && theme == "MCPE") {
-                    button11 = minecraftButton("X-Ray | OFF");
+                    button11 = minecraftButton(Texts.xray + " | " + Texts.off);
                     MoreOptionsPE.xRay(0);
                     //button11.setTypeface(mcpeFont);
                     //button11.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State11 == true && theme == "MCPE") {
-                    button11 = minecraftButton("X-Ray | ON");
+                    button11 = minecraftButton(Texts.xray + " | " + Texts.on);
                     MoreOptionsPE.xRay(1);
                     //button11.setTypeface(mcpeFont);
                     //button11.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State11 == false && theme == "Blue") {
                     button11 = new android.widget.Button(ctx);
                     MoreOptionsPE.xRay(0);
-                    button11.setText("X-Ray | OFF");
+                    button11.setText(Texts.xray + " | " + Texts.off);
                     button11.setTextColor(android.graphics.Color.WHITE);
                     button11.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button11.setTypeface(mcpeFont);
@@ -4485,7 +5536,7 @@ function mainMenu() {
                 } else if(State11 == true && theme == "Blue") {
                     button11 = new android.widget.Button(ctx);
                     MoreOptionsPE.xRay(1);
-                    button11.setText("X-Ray | ON");
+                    button11.setText(Texts.xray + " | " + Texts.on);
                     button11.setTextColor(android.graphics.Color.BLUE);
                     button11.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button11.setTypeface(mcpeFont);
@@ -4498,43 +5549,43 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State11 == false && theme == "Alternative") {
                             State11 = true;
-                            reloadHacksList();
+                            
                             MoreOptionsPE.xRay(1);
-                            State11.setText("X-Ray | ON");
+                            State11.setText(Texts.xray + " | " + Texts.on);
                             button11.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State11 == true && theme == "Alternative") {
                             State11 = false;
-                            reloadHacksList();
+                            
                             MoreOptionsPE.xRay(0);
-                            button11.setText("X-Ray | OFF");
+                            button11.setText(Texts.xray + " | " + Texts.off);
                             button11.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State11 == false && theme == "MCPE") {
                             State11 = true;
-                            reloadHacksList();
+                            
                             MoreOptionsPE.xRay(1);
-                            button11.setText("X-Ray | ON");
+                            button11.setText(Texts.xray + " | " + Texts.on);
                             //button11.setTypeface(mcpeFont);
                             //button11.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State11 == true && theme == "MCPE") {
                             State11 = false;
-                            reloadHacksList();
+                            
                             MoreOptionsPE.xRay(0);
-                            button11.setText("X-Ray | OFF");
+                            button11.setText(Texts.xray + " | " + Texts.off);
                             //button11.setTypeface(mcpeFont);
                             //button11.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State11 == false && theme == "Blue") {
                             State11 = true;
-                            reloadHacksList();
+                            
                             MoreOptionsPE.xRay(1);
-                            button11.setText("X-Ray | ON");
+                            button11.setText(Texts.xray + " | " + Texts.on);
                             button11.setTextColor(android.graphics.Color.BLUE);
                             button11.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button11.setTypeface(mcpeFont);
                         } else if(State11 == true && theme == "Blue") {
                             State11 = false;
-                            reloadHacksList();
+                            
                             MoreOptionsPE.xRay(0);
-                            button11.setText("X-Ray | OFF");
+                            button11.setText(Texts.xray + " | " + Texts.off);
                             button11.setTextColor(android.graphics.Color.WHITE);
                             button11.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button11.setTypeface(mcpeFont);
@@ -4546,23 +5597,23 @@ function mainMenu() {
                 var button12 = new android.widget.Button(ctx);
                 if(State12 == false && theme == "Alternative") {
                     button12 = new android.widget.Button(ctx);
-                    button12.setText("Always day | OFF");
+                    button12.setText(Texts.always_day + " | " + Texts.off);
                     button12.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State12 == true && theme == "Alternative") {
                     button12 = new android.widget.Button(ctx);
-                    button12.setText("Always day | ON");
+                    button12.setText(Texts.always_day + " | " + Texts.on);
                     button12.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State12 == false && theme == "MCPE") {
-                    button12 = minecraftButton("Always day | OFF");
+                    button12 = minecraftButton(Texts.always_day + " | " + Texts.off);
                     //button11.setTypeface(mcpeFont);
                     //button12.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State12 == true && theme == "MCPE") {
-                    button12 = minecraftButton("Always day | ON");
+                    button12 = minecraftButton(Texts.always_day + " | " + Texts.on);
                     //button11.setTypeface(mcpeFont);
                     //button12.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State12 == false && theme == "Blue") {
                     button12 = new android.widget.Button(ctx);
-                    button12.setText("Always day | OFF");
+                    button12.setText(Texts.always_day + " | " + Texts.off);
                     button12.setTextColor(android.graphics.Color.WHITE);
                     button12.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button12.setTypeface(mcpeFont);
@@ -4570,7 +5621,7 @@ function mainMenu() {
                     //button12.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State12 == true && theme == "Blue") {
                     button12 = new android.widget.Button(ctx);
-                    button12.setText("Always day | ON");
+                    button12.setText(Texts.always_day + " | " + Texts.on);
                     button12.setTextColor(android.graphics.Color.BLUE);
                     button12.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button12.setTypeface(mcpeFont);
@@ -4583,37 +5634,37 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State12 == false && theme == "Alternative") {
                             State12 = true;
-                            reloadHacksList();
-                            button12.setText("Always day | ON");
+                            
+                            button12.setText(Texts.always_day + " | " + Texts.on);
                             button12.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State12 == true && theme == "Alternative") {
                             State12 = false;
-                            reloadHacksList();
-                            button12.setText("Always day | OFF");
+                            
+                            button12.setText(Texts.always_day + " | " + Texts.off);
                             button12.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State12 == false && theme == "MCPE") {
                             State12 = true;
-                            reloadHacksList();
-                            button12.setText("Always day | ON");
+                            
+                            button12.setText(Texts.always_day + " | " + Texts.on);
                             //button12.setTypeface(mcpeFont);
                             //button12.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State12 == true && theme == "MCPE") {
                             State12 = false;
-                            reloadHacksList();
-                            button12.setText("Always day | OFF");
+                            
+                            button12.setText(Texts.always_day + " | " + Texts.off);
                             //button12.setTypeface(mcpeFont);
                             //button12.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State12 == false && theme == "Blue") {
                             State12 = true;
-                            reloadHacksList();
-                            button12.setText("Always day | ON");
+                            
+                            button12.setText(Texts.always_day + " | " + Texts.on);
                             button12.setTextColor(android.graphics.Color.BLUE);
                             button12.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button12.setTypeface(mcpeFont);
                         } else if(State12 == true && theme == "Blue") {
                             State12 = false;
-                            reloadHacksList();
-                            button12.setText("Always day | OFF");
+                            
+                            button12.setText(Texts.always_day + " | " + Texts.off);
                             button12.setTextColor(android.graphics.Color.WHITE);
                             button12.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button12.setTypeface(mcpeFont);
@@ -4625,23 +5676,23 @@ function mainMenu() {
                 var button13 = new android.widget.Button(ctx);
                 if(State13 == false && theme == "Alternative") {
                     button13 = new android.widget.Button(ctx);
-                    button13.setText("Saddle Up | OFF");
+                    button13.setText(Texts.saddle_up + " | " + Texts.off);
                     button13.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State13 == true && theme == "Alternative") {
                     button13 = new android.widget.Button(ctx);
-                    button13.setText("Saddle Up | ON");
+                    button13.setText(Texts.saddle_up + " | " + Texts.on);
                     button13.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State13 == false && theme == "MCPE") {
-                    button13 = minecraftButton("Saddle Up | OFF");
+                    button13 = minecraftButton(Texts.saddle_up + " | " + Texts.off);
                     //button13.setTypeface(mcpeFont);
                     //button13.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State13 == true && theme == "MCPE") {
-                    button13 = minecraftButton("Saddle Up | ON");
+                    button13 = minecraftButton(Texts.saddle_up + " | " + Texts.on);
                     //button13.setTypeface(mcpeFont);
                     //button13.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State13 == false && theme == "Blue") {
                     button13 = new android.widget.Button(ctx);
-                    button13.setText("Saddle Up | OFF");
+                    button13.setText(Texts.saddle_up + " | " + Texts.off);
                     button13.setTextColor(android.graphics.Color.WHITE);
                     button13.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button13.setTypeface(mcpeFont);
@@ -4649,7 +5700,7 @@ function mainMenu() {
                     //button13.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State13 == true && theme == "Blue") {
                     button13 = new android.widget.Button(ctx);
-                    button13.setText("Saddle Up | ON");
+                    button13.setText(Texts.saddle_up + " | " + Texts.on);
                     button13.setTextColor(android.graphics.Color.BLUE);
                     button13.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button13.setTypeface(mcpeFont);
@@ -4662,37 +5713,37 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State13 == false && theme == "Alternative") {
                             State13 = true;
-                            reloadHacksList();
-                            button13.setText("Saddle Up | ON");
+                            
+                            button13.setText(Texts.saddle_up + " | " + Texts.on);
                             button13.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State13 == true && theme == "Alternative") {
                             State13 = false;
-                            reloadHacksList();
-                            button13.setText("Saddle Up | OFF");
+                            
+                            button13.setText(Texts.saddle_up + " | " + Texts.off);
                             button13.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State13 == false && theme == "MCPE") {
                             State13 = true;
-                            reloadHacksList();
-                            button13.setText("Saddle Up | ON");
+                            
+                            button13.setText(Texts.saddle_up + " | " + Texts.on);
                             //button13.setTypeface(mcpeFont);
                             //button13.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State13 == true && theme == "MCPE") {
                             State13 = false;
-                            reloadHacksList();
-                            button13.setText("Saddle Up | OFF");
+                            
+                            button13.setText(Texts.saddle_up + " | " + Texts.off);
                             //button13.setTypeface(mcpeFont);
                             //button13.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State13 == false && theme == "Blue") {
                             State13 = true;
-                            reloadHacksList();
-                            button13.setText("Saddle Up | ON");
+                            
+                            button13.setText(Texts.saddle_up + " | " + Texts.on);
                             button13.setTextColor(android.graphics.Color.BLUE);
                             button13.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button13.setTypeface(mcpeFont);
                         } else if(State13 == true && theme == "Blue") {
                             State13 = false;
-                            reloadHacksList();
-                            button13.setText("Saddle Up | OFF");
+                            
+                            button13.setText(Texts.saddle_up + " | " + Texts.off);
                             button13.setTextColor(android.graphics.Color.WHITE);
                             button13.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button13.setTypeface(mcpeFont);
@@ -4704,23 +5755,23 @@ function mainMenu() {
                 var button14 = new android.widget.Button(ctx);
                 if(State14 == false && theme == "Alternative") {
                     button14 = new android.widget.Button(ctx);
-                    button14.setText("StackDrop | OFF");
+                    button14.setText(Texts.stackdrop + " | " + Texts.off);
                     button14.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State14 == true && theme == "Alternative") {
                     button14 = new android.widget.Button(ctx);
-                    button14.setText("StackDrop | ON");
+                    button14.setText(Texts.stackdrop + " | " + Texts.on);
                     button14.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State14 == false && theme == "MCPE") {
-                    button14 = minecraftButton("StackDrop | OFF");
+                    button14 = minecraftButton(Texts.stackdrop + " | " + Texts.off);
                     //button14.setTypeface(mcpeFont);
                     //button14.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State14 == true && theme == "MCPE") {
-                    button14 = minecraftButton("StackDrop | ON");
+                    button14 = minecraftButton(Texts.stackdrop + " | " + Texts.on);
                     //button14.setTypeface(mcpeFont);
                     //button14.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State14 == false && theme == "Blue") {
                     button14 = new android.widget.Button(ctx);
-                    button14.setText("StackDrop | OFF");
+                    button14.setText(Texts.stackdrop + " | " + Texts.off);
                     button14.setTextColor(android.graphics.Color.WHITE);
                     button14.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button14.setTypeface(mcpeFont);
@@ -4728,7 +5779,7 @@ function mainMenu() {
                     //button14.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State14 == true && theme == "Blue") {
                     button14 = new android.widget.Button(ctx);
-                    button14.setText("StackDrop | ON");
+                    button14.setText(Texts.stackdrop + " | " + Texts.on);
                     button14.setTextColor(android.graphics.Color.BLUE);
                     button14.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button14.setTypeface(mcpeFont);
@@ -4741,37 +5792,37 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State14 == false && theme == "Alternative") {
                             State14 = true;
-                            reloadHacksList();
-                            button14.setText("StackDrop | ON");
+                            
+                            button14.setText(Texts.stackdrop + " | " + Texts.on);
                             button14.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State14 == true && theme == "Alternative") {
                             State14 = false;
-                            reloadHacksList();
-                            button14.setText("StackDrop | OFF");
+                            
+                            button14.setText(Texts.stackdrop + " | " + Texts.off);
                             button14.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State14 == false && theme == "MCPE") {
                             State14 = true;
-                            reloadHacksList();
-                            button14.setText("StackDrop | ON");
+                            
+                            button14.setText(Texts.stackdrop + " | " + Texts.on);
                             //button14.setTypeface(mcpeFont);
                             //button14.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State14 == true && theme == "MCPE") {
                             State14 = false;
-                            reloadHacksList();
-                            button14.setText("StackDrop | OFF");
+                            
+                            button14.setText(Texts.stackdrop + " | " + Texts.off);
                             //button14.setTypeface(mcpeFont);
                             //button14.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State14 == false && theme == "Blue") {
                             State14 = true;
-                            reloadHacksList();
-                            button14.setText("StackDrop | ON");
+                            
+                            button14.setText(Texts.stackdrop + " | " + Texts.on);
                             button14.setTextColor(android.graphics.Color.BLUE);
                             button14.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button14.setTypeface(mcpeFont);
                         } else if(State14 == true && theme == "Blue") {
                             State14 = false;
-                            reloadHacksList();
-                            button14.setText("StackDrop | OFF");
+                            
+                            button14.setText(Texts.stackdrop + " | " + Texts.off);
                             button14.setTextColor(android.graphics.Color.WHITE);
                             button14.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button14.setTypeface(mcpeFont);
@@ -4783,29 +5834,29 @@ function mainMenu() {
                 var button15 = new android.widget.Button(ctx);
                 if(State15 == false && theme == "Alternative") {
                     button15 = new android.widget.Button(ctx);
-                    button15.setText("TapTeleporter | OFF");
+                    button15.setText(Texts.tapteleporter + " | " + Texts.off);
                     button15.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State15 == true && theme == "Alternative") {
                     button15 = new android.widget.Button(ctx);
-                    button15.setText("TapTeleporter | ON");
+                    button15.setText(Texts.tapteleporter + " | " + Texts.on);
                     button15.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State15 == false && theme == "MCPE") {
-                    button15 = minecraftButton("TapTeleporter | OFF");
+                    button15 = minecraftButton(Texts.tapteleporter + " | " + Texts.off);
                     //button15.setTypeface(mcpeFont);
                     //button15.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State15 == true && theme == "MCPE") {
-                    button15 = minecraftButton("TapTeleporter | ON");
+                    button15 = minecraftButton(Texts.tapteleporter + " | " + Texts.on);
                     //button15.setTypeface(mcpeFont);
                     //button15.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State15 == false && theme == "Blue") {
                     button15 = new android.widget.Button(ctx);
-                    button15.setText("TapTeleporter | OFF");
+                    button15.setText(Texts.tapteleporter + " | " + Texts.off);
                     button15.setTextColor(android.graphics.Color.WHITE);
                     button15.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button15.setTypeface(mcpeFont);
                 } else if(State15 == true && theme == "Blue") {
                     button15 = new android.widget.Button(ctx);
-                    button15.setText("TapTeleporter | ON");
+                    button15.setText(Texts.tapteleporter + " | " + Texts.on);
                     button15.setTextColor(android.graphics.Color.BLUE);
                     button15.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button15.setTypeface(mcpeFont);
@@ -4816,35 +5867,35 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State15 == false && theme == "Alternative") {
                             State15 = true;
-                            reloadHacksList();
-                            button15.setText("TapTeleporter | ON");
+                            
+                            button15.setText(Texts.tapteleporter + " | " + Texts.on);
                             button15.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State15 == true && theme == "Alternative") {
                             State15 = false;
-                            reloadHacksList();
-                            button15.setText("TapTeleporter | OFF");
+                            
+                            button15.setText(Texts.tapteleporter + " | " + Texts.off);
                             button15.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State15 == false && theme == "MCPE") {
                             State15 = true;
-                            reloadHacksList();
-                            button15.setText("TapTeleporter | ON");
+                            
+                            button15.setText(Texts.tapteleporter + " | " + Texts.on);
                             //button15.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State15 == true && theme == "MCPE") {
                             State15 = false;
-                            reloadHacksList();
-                            button15.setText("TapTeleporter | OFF");
+                            
+                            button15.setText(Texts.tapteleporter + " | " + Texts.off);
                             //button15.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State15 == false && theme == "Blue") {
                             State15 = true;
-                            reloadHacksList();
-                            button15.setText("TapTeleporter | ON");
+                            
+                            button15.setText(Texts.tapteleporter + " | " + Texts.on);
                             button15.setTextColor(android.graphics.Color.BLUE);
                             button15.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button15.setTypeface(mcpeFont);
                         } else if(State15 == true && theme == "Blue") {
                             State15 = false;
-                            reloadHacksList();
-                            button15.setText("TapTeleporter | OFF");
+                            
+                            button15.setText(Texts.tapteleporter + " | " + Texts.off);
                             button15.setTextColor(android.graphics.Color.WHITE);
                             button15.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button15.setTypeface(mcpeFont);
@@ -4856,29 +5907,29 @@ function mainMenu() {
                 var button16 = new android.widget.Button(ctx);
                 if(State16 == false && theme == "Alternative") {
                     button16 = new android.widget.Button(ctx);
-                    button16.setText("InstaKill | OFF");
+                    button16.setText(Texts.instakill + " | " + Texts.off);
                     button16.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State16 == true && theme == "Alternative") {
                     button16 = new android.widget.Button(ctx);
-                    button16.setText("InstaKill | ON");
+                    button16.setText(Texts.instakill + " | " + Texts.on);
                     button16.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State16 == false && theme == "MCPE") {
-                    button16 = minecraftButton("InstaKill | OFF");
+                    button16 = minecraftButton(Texts.instakill + " | " + Texts.off);
                     //button16.setTypeface(mcpeFont);
                     //button16.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State16 == true && theme == "MCPE") {
-                    button16 = minecraftButton("InstaKill | ON");
+                    button16 = minecraftButton(Texts.instakill + " | " + Texts.on);
                     //button16.setTypeface(mcpeFont);
                     //button16.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State16 == false && theme == "Blue") {
                     button16 = new android.widget.Button(ctx);
-                    button16.setText("InstaKill | OFF");
+                    button16.setText(Texts.instakill + " | " + Texts.off);
                     button16.setTextColor(android.graphics.Color.WHITE);
                     button16.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button16.setTypeface(mcpeFont);
                 } else if(State16 == true && theme == "Blue") {
                     button16 = new android.widget.Button(ctx);
-                    button16.setText("InstaKill | ON");
+                    button16.setText(Texts.instakill + " | " + Texts.on);
                     button16.setTextColor(android.graphics.Color.BLUE);
                     button16.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button16.setTypeface(mcpeFont);
@@ -4889,35 +5940,35 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State16 == false && theme == "Alternative") {
                             State16 = true;
-                            reloadHacksList();
-                            button16.setText("InstaKill | ON");
+                            
+                            button16.setText(Texts.instakill + " | " + Texts.on);
                             button16.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State16 == true && theme == "Alternative") {
                             State16 = false;
-                            reloadHacksList();
-                            button16.setText("InstaKill | OFF");
+                            
+                            button16.setText(Texts.instakill + " | " + Texts.off);
                             button16.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State16 == false && theme == "MCPE") {
                             State16 = true;
-                            reloadHacksList();
-                            button16.setText("InstaKill | ON");
+                            
+                            button16.setText(Texts.instakill + " | " + Texts.on);
                             //button16.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State16 == true && theme == "MCPE") {
                             State16 = false;
-                            reloadHacksList();
-                            button16.setText("InstaKill | OFF");
+                            
+                            button16.setText(Texts.instakill + " | " + Texts.off);
                             //button16.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State16 == false && theme == "Blue") {
                             State16 = true;
-                            reloadHacksList();
-                            button16.setText("InstaKill | ON");
+                            
+                            button16.setText(Texts.instakill + " | " + Texts.on);
                             button16.setTextColor(android.graphics.Color.BLUE);
                             button16.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button16.setTypeface(mcpeFont);
                         } else if(State16 == true && theme == "Blue") {
                             State16 = false;
-                            reloadHacksList();
-                            button16.setText("InstaKill | OFF");
+                            
+                            button16.setText(Texts.instakill + " | " + Texts.off);
                             button16.setTextColor(android.graphics.Color.WHITE);
                             button16.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button16.setTypeface(mcpeFont);
@@ -4929,29 +5980,29 @@ function mainMenu() {
                 var button17 = new android.widget.Button(ctx);
                 if(State17 == false && theme == "Alternative") {
                     button17 = new android.widget.Button(ctx);
-                    button17.setText("SignEditor (EXPERIMENTAL) | OFF");
+                    button17.setText(Texts.signeditor + " (EXPERIMENTAL) | " + Texts.off);
                     button17.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State17 == true && theme == "Alternative") {
                     button17 = new android.widget.Button(ctx);
-                    button17.setText("SignEditor (EXPERIMENTAL) | ON");
+                    button17.setText(Texts.signeditor + " (EXPERIMENTAL) | " + Texts.on);
                     button17.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State17 == false && theme == "MCPE") {
-                    button17 = minecraftButton("SignEditor (EXPERIMENTAL) | OFF");
+                    button17 = minecraftButton(Texts.signeditor + " (EXPERIMENTAL) | " + Texts.off);
                     //button17.setTypeface(mcpeFont);
                     //button17.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State17 == true && theme == "MCPE") {
-                    button17 = minecraftButton("SignEditor (EXPERIMENTAL) | ON");
+                    button17 = minecraftButton(Texts.signeditor + " (EXPERIMENTAL) | " + Texts.on);
                     //button17.setTypeface(mcpeFont);
                     //button17.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State17 == false && theme == "Blue") {
                     button17 = new android.widget.Button(ctx);
-                    button17.setText("SignEditor (EXPERIMENTAL) | OFF");
+                    button17.setText(Texts.signeditor + " (EXPERIMENTAL) | " + Texts.off);
                     button17.setTextColor(android.graphics.Color.WHITE);
                     button17.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button17.setTypeface(mcpeFont);
                 } else if(State17 == true && theme == "Blue") {
                     button17 = new android.widget.Button(ctx);
-                    button17.setText("SignEditor (EXPERIMENTAL) | ON");
+                    button17.setText(Texts.signeditor + " (EXPERIMENTAL) | " + Texts.on);
                     button17.setTextColor(android.graphics.Color.BLUE);
                     button17.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button17.setTypeface(mcpeFont);
@@ -4962,35 +6013,35 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State17 == false && theme == "Alternative") {
                             State17 = true;
-                            reloadHacksList();
-                            button17.setText("SignEditor (EXPERIMENTAL) | ON");
+                            
+                            button17.setText(Texts.signeditor + " (EXPERIMENTAL) | " + Texts.on);
                             button17.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State17 == true && theme == "Alternative") {
                             State17 = false;
-                            reloadHacksList();
-                            button17.setText("SignEditor (EXPERIMENTAL) | OFF");
+                            
+                            button17.setText(Texts.signeditor + " (EXPERIMENTAL) | " + Texts.off);
                             button17.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State17 == false && theme == "MCPE") {
                             State17 = true;
-                            reloadHacksList();
-                            button17.setText("SignEditor (EXPERIMENTAL) | ON");
+                            
+                            button17.setText(Texts.signeditor + " (EXPERIMENTAL) | " + Texts.on);
                             //button17.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State17 == true && theme == "MCPE") {
                             State17 = false;
-                            reloadHacksList();
-                            button17.setText("SignEditor (EXPERIMENTAL) | OFF");
+                            
+                            button17.setText(Texts.signeditor + " (EXPERIMENTAL) | " + Texts.off);
                             //button17.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State17 == false && theme == "Blue") {
                             State17 = true;
-                            reloadHacksList();
-                            button17.setText("SignEditor (EXPERIMENTAL) | ON");
+                            
+                            button17.setText(Texts.signeditor + " (EXPERIMENTAL) | " + Texts.on);
                             button17.setTextColor(android.graphics.Color.BLUE);
                             button17.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button17.setTypeface(mcpeFont);
                         } else if(State17 == true && theme == "Blue") {
                             State17 = false;
-                            reloadHacksList();
-                            button17.setText("SignEditor (EXPERIMENTAL) | OFF");
+                            
+                            button17.setText(Texts.signeditor + " (EXPERIMENTAL) | " + Texts.off);
                             button17.setTextColor(android.graphics.Color.WHITE);
                             button17.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button17.setTypeface(mcpeFont);
@@ -5003,34 +6054,34 @@ function mainMenu() {
                 if(State18 == false && theme == "Alternative") {
                     button18 = new android.widget.Button(ctx);
                     MoreOptionsPE.allItemsEatable(0);
-                    button18.setText("All items eatable | OFF");
+                    button18.setText(Texts.all_items_eatable + " (EXPERIMENTAL) | " + Texts.off);
                     button18.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State18 == true && theme == "Alternative") {
                     button18 = new android.widget.Button(ctx);
                     MoreOptionsPE.allItemsEatable(1);
-                    button18.setText("All items eatable | ON");
+                    button18.setText(Texts.all_items_eatable + " (EXPERIMENTAL) | " + Texts.on);
                     button18.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State18 == false && theme == "MCPE") {
-                    button18 = minecraftButton("All items eatable | OFF");
+                    button18 = minecraftButton(Texts.all_items_eatable + " (EXPERIMENTAL) | " + Texts.off);
                     MoreOptionsPE.allItemsEatable(0);
                     //button18.setTypeface(mcpeFont);
                     //button18.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State18 == true && theme == "MCPE") {
-                    button18 = minecraftButton("All items eatable | ON");
+                    button18 = minecraftButton(Texts.all_items_eatable + " (EXPERIMENTAL) | " + Texts.on);
                     MoreOptionsPE.allItemsEatable(1);
                     //button18.setTypeface(mcpeFont);
                     //button18.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State18 == false && theme == "Blue") {
                     button18 = new android.widget.Button(ctx);
                     MoreOptionsPE.allItemsEatable(0);
-                    button18.setText("All items eatable | OFF");
+                    button18.setText(Texts.all_items_eatable + " (EXPERIMENTAL) | " + Texts.off);
                     button18.setTextColor(android.graphics.Color.WHITE);
                     button18.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button18.setTypeface(mcpeFont);
                 } else if(State18 == true && theme == "Blue") {
                     button18 = new android.widget.Button(ctx);
                     MoreOptionsPE.allItemsEatable(1);
-                    button18.setText("All items eatable | ON");
+                    button18.setText(Texts.all_items_eatable + " (EXPERIMENTAL) | " + Texts.on);
                     button18.setTextColor(android.graphics.Color.BLUE);
                     button18.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button18.setTypeface(mcpeFont);
@@ -5041,41 +6092,41 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State18 == false && theme == "Alternative") {
                             State18 = true;
-                            reloadHacksList();
+                            
                             MoreOptionsPE.allItemsEatable(1);
-                            button18.setText("All items eatable | ON");
+                            button18.setText(Texts.all_items_eatable + " (EXPERIMENTAL) | " + Texts.on);
                             button18.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State18 == true && theme == "Alternative") {
                             State18 = false;
-                            reloadHacksList();
+                            
                             MoreOptionsPE.allItemsEatable(0);
-                            button18.setText("All items eatable | OFF");
+                            button18.setText(Texts.all_items_eatable + " (EXPERIMENTAL) | " + Texts.off);
                             button18.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State18 == false && theme == "MCPE") {
                             State18 = true;
-                            reloadHacksList();
+                            
                             MoreOptionsPE.allItemsEatable(1);
-                            button18.setText("All items eatable | ON");
+                            button18.setText(Texts.all_items_eatable + " (EXPERIMENTAL) | " + Texts.on);
                             //button18.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State18 == true && theme == "MCPE") {
                             State18 = false;
-                            reloadHacksList();
+                            
                             MoreOptionsPE.allItemsEatable(0);
-                            button18.setText("All items eatable | OFF");
+                            button18.setText(Texts.all_items_eatable + " (EXPERIMENTAL) | " + Texts.off);
                             //button18.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State18 == false && theme == "Blue") {
                             State18 = true;
-                            reloadHacksList();
+                            
                             MoreOptionsPE.allItemsEatable(1);
-                            button18.setText("All items eatable | ON");
+                            button18.setText(Texts.all_items_eatable + " (EXPERIMENTAL) | " + Texts.on);
                             button18.setTextColor(android.graphics.Color.BLUE);
                             button18.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button18.setTypeface(mcpeFont);
                         } else if(State18 == true && theme == "Blue") {
                             State18 = false;
-                            reloadHacksList();
+                            
                             MoreOptionsPE.allItemsEatable(0);
-                            button18.setText("All items eatable | OFF");
+                            button18.setText(Texts.all_items_eatable + " (EXPERIMENTAL) | " + Texts.off);
                             button18.setTextColor(android.graphics.Color.WHITE);
                             button18.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button18.setTypeface(mcpeFont);
@@ -5087,29 +6138,29 @@ function mainMenu() {
                 var button19 = new android.widget.Button(ctx);
                 if(State19 == false && theme == "Alternative") {
                     button19 = new android.widget.Button(ctx);
-                    button19.setText("Sprinting | OFF");
+                    button19.setText(Texts.sprinting + " | " + Texts.off);
                     button19.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State19 == true && theme == "Alternative") {
                     button19 = new android.widget.Button(ctx);
-                    button19.setText("Sprinting | ON");
+                    button19.setText(Texts.sprinting + " | " + Texts.on);
                     button19.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State19 == false && theme == "MCPE") {
-                    button19 = minecraftButton("Sprinting | OFF");
+                    button19 = minecraftButton(Texts.sprinting + " | " + Texts.off);
                     //button19.setTypeface(mcpeFont);
                     //button19.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State19 == true && theme == "MCPE") {
-                    button19 = minecraftButton("Sprinting | ON");
+                    button19 = minecraftButton(Texts.sprinting + " | " + Texts.on);
                     //button19.setTypeface(mcpeFont);
                     //button19.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State19 == false && theme == "Blue") {
                     button19 = new android.widget.Button(ctx);
-                    button19.setText("Sprinting | OFF");
+                    button19.setText(Texts.sprinting + " | " + Texts.off);
                     button19.setTextColor(android.graphics.Color.WHITE);
                     button19.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button19.setTypeface(mcpeFont);
                 } else if(State19 == true && theme == "Blue") {
                     button19 = new android.widget.Button(ctx);
-                    button19.setText("Sprinting | ON");
+                    button19.setText(Texts.sprinting + " | " + Texts.on);
                     button19.setTextColor(android.graphics.Color.BLUE);
                     button19.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button19.setTypeface(mcpeFont);
@@ -5120,41 +6171,41 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State19 == false && theme == "Alternative") {
                             State19 = true;
-                            reloadHacksList();
+                            
                             f = 1;
-                            button19.setText("Sprinting | ON");
+                            button19.setText(Texts.sprinting + " | " + Texts.on);
                             button19.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State19 == true && theme == "Alternative") {
                             State19 = false;
-                            reloadHacksList();
+                            
                             f = 0;
-                            button19.setText("Sprinting | OFF");
+                            button19.setText(Texts.sprinting + " | " + Texts.off);
                             button19.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State19 == false && theme == "MCPE") {
                             State19 = true;
-                            reloadHacksList();
+                            
                             f = 1;
-                            button19.setText("Sprinting | ON");
+                            button19.setText(Texts.sprinting + " | " + Texts.on);
                             //button19.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State19 == true && theme == "MCPE") {
                             State19 = false;
-                            reloadHacksList();
+                            
                             f = 0;
-                            button19.setText("Sprinting | OFF");
+                            button19.setText(Texts.sprinting + " | " + Texts.off);
                             //button19.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State19 == false && theme == "Blue") {
                             State19 = true;
-                            reloadHacksList();
+                            
                             f = 1;
-                            button19.setText("Sprinting | ON");
+                            button19.setText(Texts.sprinting + " | " + Texts.on);
                             button19.setTextColor(android.graphics.Color.BLUE);
                             button19.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button19.setTypeface(mcpeFont);
                         } else if(State19 == true && theme == "Blue") {
                             State19 = false;
-                            reloadHacksList();
+                            
                             f = 0;
-                            button19.setText("Sprinting | OFF");
+                            button19.setText(Texts.sprinting + " | " + Texts.off);
                             button19.setTextColor(android.graphics.Color.WHITE);
                             button19.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button19.setTypeface(mcpeFont);
@@ -5166,29 +6217,29 @@ function mainMenu() {
                 var button20 = new android.widget.Button(ctx);
                 if(State20 == false && theme == "Alternative") {
                     button20 = new android.widget.Button(ctx);
-                    button20.setText("JetPack | OFF");
+                    button20.setText(Texts.jetpack + " | " + Texts.off);
                     button20.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State20 == true && theme == "Alternative") {
                     button20 = new android.widget.Button(ctx);
-                    button20.setText("JetPack | ON");
+                    button20.setText(Texts.jetpack + " | " + Texts.on);
                     button20.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State20 == false && theme == "MCPE") {
-                    button20 = minecraftButton("JetPack | OFF");
+                    button20 = minecraftButton(Texts.jetpack + " | " + Texts.off);
                     //button20.setTypeface(mcpeFont);
                     //button20.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State20 == true && theme == "MCPE") {
-                    button20 = minecraftButton("JetPack | ON");
+                    button20 = minecraftButton(Texts.jetpack + " | " + Texts.on);
                     //button20.setTypeface(mcpeFont);
                     //button20.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State20 == false && theme == "Blue") {
                     button20 = new android.widget.Button(ctx);
-                    button20.setText("JetPack | OFF");
+                    button20.setText(Texts.jetpack + " | " + Texts.off);
                     button20.setTextColor(android.graphics.Color.WHITE);
                     button20.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button20.setTypeface(mcpeFont);
                 } else if(State20 == true && theme == "Blue") {
                     button20 = new android.widget.Button(ctx);
-                    button20.setText("JetPack | ON");
+                    button20.setText(Texts.jetpack + " | " + Texts.on);
                     button20.setTextColor(android.graphics.Color.BLUE);
                     button20.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button20.setTypeface(mcpeFont);
@@ -5199,35 +6250,35 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State20 == false && theme == "Alternative") {
                             State20 = true;
-                            reloadHacksList();
-                            button20.setText("JetPack | ON");
+                            
+                            button20.setText(Texts.jetpack + " | " + Texts.on);
                             button20.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State20 == true && theme == "Alternative") {
                             State20 = false;
-                            reloadHacksList();
-                            button20.setText("JetPack | OFF");
+                            
+                            button20.setText(Texts.jetpack + " | " + Texts.off);
                             button20.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State20 == false && theme == "MCPE") {
                             State20 = true;
-                            reloadHacksList();
-                            button20.setText("JetPack | ON");
+                            
+                            button20.setText(Texts.jetpack + " | " + Texts.on);
                             //button20.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State20 == true && theme == "MCPE") {
                             State20 = false;
-                            reloadHacksList();
-                            button20.setText("JetPack | OFF");
+                            
+                            button20.setText(Texts.jetpack + " | " + Texts.off);
                             //button20.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State20 == false && theme == "Blue") {
                             State20 = true;
-                            reloadHacksList();
-                            button20.setText("JetPack | ON");
+                            
+                            button20.setText(Texts.jetpack + " | " + Texts.on);
                             button20.setTextColor(android.graphics.Color.BLUE);
                             button20.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button20.setTypeface(mcpeFont);
                         } else if(State20 == true && theme == "Blue") {
                             State20 = false;
-                            reloadHacksList();
-                            button20.setText("JetPack | OFF");
+                            
+                            button20.setText(Texts.jetpack + " | " + Texts.off);
                             button20.setTextColor(android.graphics.Color.WHITE);
                             button20.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button20.setTypeface(mcpeFont);
@@ -5239,29 +6290,29 @@ function mainMenu() {
                 var button21 = new android.widget.Button(ctx);
                 if(State21 == false && theme == "Alternative") {
                     button21 = new android.widget.Button(ctx);
-                    button21.setText("HighJump | OFF");
+                    button21.setText(Texts.highjump + " | " + Texts.off);
                     button21.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State21 == true && theme == "Alternative") {
                     button21 = new android.widget.Button(ctx);
-                    button21.setText("HighJump | ON");
+                    button21.setText(Texts.highjump + " | " + Texts.on);
                     button21.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State21 == false && theme == "MCPE") {
-                    button21 = minecraftButton("HighJump | OFF");
+                    button21 = minecraftButton(Texts.highjump + " | " + Texts.off);
                     //button21.setTypeface(mcpeFont);
                     //button21.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State21 == true && theme == "MCPE") {
-                    button21 = minecraftButton("HighJump | ON");
+                    button21 = minecraftButton(Texts.highjump + " | " + Texts.on);
                     //button21.setTypeface(mcpeFont);
                     //button21.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State21 == false && theme == "Blue") {
                     button21 = new android.widget.Button(ctx);
-                    button21.setText("HighJump | OFF");
+                    button21.setText(Texts.highjump + " | " + Texts.off);
                     button21.setTextColor(android.graphics.Color.WHITE);
                     button21.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button21.setTypeface(mcpeFont);
                 } else if(State21 == true && theme == "Blue") {
                     button21 = new android.widget.Button(ctx);
-                    button21.setText("HighJump | ON");
+                    button21.setText(Texts.highjump + " | " + Texts.on);
                     button21.setTextColor(android.graphics.Color.BLUE);
                     button21.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button21.setTypeface(mcpeFont);
@@ -5272,35 +6323,35 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State21 == false && theme == "Alternative") {
                             State21 = true;
-                            reloadHacksList();
-                            button21.setText("HighJump | ON");
+                            
+                            button21.setText(Texts.highjump + " | " + Texts.on);
                             button21.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State21 == true && theme == "Alternative") {
                             State21 = false;
-                            reloadHacksList();
-                            button21.setText("HighJump | OFF");
+                            
+                            button21.setText(Texts.highjump + " | " + Texts.off);
                             button21.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State21 == false && theme == "MCPE") {
                             State21 = true;
-                            reloadHacksList();
-                            button21.setText("HighJump | ON");
+                            
+                            button21.setText(Texts.highjump + " | " + Texts.on);
                             //button21.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State21 == true && theme == "MCPE") {
                             State21 = false;
-                            reloadHacksList();
-                            button21.setText("HighJump | OFF");
+                            
+                            button21.setText(Texts.highjump + " | " + Texts.off);
                             //button21.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State21 == false && theme == "Blue") {
                             State21 = true;
-                            reloadHacksList();
-                            button21.setText("HighJump | ON");
+                            
+                            button21.setText(Texts.highjump + " | " + Texts.on);
                             button21.setTextColor(android.graphics.Color.BLUE);
                             button21.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button21.setTypeface(mcpeFont);
                         } else if(State21 == true && theme == "Blue") {
                             State21 = false;
-                            reloadHacksList();
-                            button21.setText("HighJump | OFF");
+                            
+                            button21.setText(Texts.highjump + " | " + Texts.off);
                             button21.setTextColor(android.graphics.Color.WHITE);
                             button21.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button21.setTypeface(mcpeFont);
@@ -5311,29 +6362,29 @@ function mainMenu() {
                 var button22 = new android.widget.Button(ctx);
                 if(State22 == false && theme == "Alternative") {
                     button22 = new android.widget.Button(ctx);
-                    button22.setText("Drone | OFF");
+                    button22.setText(Texts.drone + " | " + Texts.off);
                     button22.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State22 == true && theme == "Alternative") {
                     button22 = new android.widget.Button(ctx);
-                    button22.setText("Drone | ON");
+                    button22.setText(Texts.drone + " | " + Texts.on);
                     button22.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State22 == false && theme == "MCPE") {
-                    button22 = minecraftButton("Drone | OFF");
+                    button22 = minecraftButton(Texts.drone + " | " + Texts.off);
                     //button22.setTypeface(mcpeFont);
                     //button22.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State22 == true && theme == "MCPE") {
-                    button22 = minecraftButton("Drone | ON");
+                    button22 = minecraftButton(Texts.drone + " | " + Texts.on);
                     //button22.setTypeface(mcpeFont);
                     //button22.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State22 == false && theme == "Blue") {
                     button22 = new android.widget.Button(ctx);
-                    button22.setText("Drone | OFF");
+                    button22.setText(Texts.drone + " | " + Texts.off);
                     button22.setTextColor(android.graphics.Color.WHITE);
                     button22.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button22.setTypeface(mcpeFont);
                 } else if(State22 == true && theme == "Blue") {
                     button22 = new android.widget.Button(ctx);
-                    button22.setText("Drone | ON");
+                    button22.setText(Texts.drone + " | " + Texts.on);
                     button22.setTextColor(android.graphics.Color.BLUE);
                     button22.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button22.setTypeface(mcpeFont);
@@ -5344,35 +6395,35 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State22 == false && theme == "Alternative") {
                             State22 = true;
-                            reloadHacksList();
-                            button22.setText("Drone | ON");
+                            
+                            button22.setText(Texts.drone + " | " + Texts.on);
                             button22.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State22 == true && theme == "Alternative") {
                             State22 = false;
-                            reloadHacksList();
-                            button22.setText("Drone | OFF");
+                            
+                            button22.setText(Texts.drone + " | " + Texts.off);
                             button22.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State22 == false && theme == "MCPE") {
                             State22 = true;
-                            reloadHacksList();
-                            button22.setText("Drone | ON");
+                            
+                            button22.setText(Texts.drone + " | " + Texts.on);
                             //button22.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State22 == true && theme == "MCPE") {
                             State22 = false;
-                            reloadHacksList();
-                            button22.setText("Drone | OFF");
+                            
+                            button22.setText(Texts.drone + " | " + Texts.off);
                             //button22.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State22 == false && theme == "Blue") {
                             State22 = true;
-                            reloadHacksList();
-                            button22.setText("Drone | ON");
+                            
+                            button22.setText(Texts.drone + " | " + Texts.on);
                             button22.setTextColor(android.graphics.Color.BLUE);
                             button22.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button22.setTypeface(mcpeFont);
                         } else if(State22 == true && theme == "Blue") {
                             State22 = false;
-                            reloadHacksList();
-                            button22.setText("Drone | OFF");
+                            
+                            button22.setText(Texts.drone + " | " + Texts.off);
                             button22.setTextColor(android.graphics.Color.WHITE);
                             button22.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button22.setTypeface(mcpeFont);
@@ -5383,29 +6434,29 @@ function mainMenu() {
                 var button23 = new android.widget.Button(ctx);
                 if(State23 == false && theme == "Alternative") {
                     button23 = new android.widget.Button(ctx);
-                    button23.setText("Parachute | OFF");
+                    button23.setText(Texts.parachute + " | " + Texts.off);
                     button23.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State23 == true && theme == "Alternative") {
                     button23 = new android.widget.Button(ctx);
-                    button23.setText("Parachute | ON");
+                    button23.setText(Texts.parachute + " | " + Texts.on);
                     button23.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State23 == false && theme == "MCPE") {
-                    button23 = minecraftButton("Parachute | OFF");
+                    button23 = minecraftButton(Texts.parachute + " | " + Texts.off);
                     //button23.setTypeface(mcpeFont);
                     //button23.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State23 == true && theme == "MCPE") {
-                    button23 = minecraftButton("Parachute | ON");
+                    button23 = minecraftButton(Texts.parachute + " | " + Texts.on);
                     //button23.setTypeface(mcpeFont);
                     //button23.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State23 == false && theme == "Blue") {
                     button23 = new android.widget.Button(ctx);
-                    button23.setText("Parachute | OFF");
+                    button23.setText(Texts.parachute + " | " + Texts.off);
                     button23.setTextColor(android.graphics.Color.WHITE);
                     button23.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button23.setTypeface(mcpeFont);
                 } else if(State23 == true && theme == "Blue") {
                     button23 = new android.widget.Button(ctx);
-                    button23.setText("Parachute | ON");
+                    button23.setText(Texts.parachute + " | " + Texts.on);
                     button23.setTextColor(android.graphics.Color.BLUE);
                     button23.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button23.setTypeface(mcpeFont);
@@ -5416,35 +6467,35 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State23 == false && theme == "Alternative") {
                             State23 = true;
-                            reloadHacksList();
-                            button23.setText("Parachute | ON");
+                            
+                            button23.setText(Texts.parachute + " | " + Texts.on);
                             button23.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State23 == true && theme == "Alternative") {
                             State23 = false;
-                            reloadHacksList();
-                            button23.setText("Parachute | OFF");
+                            
+                            button23.setText(Texts.parachute + " | " + Texts.off);
                             button23.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State23 == false && theme == "MCPE") {
                             State23 = true;
-                            reloadHacksList();
-                            button23.setText("Parachute | ON");
+                            
+                            button23.setText(Texts.parachute + " | " + Texts.on);
                             //button23.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State23 == true && theme == "MCPE") {
                             State23 = false;
-                            reloadHacksList();
-                            button23.setText("Parachute | OFF");
+                            
+                            button23.setText(Texts.parachute + " | " + Texts.off);
                             //button23.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State23 == false && theme == "Blue") {
                             State23 = true;
-                            reloadHacksList();
-                            button23.setText("Parachute | ON");
+                            
+                            button23.setText(Texts.parachute + " | " + Texts.on);
                             button23.setTextColor(android.graphics.Color.BLUE);
                             button23.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button23.setTypeface(mcpeFont);
                         } else if(State23 == true && theme == "Blue") {
                             State23 = false;
-                            reloadHacksList();
-                            button23.setText("Parachute | OFF");
+                            
+                            button23.setText(Texts.parachute + " | " + Texts.off);
                             button23.setTextColor(android.graphics.Color.WHITE);
                             button23.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button24.setTypeface(mcpeFont);
@@ -5455,29 +6506,29 @@ function mainMenu() {
                 var button24 = new android.widget.Button(ctx);
                 if(State24 == false && theme == "Alternative") {
                     button24 = new android.widget.Button(ctx);
-                    button24.setText("TapNuker | OFF");
+                    button24.setText("TapNuker | " + Texts.off);
                     button24.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State24 == true && theme == "Alternative") {
                     button24 = new android.widget.Button(ctx);
-                    button24.setText("TapNuker | ON");
+                    button24.setText("TapNuker | " + Texts.on);
                     button24.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State24 == false && theme == "MCPE") {
-                    button24 = minecraftButton("TapNuker | OFF");
+                    button24 = minecraftButton("TapNuker | " + Texts.off);
                     //button24.setTypeface(mcpeFont);
                     //button24.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State24 == true && theme == "MCPE") {
-                    button24 = minecraftButton("TapNuker | ON");
+                    button24 = minecraftButton("TapNuker | " + Texts.on);
                     //button24.setTypeface(mcpeFont);
                     //button24.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State24 == false && theme == "Blue") {
                     button24 = new android.widget.Button(ctx);
-                    button24.setText("TapNuker | OFF");
+                    button24.setText("TapNuker | " + Texts.off);
                     button24.setTextColor(android.graphics.Color.WHITE);
                     button24.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button24.setTypeface(mcpeFont);
                 } else if(State24 == true && theme == "Blue") {
                     button24 = new android.widget.Button(ctx);
-                    button24.setText("TapNuker | ON");
+                    button24.setText("TapNuker | " + Texts.on);
                     button24.setTextColor(android.graphics.Color.BLUE);
                     button24.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button24.setTypeface(mcpeFont);
@@ -5488,35 +6539,35 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State24 == false && theme == "Alternative") {
                             State24 = true;
-                            reloadHacksList();
-                            button24.setText("TapNuker | ON");
+                            
+                            button24.setText("TapNuker | " + Texts.on);
                             button24.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State24 == true && theme == "Alternative") {
                             State24 = false;
-                            reloadHacksList();
-                            button24.setText("TapNuker | OFF");
+                            
+                            button24.setText("TapNuker | " + Texts.off);
                             button24.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State24 == false && theme == "MCPE") {
                             State24 = true;
-                            reloadHacksList();
-                            button24.setText("TapNuker | ON");
+                            
+                            button24.setText("TapNuker | " + Texts.on);
                             //button24.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State24 == true && theme == "MCPE") {
                             State24 = false;
-                            reloadHacksList();
-                            button24.setText("TapNuker | OFF");
+                            
+                            button24.setText("TapNuker | " + Texts.off);
                             //button24.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State24 == false && theme == "Blue") {
                             State24 = true;
-                            reloadHacksList();
-                            button24.setText("TapNuker | ON");
+                            
+                            button24.setText("TapNuker | " + Texts.on);
                             button24.setTextColor(android.graphics.Color.BLUE);
                             button24.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button24.setTypeface(mcpeFont);
                         } else if(State24 == true && theme == "Blue") {
                             State24 = false;
-                            reloadHacksList();
-                            button24.setText("TapNuker | OFF");
+                            
+                            button24.setText("TapNuker | " + Texts.off);
                             button24.setTextColor(android.graphics.Color.WHITE);
                             button24.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button24.setTypeface(mcpeFont);
@@ -5527,29 +6578,29 @@ function mainMenu() {
                 var button25 = new android.widget.Button(ctx);
                 if(State25 == false && theme == "Alternative") {
                     button25 = new android.widget.Button(ctx);
-                    button25.setText("Walk on Liquids (EXPERIMENTAL) | OFF");
+                    button25.setText(Texts.walk_on_liquids + " | " + Texts.off);
                     button25.setBackgroundColor(android.graphics.Color.RED);
                 } else if(State25 == true && theme == "Alternative") {
                     button25 = new android.widget.Button(ctx);
-                    button25.setText("Walk on Liquids (EXPERIMENTAL) | ON");
+                    button25.setText(Texts.walk_on_liquids + " | " + Texts.on);
                     button25.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(State25 == false && theme == "MCPE") {
-                    button25 = minecraftButton("Walk on Liquids (EXPERIMENTAL) | OFF");
+                    button25 = minecraftButton(Texts.walk_on_liquids + " | " + Texts.off);
                     //button25.setTypeface(mcpeFont);
                     //button25.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State25 == true && theme == "MCPE") {
-                    button25 = minecraftButton("Walk on Liquids (EXPERIMENTAL) | ON");
+                    button25 = minecraftButton(Texts.walk_on_liquids + " | " + Texts.on);
                     //button25.setTypeface(mcpeFont);
                     //button25.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(State25 == false && theme == "Blue") {
                     button25 = new android.widget.Button(ctx);
-                    button25.setText("Walk on Liquids (EXPERIMENTAL) | OFF");
+                    button25.setText(Texts.walk_on_liquids + " | " + Texts.off);
                     button25.setTextColor(android.graphics.Color.WHITE);
                     button25.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button25.setTypeface(mcpeFont);
                 } else if(State25 == true && theme == "Blue") {
                     button25 = new android.widget.Button(ctx);
-                    button25.setText("Walk on Liquids (EXPERIMENTAL) | ON");
+                    button25.setText(Texts.walk_on_liquids + " | " + Texts.on);
                     button25.setTextColor(android.graphics.Color.BLUE);
                     button25.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     button25.setTypeface(mcpeFont);
@@ -5560,38 +6611,254 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(State25 == false && theme == "Alternative") {
                             State25 = true;
-                            reloadHacksList();
-                            button25.setText("Walk on Liquids (EXPERIMENTAL) | ON");
+                            
+                            button25.setText(Texts.walk_on_liquids + " | " + Texts.on);
                             button25.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(State25 == true && theme == "Alternative") {
                             State25 = false;
-                            reloadHacksList();
-                            button25.setText("Walk on Liquids (EXPERIMENTAL) | OFF");
+                            
+                            button25.setText(Texts.walk_on_liquids + " | " + Texts.off);
                             button25.setBackgroundColor(android.graphics.Color.RED);
                         } else if(State25 == false && theme == "MCPE") {
                             State25 = true;
-                            reloadHacksList();
-                            button25.setText("Walk on Liquids (EXPERIMENTAL) | ON");
+                            
+                            button25.setText(Texts.walk_on_liquids + " | " + Texts.on);
                             //button25.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State25 == true && theme == "MCPE") {
                             State25 = false;
-                            reloadHacksList();
-                            button25.setText("Walk on Liquids (EXPERIMENTAL) | OFF");
+                            
+                            button25.setText(Texts.walk_on_liquids + " | " + Texts.off);
                             //button25.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(State25 == false && theme == "Blue") {
                             State25 = true;
-                            reloadHacksList();
-                            button25.setText("Walk on Liquids (EXPERIMENTAL) | ON");
+                            
+                            button25.setText(Texts.walk_on_liquids + " | " + Texts.on);
                             button25.setTextColor(android.graphics.Color.BLUE);
                             button25.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button25.setTypeface(mcpeFont);
                         } else if(State25 == true && theme == "Blue") {
                             State25 = false;
-                            reloadHacksList();
-                            button25.setText("Walk on Liquids (EXPERIMENTAL) | OFF");
+                            
+                            button25.setText(Texts.walk_on_liquids + " | " + Texts.off);
                             button25.setTextColor(android.graphics.Color.WHITE);
                             button25.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             button25.setTypeface(mcpeFont);
+                        }
+                    }
+                }));
+				
+				var button26 = new android.widget.Button(ctx);
+                if(State26 == false && theme == "Alternative") {
+                    button26 = new android.widget.Button(ctx);
+                    button26.setText(Texts.autospammer + " | " + Texts.off);
+                    button26.setBackgroundColor(android.graphics.Color.RED);
+                } else if(State26 == true && theme == "Alternative") {
+                    button26 = new android.widget.Button(ctx);
+                    button26.setText(Texts.autospammer + " | " + Texts.on);
+                    button26.setBackgroundColor(android.graphics.Color.GREEN);
+                } else if(State26 == false && theme == "MCPE") {
+                    button26 = minecraftButton(Texts.autospammer + " | " + Texts.off);
+                    //button26.setTypeface(mcpeFont);
+                    //button26.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(State26 == true && theme == "MCPE") {
+                    button26 = minecraftButton(Texts.autospammer + " | " + Texts.on);
+                    //button26.setTypeface(mcpeFont);
+                    //button26.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(State26 == false && theme == "Blue") {
+                    button26 = new android.widget.Button(ctx);
+                    button26.setText(Texts.autospammer + " | " + Texts.off);
+                    button26.setTextColor(android.graphics.Color.WHITE);
+                    button26.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    button26.setTypeface(mcpeFont);
+                } else if(State26 == true && theme == "Blue") {
+                    button26 = new android.widget.Button(ctx);
+                    button26.setText(Texts.autospammer + " | " + Texts.on);
+                    button26.setTextColor(android.graphics.Color.BLUE);
+                    button26.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    button26.setTypeface(mcpeFont);
+                }
+
+                button26.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        if(State26 == false && theme == "Alternative") {
+                            State26 = true;
+                            
+                            button26.setText(Texts.autospammer + " | " + Texts.on);
+                            button26.setBackgroundColor(android.graphics.Color.GREEN);
+                        } else if(State26 == true && theme == "Alternative") {
+                            State26 = false;
+                            
+                            button26.setText(Texts.autospammer + " | " + Texts.off);
+                            button26.setBackgroundColor(android.graphics.Color.RED);
+                        } else if(State26 == false && theme == "MCPE") {
+                            State26 = true;
+                            
+                            button26.setText(Texts.autospammer + " | " + Texts.on);
+                            //button26.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(State26 == true && theme == "MCPE") {
+                            State26 = false;
+                            
+                            button26.setText(Texts.autospammer + " | " + Texts.off);
+                            //button26.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(State26 == false && theme == "Blue") {
+                            State26 = true;
+                            
+                            button26.setText(Texts.autospammer + " | " + Texts.on);
+                            button26.setTextColor(android.graphics.Color.BLUE);
+                            button26.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            button26.setTypeface(mcpeFont);
+                        } else if(State26 == true && theme == "Blue") {
+                            State26 = false;
+                            
+                            button26.setText(Texts.autospammer + " | " + Texts.off);
+                            button26.setTextColor(android.graphics.Color.WHITE);
+                            button26.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            button26.setTypeface(mcpeFont);
+                        }
+                    }
+                }));
+				
+				var button27 = new android.widget.Button(ctx);
+                if(State27 == false && theme == "Alternative") {
+                    button27 = new android.widget.Button(ctx);
+                    button27.setText(Texts.autoleave + " | " + Texts.off);
+                    button27.setBackgroundColor(android.graphics.Color.RED);
+                } else if(State27 == true && theme == "Alternative") {
+                    button27 = new android.widget.Button(ctx);
+                    button27.setText(Texts.autoleave + " | " + Texts.on);
+                    button27.setBackgroundColor(android.graphics.Color.GREEN);
+                } else if(State27 == false && theme == "MCPE") {
+                    button27 = minecraftButton(Texts.autoleave + " | " + Texts.off);
+                    //button27.setTypeface(mcpeFont);
+                    //button27.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(State27 == true && theme == "MCPE") {
+                    button27 = minecraftButton(Texts.autoleave + " | " + Texts.on);
+                    //button27.setTypeface(mcpeFont);
+                    //button27.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(State27 == false && theme == "Blue") {
+                    button27 = new android.widget.Button(ctx);
+                    button27.setText(Texts.autoleave + " | " + Texts.off);
+                    button27.setTextColor(android.graphics.Color.WHITE);
+                    button27.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    button27.setTypeface(mcpeFont);
+                } else if(State27 == true && theme == "Blue") {
+                    button27 = new android.widget.Button(ctx);
+                    button27.setText(Texts.autoleave + " | " + Texts.on);
+                    button27.setTextColor(android.graphics.Color.BLUE);
+                    button27.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    button27.setTypeface(mcpeFont);
+                }
+
+                button27.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        if(State27 == false && theme == "Alternative") {
+                            State27 = true;
+                            
+                            button27.setText(Texts.autoleave + " | " + Texts.on);
+                            button27.setBackgroundColor(android.graphics.Color.GREEN);
+                        } else if(State27 == true && theme == "Alternative") {
+                            State27 = false;
+                            
+                            button27.setText(Texts.autoleave + " | " + Texts.off);
+                            button27.setBackgroundColor(android.graphics.Color.RED);
+                        } else if(State27 == false && theme == "MCPE") {
+                            State27 = true;
+                            
+                            button27.setText(Texts.autoleave + " | " + Texts.on);
+                            //button27.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(State27 == true && theme == "MCPE") {
+                            State27 = false;
+                            
+                            button27.setText(Texts.autoleave + " | " + Texts.off);
+                            //button27.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(State27 == false && theme == "Blue") {
+                            State27 = true;
+                            
+                            button27.setText(Texts.autoleave + " | " + Texts.on);
+                            button27.setTextColor(android.graphics.Color.BLUE);
+                            button27.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            button27.setTypeface(mcpeFont);
+                        } else if(State27 == true && theme == "Blue") {
+                            State27 = false;
+                            
+                            button27.setText(Texts.autoleave + " | " + Texts.off);
+                            button27.setTextColor(android.graphics.Color.WHITE);
+                            button27.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            button27.setTypeface(mcpeFont);
+                        }
+                    }
+                }));
+				
+				var button28 = new android.widget.Button(ctx);
+                if(State28 == false && theme == "Alternative") {
+                    button28 = new android.widget.Button(ctx);
+                    button28.setText(Texts.instafood + " | " + Texts.off);
+                    button28.setBackgroundColor(android.graphics.Color.RED);
+                } else if(State28 == true && theme == "Alternative") {
+                    button28 = new android.widget.Button(ctx);
+                    button28.setText(Texts.instafood + " | " + Texts.on);
+                    button28.setBackgroundColor(android.graphics.Color.GREEN);
+                } else if(State28 == false && theme == "MCPE") {
+                    button28 = minecraftButton(Texts.instafood + " | " + Texts.off);
+                    //button28.setTypeface(mcpeFont);
+                    //button28.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(State28 == true && theme == "MCPE") {
+                    button28 = minecraftButton(Texts.instafood + " | " + Texts.on);
+                    //button28.setTypeface(mcpeFont);
+                    //button28.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(State28 == false && theme == "Blue") {
+                    button28 = new android.widget.Button(ctx);
+                    button28.setText(Texts.instafood + " | " + Texts.off);
+                    button28.setTextColor(android.graphics.Color.WHITE);
+                    button28.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    button28.setTypeface(mcpeFont);
+                } else if(State28 == true && theme == "Blue") {
+                    button28 = new android.widget.Button(ctx);
+                    button28.setText(Texts.instafood + " | " + Texts.on);
+                    button28.setTextColor(android.graphics.Color.BLUE);
+                    button28.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    button28.setTypeface(mcpeFont);
+                }
+
+                button28.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        if(State28 == false && theme == "Alternative") {
+                            State28 = true;
+                            
+                            button28.setText(Texts.instafood + " | " + Texts.on);
+                            button28.setBackgroundColor(android.graphics.Color.GREEN);
+                        } else if(State28 == true && theme == "Alternative") {
+                            State28 = false;
+                            
+                            button28.setText(Texts.instafood + " | " + Texts.off);
+                            button28.setBackgroundColor(android.graphics.Color.RED);
+                        } else if(State28 == false && theme == "MCPE") {
+                            State28 = true;
+                            
+                            button28.setText(Texts.instafood + " | " + Texts.on);
+                            //button28.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(State28 == true && theme == "MCPE") {
+                            State28 = false;
+                            
+                            button28.setText(Texts.instafood + " | " + Texts.off);
+                            //button28.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(State28 == false && theme == "Blue") {
+                            State28 = true;
+                            
+                            button28.setText(Texts.instafood + " | " + Texts.on);
+                            button28.setTextColor(android.graphics.Color.BLUE);
+                            button28.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            button28.setTypeface(mcpeFont);
+                        } else if(State28 == true && theme == "Blue") {
+                            State28 = false;
+                            
+                            button28.setText(Texts.instafood + " | " + Texts.off);
+                            button28.setTextColor(android.graphics.Color.WHITE);
+                            button28.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            button28.setTypeface(mcpeFont);
                         }
                     }
                 }));
@@ -5601,7 +6868,7 @@ function mainMenu() {
 
                 var funTitle = new android.widget.TextView(ctx);
                 funTitle.setTextSize(12);
-                funTitle.setText("\nFun"); //Title
+                funTitle.setText("\n" + Texts.fun); //Title
                 //funTitle.setTypeface(mcpeFont);
                 funTitle.setTextColor(android.graphics.Color.WHITE); //Color
                 funTitle.setGravity(android.view.Gravity.CENTER);
@@ -5618,29 +6885,29 @@ function mainMenu() {
                 var twerkButton = new android.widget.Button(ctx);
                 if(StateTwerk == false && theme == "Alternative") {
                     twerkButton = new android.widget.Button(ctx);
-                    twerkButton.setText("Twerk | OFF");
+                    twerkButton.setText("Twerk | " + Texts.off);
                     twerkButton.setBackgroundColor(android.graphics.Color.RED);
                 } else if(StateTwerk == true && theme == "Alternative") {
                     twerkButton = new android.widget.Button(ctx);
-                    twerkButton.setText("Twerk | ON");
+                    twerkButton.setText("Twerk | " + Texts.on);
                     twerkButton.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(StateTwerk == false && theme == "MCPE") {
-                    twerkButton = minecraftButton("Twerk | OFF");
+                    twerkButton = minecraftButton("Twerk | " + Texts.off);
                     //twerkButton.setTypeface(mcpeFont);
                     //twerkButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(StateTwerk == true && theme == "MCPE") {
-                    twerkButton = minecraftButton("Twerk | ON");
+                    twerkButton = minecraftButton("Twerk | " + Texts.on);
                     //twerkButton.setTypeface(mcpeFont);
                     //twerkButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(StateTwerk == false && theme == "Blue") {
                     twerkButton = new android.widget.Button(ctx);
-                    twerkButton.setText("Twerk | OFF");
+                    twerkButton.setText("Twerk | " + Texts.off);
                     twerkButton.setTextColor(android.graphics.Color.WHITE);
                     twerkButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     twerkButton.setTypeface(mcpeFont);
                 } else if(StateTwerk == true && theme == "Blue") {
                     twerkButton = new android.widget.Button(ctx);
-                    twerkButton.setText("Twerk | ON");
+                    twerkButton.setText("Twerk | " + Texts.on);
                     twerkButton.setTextColor(android.graphics.Color.BLUE);
                     twerkButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     twerkButton.setTypeface(mcpeFont);
@@ -5652,55 +6919,55 @@ function mainMenu() {
                         if(StateTwerk == false && theme == "Alternative") {
                             StateTwerk = true;
                             twerkCounter = 1;
-                            reloadHacksList();
-                            twerkButton.setText("Twerk | ON");
+                            
+                            twerkButton.setText("Twerk | " + Texts.on);
                             twerkButton.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(StateTwerk == true && theme == "Alternative") {
                             StateTwerk = false;
                             twerkCounter = 0;
-                            reloadHacksList();
+                            
                             if(State6 == true) {
                                 Entity.setSneaking(Player.getEntity(), 1);
                             } else if(State6 == false) {
                                 Entity.setSneaking(Player.getEntity(), 0);
                             }
-                            twerkButton.setText("Twerk | OFF");
+                            twerkButton.setText("Twerk | " + Texts.off);
                             twerkButton.setBackgroundColor(android.graphics.Color.RED);
                         } else if(StateTwerk == false && theme == "MCPE") {
                             StateTwerk = true;
                             twerkCounter = 1;
-                            reloadHacksList();
-                            twerkButton.setText("Twerk | ON");
+                            
+                            twerkButton.setText("Twerk | " + Texts.on);
                             //twerkButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(StateTwerk == true && theme == "MCPE") {
                             StateTwerk = false;
                             twerkCounter = 0;
-                            reloadHacksList();
+                            
                             if(State6 == true) {
                                 Entity.setSneaking(Player.getEntity(), 1);
                             } else if(State6 == false) {
                                 Entity.setSneaking(Player.getEntity(), 0);
                             }
-                            twerkButton.setText("Twerk | OFF");
+                            twerkButton.setText("Twerk | " + Texts.off);
                             //twerkButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(StateTwerk == false && theme == "Blue") {
                             StateTwerk = true;
                             twerkCounter = 1;
-                            reloadHacksList();
-                            twerkButton.setText("Twerk | ON");
+                            
+                            twerkButton.setText("Twerk | " + Texts.on);
                             twerkButton.setTextColor(android.graphics.Color.BLUE);
                             twerkButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             twerkButton.setTypeface(mcpeFont);
                         } else if(StateTwerk == true && theme == "Blue") {
                             StateTwerk = false;
                             twerkCounter = 0;
-                            reloadHacksList();
+                            
                             if(State6 == true) {
                                 Entity.setSneaking(Player.getEntity(), 1);
                             } else if(State6 == false) {
                                 Entity.setSneaking(Player.getEntity(), 0);
                             }
-                            twerkButton.setText("Twerk | OFF");
+                            twerkButton.setText("Twerk | " + Texts.off);
                             twerkButton.setTextColor(android.graphics.Color.WHITE);
                             twerkButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             twerkButton.setTypeface(mcpeFont);
@@ -5711,29 +6978,29 @@ function mainMenu() {
                 var derpButton = new android.widget.Button(ctx);
                 if(StateDerp == false && theme == "Alternative") {
                     derpButton = new android.widget.Button(ctx);
-                    derpButton.setText("Derp | OFF");
+                    derpButton.setText("Derp | " + Texts.off);
                     derpButton.setBackgroundColor(android.graphics.Color.RED);
                 } else if(StateDerp == true && theme == "Alternative") {
                     derpButton = new android.widget.Button(ctx);
-                    derpButton.setText("Derp | ON");
+                    derpButton.setText("Derp | " + Texts.on);
                     derpButton.setBackgroundColor(android.graphics.Color.GREEN);
                 } else if(StateDerp == false && theme == "MCPE") {
-                    derpButton = minecraftButton("Derp | OFF");
+                    derpButton = minecraftButton("Derp | " + Texts.off);
                     //derpButton.setTypeface(mcpeFont);
                     //derpButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(StateDerp == true && theme == "MCPE") {
-                    derpButton = minecraftButton("Derp | ON");
+                    derpButton = minecraftButton("Derp | " + Texts.on);
                     //derpButton.setTypeface(mcpeFont);
                     //derpButton.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(StateDerp == false && theme == "Blue") {
                     derpButton = new android.widget.Button(ctx);
-                    derpButton.setText("Derp | OFF");
+                    derpButton.setText("Derp | " + Texts.off);
                     derpButton.setTextColor(android.graphics.Color.WHITE);
                     derpButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     derpButton.setTypeface(mcpeFont);
                 } else if(StateDerp == true && theme == "Blue") {
                     derpButton = new android.widget.Button(ctx);
-                    derpButton.setText("Derp | ON");
+                    derpButton.setText("Derp | " + Texts.on);
                     derpButton.setTextColor(android.graphics.Color.BLUE);
                     derpButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     derpButton.setTypeface(mcpeFont);
@@ -5744,35 +7011,35 @@ function mainMenu() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(StateDerp == false && theme == "Alternative") {
                             StateDerp = true;
-                            reloadHacksList();
-                            derpButton.setText("Derp | ON");
+                            
+                            derpButton.setText("Derp | " + Texts.on);
                             derpButton.setBackgroundColor(android.graphics.Color.GREEN);
                         } else if(StateDerp == true && theme == "Alternative") {
                             StateDerp = false;
-                            reloadHacksList();
-                            derpButton.setText("Derp | OFF");
+                            
+                            derpButton.setText("Derp | " + Texts.off);
                             derpButton.setBackgroundColor(android.graphics.Color.RED);
                         } else if(StateDerp == false && theme == "MCPE") {
                             StateDerp = true;
-                            reloadHacksList();
-                            derpButton.setText("Derp | ON");
+                            
+                            derpButton.setText("Derp | " + Texts.on);
                             //derpButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(StateDerp == true && theme == "MCPE") {
                             StateDerp = false;
-                            reloadHacksList();
-                            derpButton.setText("Derp | OFF");
+                            
+                            derpButton.setText("Derp | " + Texts.off);
                             //derpButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(StateDerp == false && theme == "Blue") {
                             StateDerp = true;
-                            reloadHacksList();
-                            derpButton.setText("Derp | ON");
+                            
+                            derpButton.setText("Derp | " + Texts.on);
                             derpButton.setTextColor(android.graphics.Color.BLUE);
                             derpButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             derpButton.setTypeface(mcpeFont);
                         } else if(StateDerp == true && theme == "Blue") {
                             StateDerp = false;
-                            reloadHacksList();
-                            derpButton.setText("Derp | OFF");
+                            
+                            derpButton.setText("Derp | " + Texts.off);
                             derpButton.setTextColor(android.graphics.Color.WHITE);
                             derpButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             derpButton.setTypeface(mcpeFont);
@@ -5785,7 +7052,7 @@ function mainMenu() {
 
                 var cheatsTitle = new android.widget.TextView(ctx);
                 cheatsTitle.setTextSize(12);
-                cheatsTitle.setText("\nCheats"); //Title
+                cheatsTitle.setText("\n" + Texts.cheats); //Title
                 //cheatsTitle.setTypeface(mcpeFont);
                 cheatsTitle.setTextColor(android.graphics.Color.WHITE); //Color
                 cheatsTitle.setGravity(android.view.Gravity.CENTER);
@@ -6050,44 +7317,114 @@ function mainMenu() {
                         }
                     }
                 }));
+				
+				var cheatsButton8 = new android.widget.Button(ctx);
+                if(theme == "Alternative") {
+                    cheatsButton8 = new android.widget.Button(ctx);
+                    cheatsButton8.setText("Add experience");
+                    cheatsButton8.setBackgroundColor(android.graphics.Color.GRAY);
+                } else if(theme == "MCPE") {
+                    cheatsButton8 = minecraftButton("Add experience");
+                    //cheatsButton8.setTypeface(mcpeFont);
+                    //cheatsButton8.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(theme == "Blue") {
+                    cheatsButton8 = new android.widget.Button(ctx);
+                    cheatsButton8.setText("Add experience");
+                    cheatsButton8.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    cheatsButton8.setTypeface(mcpeFont);
+                }
+
+                cheatsButton8.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        if(theme == "Alternative") {
+                            cheatsButton8.setText("Add experience");
+                            cheatsButton8.setBackgroundColor(android.graphics.Color.GRAY);
+                        } else if(theme == "MCPE") {
+                            cheatsButton8.setText("Add experience");
+                            //cheatsButton8.setTypeface(mcpeFont);
+                            //cheatsButton8.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(theme == "Blue") {
+                            cheatsButton8.setText("Add experience");
+                            cheatsButton8.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            cheatsButton8.setTypeface(mcpeFont);
+                        }
+                        openMenu("exp");
+                    }
+                }));
+				
+				var cheatsButton9 = new android.widget.Button(ctx);
+                if(theme == "Alternative") {
+                    cheatsButton9 = new android.widget.Button(ctx);
+                    cheatsButton9.setText("Weather");
+                    cheatsButton9.setBackgroundColor(android.graphics.Color.GRAY);
+                } else if(theme == "MCPE") {
+                    cheatsButton9 = minecraftButton("Weather");
+                    //cheatsButton9.setTypeface(mcpeFont);
+                    //cheatsButton9.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(theme == "Blue") {
+                    cheatsButton9 = new android.widget.Button(ctx);
+                    cheatsButton9.setText("Weather");
+                    cheatsButton9.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    cheatsButton9.setTypeface(mcpeFont);
+                }
+
+                cheatsButton9.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        if(theme == "Alternative") {
+                            cheatsButton9.setText("Weather");
+                            cheatsButton9.setBackgroundColor(android.graphics.Color.GRAY);
+                        } else if(theme == "MCPE") {
+                            cheatsButton9.setText("Weather");
+                            //cheatsButton9.setTypeface(mcpeFont);
+                            //cheatsButton9.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(theme == "Blue") {
+                            cheatsButton9.setText("Weather");
+                            cheatsButton9.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            cheatsButton9.setTypeface(mcpeFont);
+                        }
+                        openMenu("weather");
+                    }
+                }));
 
                 var dividerViewer2 = new android.widget.ImageView(ctx);
                 dividerViewer2.setImageBitmap(android.graphics.BitmapFactory.decodeByteArray(divider, 0, divider.length));
 
-                var otherTitle = new android.widget.TextView(ctx);
-                otherTitle.setTextSize(12);
-                otherTitle.setText("\nOther"); //Title
-                otherTitle.setTextColor(android.graphics.Color.WHITE); //Color
-                otherTitle.setGravity(android.view.Gravity.CENTER);
+                var miscTitle = new android.widget.TextView(ctx);
+                miscTitle.setTextSize(12);
+                miscTitle.setText("\n" + Texts.misc); //Title
+                miscTitle.setTextColor(android.graphics.Color.WHITE); //Color
+                miscTitle.setGravity(android.view.Gravity.CENTER);
                 if(theme == "Blue") {
-                    otherTitle.setTypeface(mcpeFont);
-                    otherTitle.setTextColor(android.graphics.Color.WHITE);
+                    miscTitle.setTypeface(mcpeFont);
+                    miscTitle.setTextColor(android.graphics.Color.WHITE);
                     if(android.os.Build.VERSION.SDK_INT > 19) { // KITKAT
-                        otherTitle.setShadowLayer(1, Math.round(otherTitle.getLineHeight() / 8), Math.round(otherTitle.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
+                        miscTitle.setShadowLayer(1, Math.round(miscTitle.getLineHeight() / 8), Math.round(miscTitle.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
                     } else {
-                        otherTitle.setShadowLayer(0.0001, Math.round(otherTitle.getLineHeight() / 8), Math.round(otherTitle.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
+                        miscTitle.setShadowLayer(0.0001, Math.round(miscTitle.getLineHeight() / 8), Math.round(miscTitle.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
                     }
                 }
 
 
 
-                var otherButton1 = new android.widget.Button(ctx);
+                var miscButton1 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
-                    otherButton1 = new android.widget.Button(ctx);
-                    otherButton1.setText("Player Customizer");
-                    otherButton1.setBackgroundColor(android.graphics.Color.GRAY);
+                    miscButton1 = new android.widget.Button(ctx);
+                    miscButton1.setText("Player Customizer");
+                    miscButton1.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    otherButton1 = minecraftButton("Player Customizer");
-                    //otherButton1.setTypeface(mcpeFont);
-                    //otherButton1.setBackgroundDrawable(mcpeButtonOldImage);
+                    miscButton1 = minecraftButton("Player Customizer");
+                    //miscButton1.setTypeface(mcpeFont);
+                    //miscButton1.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
-                    otherButton1 = new android.widget.Button(ctx);
-                    otherButton1.setText("Player Customizer");
-                    otherButton1.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-                    otherButton1.setTypeface(mcpeFont);
+                    miscButton1 = new android.widget.Button(ctx);
+                    miscButton1.setText("Player Customizer");
+                    miscButton1.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    miscButton1.setTypeface(mcpeFont);
                 }
 
-                otherButton1.setOnClickListener(new android.view.View.OnClickListener({
+                miscButton1.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         if(theme == "Alternative") {
@@ -6114,6 +7451,126 @@ function mainMenu() {
                         }
                     }
                 }));
+				
+				var miscButton2 = new android.widget.Button(ctx);
+                if(theme == "Alternative") {
+                    miscButton2 = new android.widget.Button(ctx);
+                    miscButton2.setText("Webbrowser");
+                    miscButton2.setBackgroundColor(android.graphics.Color.GRAY);
+                } else if(theme == "MCPE") {
+                    miscButton2 = minecraftButton("Webbrowser");
+                    //miscButton2.setTypeface(mcpeFont);
+                    //miscButton2.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(theme == "Blue") {
+                    miscButton2 = new android.widget.Button(ctx);
+                    miscButton2.setText("Webbrowser");
+                    miscButton2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    miscButton2.setTypeface(mcpeFont);
+                }
+
+                miscButton2.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        if(theme == "Alternative") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            exitUI.dismiss(); //Close
+                            menu.dismiss();
+                            openWebbrowser(defaultUrl);
+							webbrowserButtons();
+                        } else if(theme == "MCPE") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            exitUI.dismiss(); //Close
+                            menu.dismiss();
+                            openWebbrowser(defaultUrl);
+							webbrowserButtons();
+                        } else if(theme == "Blue") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            exitUI.dismiss(); //Close
+                            menu.dismiss();
+                            openWebbrowser(defaultUrl);
+							webbrowserButtons();
+                        }
+                    }
+                }));
+				
+				var miscButton3 = new android.widget.Button(ctx);
+                if(theme == "Alternative") {
+                    miscButton3 = new android.widget.Button(ctx);
+                    miscButton3.setText(Texts.console);
+                    miscButton3.setBackgroundColor(android.graphics.Color.GRAY);
+                } else if(theme == "MCPE") {
+                    miscButton3 = minecraftButton(Texts.console);
+                    //miscButton3.setTypeface(mcpeFont);
+                    //miscButton3.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(theme == "Blue") {
+                    miscButton3 = new android.widget.Button(ctx);
+                    miscButton3.setText(Texts.console);
+                    miscButton3.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    miscButton3.setTypeface(mcpeFont);
+                }
+
+                miscButton3.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        if(theme == "Alternative") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            exitUI.dismiss(); //Close
+                            menu.dismiss();
+                            consoleScreen();
+							exitConsole();
+                        } else if(theme == "MCPE") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            exitUI.dismiss(); //Close
+                            menu.dismiss();
+                            consoleScreen();
+							exitConsole();
+                        } else if(theme == "Blue") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            exitUI.dismiss(); //Close
+                            menu.dismiss();
+                            consoleScreen();
+							exitConsole();
+                        }
+                    }
+                }));
+				
+				var miscButton4 = new android.widget.Button(ctx);
+                if(theme == "Alternative") {
+                    miscButton4 = new android.widget.Button(ctx);
+                    miscButton4.setText(Texts.online_players_list);
+                    miscButton4.setBackgroundColor(android.graphics.Color.GRAY);
+                } else if(theme == "MCPE") {
+                    miscButton4 = minecraftButton(Texts.online_players_list);
+                    //miscButton4.setTypeface(mcpeFont);
+                    //miscButton4.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(theme == "Blue") {
+                    miscButton4 = new android.widget.Button(ctx);
+                    miscButton4.setText(Texts.online_players_list);
+                    miscButton4.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    miscButton4.setTypeface(mcpeFont);
+                }
+
+                miscButton4.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        if(theme == "Alternative") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            exitUI.dismiss(); //Close
+                            menu.dismiss();
+                            onlinePlayersListScreen();
+                        } else if(theme == "MCPE") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            exitUI.dismiss(); //Close
+                            menu.dismiss();
+                            onlinePlayersListScreen();
+                        } else if(theme == "Blue") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            exitUI.dismiss(); //Close
+                            menu.dismiss();
+                            onlinePlayersListScreen();
+                        }
+                    }
+                }));
 
 
                 menuLayout.addView(hacksTitle);
@@ -6124,7 +7581,7 @@ function mainMenu() {
                 menuLayout.addView(button3);
                 menuLayout.addView(button4);
                 menuLayout.addView(button5);
-                menuLayout.addView(button6);
+                //menuLayout.addView(button6);
                 menuLayout.addView(button7);
                 menuLayout.addView(button8);
                 menuLayout.addView(button9);
@@ -6145,14 +7602,15 @@ function mainMenu() {
                 menuLayout.addView(button22);
                 menuLayout.addView(button23);
                 menuLayout.addView(button24);
-                if(experimentalFeatures == "on") {
-                    menuLayout.addView(button25);
-                }
+                menuLayout.addView(button25);
+				menuLayout.addView(button26);
+				menuLayout.addView(button27);
+				menuLayout.addView(button28);
                 if(theme == "Blue") {
                     menuLayout.addView(dividerViewer);
                 }
                 menuLayout.addView(funTitle);
-                menuLayout.addView(twerkButton);
+                //menuLayout.addView(twerkButton);
                 menuLayout.addView(derpButton);
                 if(theme == "Blue") {
                     menuLayout.addView(dividerViewer1);
@@ -6165,11 +7623,16 @@ function mainMenu() {
                 menuLayout.addView(cheatsButton5);
                 menuLayout.addView(cheatsButton6);
                 menuLayout.addView(cheatsButton7);
+                menuLayout.addView(cheatsButton8);
+                menuLayout.addView(cheatsButton9);
                 if(theme == "Blue") {
                     menuLayout.addView(dividerViewer2);
                 }
-                menuLayout.addView(otherTitle);
-                menuLayout.addView(otherButton1);
+                menuLayout.addView(miscTitle);
+                menuLayout.addView(miscButton1);
+                menuLayout.addView(miscButton2);
+                //menuLayout.addView(miscButton3);
+                //menuLayout.addView(miscButton4);
 
                 var dividerViewer3 = new android.widget.ImageView(ctx);
                 dividerViewer3.setImageBitmap(android.graphics.BitmapFactory.decodeByteArray(divider, 0, divider.length));
@@ -6290,6 +7753,7 @@ function mainMenu() {
                                 MoreOptionsPE.getLatestVersion();
                                 if(latestVersion != CURRENT_VERSION && latestVersion != undefined) {
                                     clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE]" + ChatColor.WHITE + " There is a new version available (v" + latestVersion + " for Minecraft Pocket Edition v" + latestPocketEditionVersion + ")!");
+									MoreOptionsPE.showMessage("update", "There is a new version available (v" + latestVersion + " for Minecraft Pocket Edition v" + latestPocketEditionVersion + ")!");
                                 } else {
                                     currentActivity.runOnUiThread(new java.lang.Runnable() {
                                         run: function() {
@@ -6339,7 +7803,7 @@ function mainMenu() {
                 menu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.RIGHT | android.view.Gravity.TOP, 0, 0);
 
                 /*var WindowManager = ctx.getSystemService(ctx.WINDOW_SERVICE);
-                ctx.getWindow().addFlags(ctx.getWindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                ctx.getWindow().addFlags(ctx.getWindowManager().LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 ctx.getWindow().setStatusBarColor(android.graphics.Color.RED);*/
             } catch(error) {
                 print('An error occured: ' + error);
@@ -6376,6 +7840,8 @@ function exit() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         exitUI.dismiss(); //Close
                         menu.dismiss(); //Close
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 }));
                 xLayout.addView(xButton);
@@ -6401,14 +7867,11 @@ function exitPlayerCustomizer() {
                 var xPlayerCustomizerLayout = new android.widget.LinearLayout(ctxe);
                 var xPlayerCustomizerButton = new android.widget.Button(ctxe);
                 if(theme == "Alternative") {
-                    xPlayerCustomizerButton = new android.widget.Button(ctxe);
-                    xPlayerCustomizerButton.setText("X"); //Text
+                    xPlayerCustomizerButton = minecraftButtonX("X");
                 } else if(theme == "MCPE") {
                     xPlayerCustomizerButton = minecraftButtonX("X");
                 } else if(theme == "Blue") {
-                    xPlayerCustomizerButton = new android.widget.Button(ctxe);
-                    xPlayerCustomizerButton.setText("X"); //Text
-                    xPlayerCustomizerButton.setTypeface(mcpeFont);
+                    xPlayerCustomizerButton = minecraftButtonX("X");
                 }
                 /*xButton.setOnTouchListener(new android.view.View.OnTouchListener({
                     onClick: function(viewarg) {
@@ -6422,6 +7885,8 @@ function exitPlayerCustomizer() {
                         exitPlayerCustomizerUI.dismiss(); //Close
 						headerGUI.dismiss(); //Close
                         playerCustomizerMenu.dismiss(); //Close
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 }));
                 xPlayerCustomizerLayout.addView(xPlayerCustomizerButton);
@@ -6443,14 +7908,11 @@ function exitSettings() {
                 var xSettingsLayout = new android.widget.LinearLayout(ctxe);
                 var xSettingsButton = new android.widget.Button(ctxe);
                 if(theme == "Alternative") {
-                    xSettingsButton = new android.widget.Button(ctxe);
-                    xSettingsButton.setText("X"); //Text
+                    xSettingsButton = minecraftButtonX("X");
                 } else if(theme == "MCPE") {
                     xSettingsButton = minecraftButtonX("X");
                 } else if(theme == "Blue") {
-                    xSettingsButton = new android.widget.Button(ctxe);
-                    xSettingsButton.setText("X"); //Text
-                    xSettingsButton.setTypeface(mcpeFont);
+                    xSettingsButton = minecraftButtonX("X");
                 }
                 /*xButton.setOnTouchListener(new android.view.View.OnTouchListener({
                     onClick: function(viewarg) {
@@ -6463,12 +7925,84 @@ function exitSettings() {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                         exitSettingsUI.dismiss(); //Close
                         settingsMenu.dismiss(); //Close
+						showHacksList();
+						MoreOptionsPE.showMainButton();
                     }
                 }));
                 xSettingsLayout.addView(xSettingsButton);
                 exitSettingsUI = new android.widget.PopupWindow(xSettingsLayout, dip2px(40), dip2px(40));
                 exitSettingsUI.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
                 exitSettingsUI.showAtLocation(ctxe.getWindow().getDecorView(), android.view.Gravity.RIGHT | android.view.Gravity.TOP, 0, 0);
+            } catch(exception) {
+                print(exception);
+            }
+        }
+    }));
+}
+
+function webbrowserButtons() {
+    var ctxe = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+    ctxe.runOnUiThread(new java.lang.Runnable({
+        run: function() {
+            try {
+                var xWebbrowserLayout = new android.widget.LinearLayout(ctxe);
+                var reloadWebbrowserLayout = new android.widget.LinearLayout(ctxe);
+				var loadWebbrowserLayout = new android.widget.LinearLayout(ctxe);
+                var xWebbrowserButton = new android.widget.Button(ctxe);
+                var reloadWebbrowserButton = new android.widget.Button(ctxe);
+                var loadWebbrowserButton = new android.widget.Button(ctxe);
+                xWebbrowserButton = new android.widget.Button(ctx);
+				xWebbrowserButton.setBackgroundDrawable(closeButtonImage);
+				xWebbrowserButton.setAlpha(0.54);
+                reloadWebbrowserButton = new android.widget.Button(ctx);
+				reloadWebbrowserButton.setBackgroundDrawable(reloadButtonImage);
+				reloadWebbrowserButton.setAlpha(0.54);
+				loadWebbrowserButton = new android.widget.Button(ctx);
+				loadWebbrowserButton.setText("...");
+				loadWebbrowserButton.setAlpha(0.54);
+                /*xButton.setOnTouchListener(new android.view.View.OnTouchListener({
+                    onClick: function(viewarg) {
+						if(theme == "MCPE"){
+						xButton.setBackgroundDrawable(mcpeExitButtonPressedImage);
+                    }
+                }}));*/
+                xWebbrowserButton.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        exitWebbrowserUI.dismiss(); //Close
+                        reloadWebbrowserUI.dismiss(); //Close
+                        loadWebbrowserUI.dismiss(); //Close
+                        webbrowserMenu.dismiss(); //Close
+						showHacksList();
+						MoreOptionsPE.showMainButton();
+                    }
+                }));
+				reloadWebbrowserButton.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+						webViewer.reload();
+                        //print(webViewer.getUrl());
+                    }
+                }));
+				loadWebbrowserButton.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+						openMenu("loadwebsite");
+                        //print(webViewer.getUrl());
+                    }
+                }));
+                xWebbrowserLayout.addView(xWebbrowserButton);
+                reloadWebbrowserLayout.addView(reloadWebbrowserButton);
+                loadWebbrowserLayout.addView(loadWebbrowserButton);
+                exitWebbrowserUI = new android.widget.PopupWindow(xWebbrowserLayout, dip2px(40), dip2px(40));
+                exitWebbrowserUI.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                exitWebbrowserUI.showAtLocation(ctxe.getWindow().getDecorView(), android.view.Gravity.RIGHT | android.view.Gravity.TOP, 0, 0);
+				reloadWebbrowserUI = new android.widget.PopupWindow(reloadWebbrowserLayout, dip2px(40), dip2px(40));
+                reloadWebbrowserUI.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                reloadWebbrowserUI.showAtLocation(ctxe.getWindow().getDecorView(), android.view.Gravity.LEFT | android.view.Gravity.TOP, 0, 0);
+				loadWebbrowserUI = new android.widget.PopupWindow(loadWebbrowserLayout, dip2px(40), dip2px(40));
+                loadWebbrowserUI.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                loadWebbrowserUI.showAtLocation(ctxe.getWindow().getDecorView(), android.view.Gravity.CENTER | android.view.Gravity.TOP, 0, 0);
             } catch(exception) {
                 print(exception);
             }
@@ -6517,6 +8051,12 @@ function closeMainMenuList() {
 }
 
 function attackHook(attacker, victim) {
+	var gamemode = Level.getGameMode();
+	if(gamemode == 1) {
+		if(spectator == "on") {
+			preventDefault();
+		}
+	}
     if(State3 == true) {
         if(Player.getEntity() == attacker) {
             Entity.setFireTicks(victim, 9999);
@@ -6717,9 +8257,19 @@ function modTick() {
         setVelY(Player.getEntity(), -0.1);
     }
     if(State25 == true) {
-        if(Level.getTile(getPlayerX, getPlayerY - 2, getPlayerZ) == 8 || Level.getTile(getPlayerX, getPlayerY - 2, getPlayerZ) == 9 || Level.getTile(getPlayerX, getPlayerY - 2, getPlayerZ) == 10 || Level.getTile(getPlayerX, getPlayerY - 2, getPlayerZ) == 10) {
+        if(Level.getTile(getPlayerX(), getPlayerY() - 2, getPlayerZ()) == 8 || Level.getTile(getPlayerX(), getPlayerY() - 2, getPlayerZ()) == 9 || Level.getTile(getPlayerX(), getPlayerY() - 2, getPlayerZ()) == 10 || Level.getTile(getPlayerX(), getPlayerY() - 2, getPlayerZ()) == 10) {
             setVelY(Player.getEntity(), 0);
         }
+    }if(State26 == true) {
+        clientMessage(spamMessage);
+        chatHook(spamMessage);
+        Server.sendChat(spamMessage);
+    }if(State27 == true) {
+        if(Entity.getHealth(Player.getEntity()) < 1) {
+			ModPE.leaveGame();
+		}
+    }if(State28 == true) {
+        Player.setHunger(20);
     }
     if(StateTrails == true) {
         var x = Player.getX();
@@ -6760,6 +8310,9 @@ function modTick() {
         State23 = false;
         State24 = false;
         State25 = false;
+        State26 = false;
+        State27 = false;
+		State28 = false;
         StateTwerk = false;
         StateDerp = false;
     }
@@ -6810,52 +8363,6 @@ function useItem(x, y, z, itemId, blockId) {
 	}
 }
 
-function saveFile(directory, filename) {
-    try {
-        directory = android.os.Environment.getExternalStorageDirectory().getPath() + "/games/com.mojang/" + directory; // The file should be saved into the world directory.
-        var newFile = new java.io.File(directory, filename);
-        var directory = new java.io.File(directory);
-        var success = directory.mkdirs(); // creates the directory if not already created
-        if(!success) { // if not succeeded
-            throw new java.io.IOException("Directory " + directory + "cannot be created"); // throws an IOException. new java.io.IOException(String) has a string parameter as a message.
-        }
-        /*
-        newFile.delete();
-        Add the above if you want to replace the file.
-        */
-        newFile.createNewFile(); // creates a blank new file
-        var outWrite = new java.io.OutputStreamWriter(new java.io.FileOutputStream(newFile)); // creates the output writer
-        outWrite.append("");
-        outWrite.close(); // closes the writer; not necessary to close, but better do it
-        return false; // tells that it succeeds; not necessary to catch, but better do it
-    } catch(thrown) { // catches the error in the try block
-        return thrown.toString(); // returns a human-readable description of the error. The most common one is java.io.IOException that there is no such file
-    }
-}
-
-function readFile(directory, filename, wantBytes) { // wantBytes: true or false
-    try {
-        directory = android.os.Environment.getExternalStorageDirectory().getPath() + "/games/com.mojang/" + directory;
-        var inFile = new java.io.File(directory, filename);
-        if(!inFile.isFile()) return "notfile"; // check if it is a file
-        var inStream = new java.io.FileReader(inFile);
-        if(wantBytes) {
-            inStream.read(bytes); // stores the contents into bytes
-            var bytes = new Array();
-            return bytes;
-        }
-        var inBuffer = new java.io.BufferedReader(inStream);
-        var line = "";
-        var returner = "";
-        while((line = inBuffer.readLine()) != null) { // read http://docs.oracle.com/javase/7/docs/api/java/io/BufferedReader.html#readLine()
-            returner = returner + line + java.lang.System.getProperty("line.seperator");
-        }
-        return returner;
-    } catch(error) {
-        return error.toString();
-    }
-}
-
 function addItemInv(itemId, amount, damage) {
     var gamemode = Level.getGameMode();
     if(gamemode == 0) {
@@ -6863,6 +8370,60 @@ function addItemInv(itemId, amount, damage) {
     } else if(gamemode == 1) {
         Entity.setCarriedItem(Player.getEntity(), itemId, 1, damage);
     }
+}
+
+function openWebbrowser(url) {
+	webViewer = new android.webkit.WebView(currentActivity);
+	var webSettings = webViewer.getSettings();
+
+	webSettings.setJavaScriptEnabled(true);
+	webViewer.setWebChromeClient(new android.webkit.WebChromeClient());
+	webViewer.setWebViewClient(new android.webkit.WebViewClient());
+
+	webViewer.loadUrl(url);
+	
+	var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+    ctx.runOnUiThread(new java.lang.Runnable({
+        run: function() {
+            try {
+				var display = new android.util.DisplayMetrics();
+				com.mojang.minecraftpe.MainActivity.currentMainActivity.get().getWindowManager().getDefaultDisplay().getMetrics(display);
+                /*var webbrowserMenuLayout = new android.widget.LinearLayout(ctx);
+                var webbrowserMenuScroll = new android.widget.ScrollView(ctx);
+                var webbrowserMenuLayout1 = new android.widget.LinearLayout(ctx);
+                webbrowserMenuLayout.setOrientation(1);
+                webbrowserMenuLayout1.setOrientation(1);
+				webbrowserMenuLayout1.setLayoutParams(new android.view.ViewGroup.LayoutParams(display.widthPixels, display.heightPixels));
+                webbrowserMenuScroll.addView(webbrowserMenuLayout);
+                webbrowserMenuLayout1.addView(webbrowserMenuScroll);*/
+                //--------Add Buttons-------//
+                /*var newLineText = new android.widget.TextView(ctx);
+                var authorText = new android.widget.TextView(ctx);
+                var currentModVersionText = new android.widget.TextView(ctx);
+                var targetMCPEVersionText = new android.widget.TextView(ctx);
+                var MCPEVersionText = new android.widget.TextView(ctx);
+                var newLine2Text = new android.widget.TextView(ctx);
+                var aboutOkBtn = new android.widget.Button(ctx);*/
+                var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
+                //webbrowserMenuLayout.addView(webViewer);
+                /*newLineText.setText("\n");
+					authorText.setText("Author : " + MOD_AUTHOR);
+					currentModVersionText.setText("Current mod version : v" + CURRENT_VERSION);
+					targetMCPEVersionText.setText("Target MCPE version : v" + targetMCPEVersion);
+					MCPEVersionText.setText("Current MCPE version : v" + mcpeVersion);
+					newLine2Text.setText("\n");
+                    //btn.setText("Ok");*/
+
+                //More buttons...
+                webbrowserMenu = new android.widget.PopupWindow(webViewer, ctx.getWindowManager().getDefaultDisplay().getWidth(), ctx.getWindowManager().getDefaultDisplay().getHeight());
+				webViewer.requestFocus(android.view.View.FOCUS_DOWN);
+                webbrowserMenu.setBackgroundDrawable(getStretchedImage(spritesheet, 4 * GuiSize, 4 * GuiSize, 8 * GuiSize, 8 * GuiSize, getContext().getScreenWidth() / 2, getContext().getScreenHeight()));
+                webbrowserMenu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.CENTER | android.view.Gravity.TOP, 0, 0);
+            } catch(error) {
+                print('An error occured: ' + error);
+            }
+        }
+    }));
 }
 
 function openMenu(menu) {
@@ -6913,7 +8474,107 @@ function openMenu(menu) {
                 }
             }
         });
-
+		
+	} else if(menu == "console") {
+        ctx.runOnUiThread(new java.lang.Runnable() {
+            run: function() {
+                try {
+                    dialogGUI = new android.widget.PopupWindow();
+                    var btn = minecraftButton("Send");
+                    var btn1 = minecraftButton("Close");
+                    var inputBar = new android.widget.EditText(ctx);
+                    var dialogLayout = new android.widget.LinearLayout(ctx);
+                    var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
+                    dialogLayout.setBackgroundDrawable(getStretchedImage(spritesheet, 4 * GuiSize, 4 * GuiSize, 8 * GuiSize, 8 * GuiSize, getContext().getScreenWidth() / 2, getContext().getScreenHeight()));
+                    dialogLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+                    dialogLayout.addView(inputBar);
+                    dialogLayout.addView(btn);
+                    dialogLayout.addView(btn1);
+                    var dialog = new android.app.Dialog(ctx);
+                    dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(dialogLayout);
+                    dialog.setTitle("Console");
+                    inputBar.setHint("Console Input");
+                    inputBar.setTypeface(mcpeFont);
+                    if(android.os.Build.VERSION.SDK_INT > 19) { // KITKAT
+                        inputBar.setShadowLayer(1, Math.round(inputBar.getLineHeight() / 8), Math.round(inputBar.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
+                    } else {
+                        inputBar.setShadowLayer(0.0001, Math.round(inputBar.getLineHeight() / 8), Math.round(inputBar.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
+                    }
+                    dialogGUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.TOP, 0, 0);
+                    dialog.show();
+                    btn.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            var consoleInputText = inputBar.getText();
+                            chatHook(consoleInputText);
+                            dialog.dismiss();
+                        }
+                    });
+                    btn1.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            dialog.dismiss();
+                        }
+                    });
+                } catch(e) {
+                    print("Error: " + e)
+                }
+            }
+        });
+		
+    } else if(menu == "exp") {
+        ctx.runOnUiThread(new java.lang.Runnable() {
+            run: function() {
+                try {
+                    dialogGUI = new android.widget.PopupWindow();
+                    var btn = minecraftButton("Add experience");
+                    var btn1 = minecraftButton("Cancel");
+                    var inputBar = new android.widget.EditText(ctx);
+                    inputBar.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+                    var dialogLayout = new android.widget.LinearLayout(ctx);
+                    var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
+                    dialogLayout.setBackgroundDrawable(getStretchedImage(spritesheet, 4 * GuiSize, 4 * GuiSize, 8 * GuiSize, 8 * GuiSize, getContext().getScreenWidth() / 2, getContext().getScreenHeight()));
+                    dialogLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+                    dialogLayout.addView(inputBar);
+                    dialogLayout.addView(btn);
+                    dialogLayout.addView(btn1);
+                    var dialog = new android.app.Dialog(ctx);
+                    dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(dialogLayout);
+                    dialog.setTitle("Add experience");
+                    inputBar.setHint("Amount of experience");
+                    inputBar.setTypeface(mcpeFont);
+                    if(android.os.Build.VERSION.SDK_INT > 19) { // KITKAT
+                        inputBar.setShadowLayer(1, Math.round(inputBar.getLineHeight() / 8), Math.round(inputBar.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
+                    } else {
+                        inputBar.setShadowLayer(0.0001, Math.round(inputBar.getLineHeight() / 8), Math.round(inputBar.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
+                    }
+                    dialogGUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.TOP, 0, 0);
+                    dialog.show();
+                    btn.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            var experienceAmount = inputBar.getText();
+                            Player.addExp(experienceAmount);
+                            dialog.dismiss();
+                        }
+                    });
+                    btn1.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            dialog.dismiss();
+                        }
+                    });
+                } catch(e) {
+                    print("Error: " + e)
+                }
+            }
+        });
     } else if(menu == "about") {
         ctx.runOnUiThread(new java.lang.Runnable() {
             run: function() {
@@ -6963,7 +8624,7 @@ function openMenu(menu) {
             run: function() {
                 try {
                     dialogGUI = new android.widget.PopupWindow();
-                    var changelogText = minecraftText( /*"v1.0 Beta 1: Initial release | v1.0 Beta 2: Name changed to AgameR MoreOptions PE, new icon, added coords option, added better grass, added every item eatable, added changelog, improved some things | v1.0 Beta 3: Added themes, added sneaking, improved fly, fixed grass being unbreakable | "*/ /*"v1.0.0-pre: Added zoom, InstaMine, X-ray, cheats, knockback, 64 item drop, improved layout, added an update checker (thanks @desno365!), fixed some hacks and more | v1.0.0-pre2: Added Morph (not finished yet), finished the new theme called Blue, improved cheats, improved Better Grass, improved menu layout (added logo), fixed bugs, improved the update checker to support Android 5.1 (thanks @desno365!), settings now save and added more settings | v1.0.0: First official non-beta release! Added some more stuff (Drone, Parachute, Twerk and Derp), fixed glitches, fixed bugs, overall improvements, Morphing now works, SignEditor is not on the menu anymore (for now, as it currently crashes when trying to use it), all dialogs have the MCPE style now. | */ CURRENT_VERSION + ": " + MOD_CHANGELOG);
+                    var changelogText = minecraftText( /*"v1.0 Beta 1: Initial release | v1.0 Beta 2: Name changed to AgameR MoreOptions PE, new icon, added coords option, added better grass, added every item eatable, added changelog, improved some things | v1.0 Beta 3: Added themes, added sneaking, improved fly, fixed grass being unbreakable | "*/ /*"v1.0.0-pre: Added zoom, InstaMine, X-ray, cheats, knockback, 64 item drop, improved layout, added an update checker (thanks @desno365!), fixed some hacks and more | v1.0.0-pre2: Added Morph (not finished yet), finished the new theme called Blue, improved cheats, improved Better Grass, improved menu layout (added logo), fixed bugs, improved the update checker to support Android 5.1 (thanks @desno365!), settings now save and added more settings | v1.0.0: First official non-beta release! Added some more stuff ((Texts.drone + ", Parachute, Twerk and Derp), fixed glitches, fixed bugs, overall improvements, Morphing now works, SignEditor is not on the menu anymore (for now, as it currently crashes when trying to use it), all dialogs have the MCPE style now. | */ CURRENT_VERSION + ": " + MOD_CHANGELOG);
 					changelogText.setEllipsize(android.text.TextUtils.TruncateAt.MARQUEE);
 					changelogText.setMarqueeRepeatLimit(-1);
 					changelogText.setSingleLine();
@@ -7097,7 +8758,7 @@ function openMenu(menu) {
                     var dialog = new android.app.Dialog(ctx);
                     dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
                     dialog.setContentView(dialogLayout);
-                    dialog.setTitle("SignEditor [WIP]");
+                    dialog.setTitle(Texts.signeditor + " [WIP]");
                     inputBar.setHint("Line 1");
                     inputBar.setTypeface(mcpeFont);
                     if(android.os.Build.VERSION.SDK_INT > 19) { // KITKAT
@@ -7191,6 +8852,7 @@ function openMenu(menu) {
                             Level.setGameMode(0);
 							hardcore = "off";
 							spectator = "off";
+							Block.setDestroyTimeDefaultAll();
 							MoreOptionsPE.savePerWorldGamemodeSettings();
                             dialog.dismiss();
                         }
@@ -7201,6 +8863,9 @@ function openMenu(menu) {
                             Level.setGameMode(1);
 							hardcore = "off";
 							spectator = "off";
+							Block.setDestroyTimeDefaultAll();
+							State2 = true;
+							Player.setCanFly(1);
 							MoreOptionsPE.savePerWorldGamemodeSettings();
                             dialog.dismiss();
                         }
@@ -7222,11 +8887,79 @@ function openMenu(menu) {
                             Level.setGameMode(1);
 							hardcore = "off";
 							spectator = "on";
+							Block.setDestroyTimeDefaultAll();
+							State = true;
+							Entity.setCollisionSize(Player.getEntity(), 0, 0);
+							State2 = true;
+							Player.setCanFly(1);
 							MoreOptionsPE.savePerWorldGamemodeSettings();
                             dialog.dismiss();
                         }
                     });
                     btn4.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            dialog.dismiss();
+                        }
+                    });
+                } catch(e) {
+                    print("Error: " + e)
+                }
+            }
+        });
+		
+	    } else if(menu == "weather") {
+        ctx.runOnUiThread(new java.lang.Runnable() {
+            run: function() {
+                try {
+                    dialogGUI = new android.widget.PopupWindow();
+                    var btn = minecraftButton("Rain");
+                    var btn1 = minecraftButton("Lightning/Thunder");
+                    var btn2 = minecraftButton("Clear");
+                    var btn3 = minecraftButton("Cancel");
+                    var newLineTextView = minecraftText("\n");
+                    var dialogLayout = new android.widget.LinearLayout(ctx);
+                    var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
+                    dialogLayout.setBackgroundDrawable(getStretchedImage(spritesheet, 4 * GuiSize, 4 * GuiSize, 8 * GuiSize, 8 * GuiSize, getContext().getScreenWidth() / 2, getContext().getScreenHeight()));
+                    dialogLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+                    dialogLayout.addView(btn);
+                    dialogLayout.addView(btn1);
+                    dialogLayout.addView(btn2);
+                    dialogLayout.addView(newLineTextView);
+                    dialogLayout.addView(btn3);
+                    var dialog = new android.app.Dialog(ctx);
+                    dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(dialogLayout);
+                    dialog.setTitle("Gamemode");
+                    dialogGUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.TOP, 0, 0);
+                    dialog.show();
+                    btn.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.setRainLevel(1);
+							Level.setLightningLevel(0);
+                            dialog.dismiss();
+                        }
+                    });
+                    btn1.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.setRainLevel(0);
+							Level.setLightningLevel(1);
+                            dialog.dismiss();
+                        }
+                    });
+					btn2.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.setRainLevel(0);
+							Level.setLightningLevel(0);
+                            dialog.dismiss();
+                        }
+                    });
+                    btn3.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             dialog.dismiss();
@@ -7773,19 +9506,19 @@ function openMenu(menu) {
 					
                     var fullScreenButton = new android.widget.Button(ctx);
                     if (theme == "Alternative" && fullScreen == "off") {
-                        fullScreenButton = minecraftButton("Fullscreen | OFF");
+                        fullScreenButton = minecraftButton("Fullscreen | " + Texts.off);
                     } else if (theme == "Alternative" && fullScreen == "on") {
-                        fullScreenButton = minecraftButton("Fullscreen | ON");
+                        fullScreenButton = minecraftButton("Fullscreen | " + Texts.on);
                     } else if (theme == "MCPE" && fullScreen == "off") {
-                        fullScreenButton = minecraftButton("Fullscreen | OFF");
+                        fullScreenButton = minecraftButton("Fullscreen | " + Texts.off);
                         //fullScreenButton.setBackgroundDrawable(mcpeButtonOldImage);
                     } else if (theme == "MCPE" && fullScreen == "on") {
-                        fullScreenButton = minecraftButton("Fullscreen | ON");
+                        fullScreenButton = minecraftButton("Fullscreen | " + Texts.on);
                         //fullScreenButton.setBackgroundDrawable(mcpeButtonOldImage);
                     } else if (theme == "Blue" && fullScreen == "off") {
-                        fullScreenButton = minecraftButton("Fullscreen | OFF");
+                        fullScreenButton = minecraftButton("Fullscreen | " + Texts.off);
                     } else if (theme == "Blue" && fullScreen == "on") {
-                        fullScreenButton = minecraftButton("Fullscreen | ON");
+                        fullScreenButton = minecraftButton("Fullscreen | " + Texts.on);
                     }
                     fullScreenButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
@@ -7793,34 +9526,34 @@ function openMenu(menu) {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 fullScreen = "on";
 								MoreOptionsPE.saveMainSettings();
-                                fullScreenButton.setText("Fullscreen | ON");
+                                fullScreenButton.setText("Fullscreen | " + Texts.on);
                             } else if (theme == "Alternative" && fullScreen == "on") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 fullScreen = "off";
 								MoreOptionsPE.saveMainSettings();
-                                fullScreenButton.setText("Fullscreen | OFF");
+                                fullScreenButton.setText("Fullscreen | " + Texts.off);
                             } else if (theme == "MCPE" && fullScreen == "off") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 fullScreen = "on";
 								MoreOptionsPE.saveMainSettings();
-                                fullScreenButton.setText("Fullscreen | ON");
+                                fullScreenButton.setText("Fullscreen | " + Texts.on);
                                 //fullScreenButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "MCPE" && fullScreen == "on") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 fullScreen = "off";
 								MoreOptionsPE.saveMainSettings();
-                                fullScreenButton.setText("Fullscreen | OFF");
+                                fullScreenButton.setText("Fullscreen | " + Texts.off);
                                 //fullScreenButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "Blue" && fullScreen == "off") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 fullScreen = "on";
 								MoreOptionsPE.saveMainSettings();
-                                fullScreenButton.setText("Fullscreen | ON");
+                                fullScreenButton.setText("Fullscreen | " + Texts.on);
                             } else if (theme == "Blue" && fullScreen == "on") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 fullScreen = "off";
 								MoreOptionsPE.saveMainSettings();
-                                fullScreenButton.setText("Fullscreen | OFF");
+                                fullScreenButton.setText("Fullscreen | " + Texts.off);
                             }
                         }
                     }));
@@ -7828,19 +9561,19 @@ function openMenu(menu) {
 					
 					var hacksListButton = new android.widget.Button(ctx);
                     if (theme == "Alternative" && showList == "off") {
-						hacksListButton = minecraftButton("Show hack list | OFF");
+						hacksListButton = minecraftButton("Show hack list | " + Texts.off);
                     } else if (theme == "Alternative" && showList == "on") {
-						hacksListButton = minecraftButton("Show hack list | ON");
+						hacksListButton = minecraftButton("Show hack list | " + Texts.on);
                     } else if (theme == "MCPE" && showList == "off") {
-                        hacksListButton = minecraftButton("Show hack list | OFF");
+                        hacksListButton = minecraftButton("Show hack list | " + Texts.off);
                         //hacksListButton.setBackgroundDrawable(mcpeButtonOldImage);
                     } else if (theme == "MCPE" && showList == "on") {
-                        hacksListButton = minecraftButton("Show hack list | ON");
+                        hacksListButton = minecraftButton("Show hack list | " + Texts.on);
                         //hacksListButton.setBackgroundDrawable(mcpeButtonOldImage);
                     } else if (theme == "Blue" && showList == "off") {
-                        hacksListButton = minecraftButton("Show hack list | OFF");
+                        hacksListButton = minecraftButton("Show hack list | " + Texts.off);
                     } else if (theme == "Blue" && showList == "on") {
-                        hacksListButton = minecraftButton("Show hack list | ON");
+                        hacksListButton = minecraftButton("Show hack list | " + Texts.on);
                     }
                     hacksListButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
@@ -7849,39 +9582,39 @@ function openMenu(menu) {
                                 showList = "on";
 								MoreOptionsPE.saveMainSettings();
 								showHacksList();
-                                hacksListButton.setText("Show hack list | ON");
+                                hacksListButton.setText("Show hack list | " + Texts.on);
                             } else if (theme == "Alternative" && showList == "on") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 showList = "off";
 								MoreOptionsPE.saveMainSettings();
 								hacksList.dismiss();
-                                hacksListButton.setText("Show hack list | OFF");
+                                hacksListButton.setText("Show hack list | " + Texts.off);
                             } else if (theme == "MCPE" && showList == "off") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 showList = "on";
 								MoreOptionsPE.saveMainSettings();
 								showHacksList();
-                                hacksListButton.setText("Show hack list | ON");
+                                hacksListButton.setText("Show hack list | " + Texts.on);
                                 //hacksListButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "MCPE" && showList == "on") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 showList = "off";
 								MoreOptionsPE.saveMainSettings();
 								hacksList.dismiss();
-                                hacksListButton.setText("Show hack list | OFF");
+                                hacksListButton.setText("Show hack list | " + Texts.off);
                                 //hacksListButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "Blue" && showList == "off") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 showList = "on";
 								MoreOptionsPE.saveMainSettings();
 								showHacksList();
-                                hacksListButton.setText("Show hack list | ON");
+                                hacksListButton.setText("Show hack list | " + Texts.on);
                             } else if (theme == "Blue" && showList == "on") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 showList = "off";
 								MoreOptionsPE.saveMainSettings();
 								hacksList.dismiss();
-                                hacksListButton.setText("Show hack list | OFF");
+                                hacksListButton.setText("Show hack list | " + Texts.off);
                             }
                         }
                     }));
@@ -7889,19 +9622,19 @@ function openMenu(menu) {
 					
 		    var oldIconButton = new android.widget.Button(ctx);
                     if (theme == "Alternative" && useOldIcon == "off") {
-			oldIconButton = minecraftButton("Use old icon | OFF");
+			oldIconButton = minecraftButton("Use old icon | " + Texts.off);
                     } else if (theme == "Alternative" && useOldIcon == "on") {
-                        oldIconButton = minecraftButton("Use old icon | ON");
+                        oldIconButton = minecraftButton("Use old icon | " + Texts.on);
                     } else if (theme == "MCPE" && useOldIcon == "off") {
-                        oldIconButton = minecraftButton("Use old icon | OFF");
+                        oldIconButton = minecraftButton("Use old icon | " + Texts.off);
                         //oldIconButton.setBackgroundDrawable(mcpeButtonOldImage);
                     } else if (theme == "MCPE" && useOldIcon == "on") {
-                        oldIconButton = minecraftButton("Use old icon | ON");
+                        oldIconButton = minecraftButton("Use old icon | " + Texts.on);
                         //oldIconButton.setBackgroundDrawable(mcpeButtonOldImage);
                     } else if (theme == "Blue" && useOldIcon == "off") {
-                        oldIconButton = minecraftButton("Use old icon | OFF");
+                        oldIconButton = minecraftButton("Use old icon | " + Texts.off);
                     } else if (theme == "Blue" && useOldIcon == "on") {
-                        oldIconButton = minecraftButton("Use old icon | ON");
+                        oldIconButton = minecraftButton("Use old icon | " + Texts.on);
                     }
                     oldIconButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
@@ -7909,34 +9642,34 @@ function openMenu(menu) {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 useOldIcon = "on";
 								MoreOptionsPE.saveMainSettings();
-                                oldIconButton.setText("Use old icon | ON");
+                                oldIconButton.setText("Use old icon | " + Texts.on);
                             } else if (theme == "Alternative" && useOldIcon == "on") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 useOldIcon = "off";
 								MoreOptionsPE.saveMainSettings();
-                                oldIconButton.setText("Use old icon | OFF");
+                                oldIconButton.setText("Use old icon | " + Texts.off);
                             } else if (theme == "MCPE" && useOldIcon == "off") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 useOldIcon = "on";
 								MoreOptionsPE.saveMainSettings();
-                                oldIconButton.setText("Use old icon | ON");
+                                oldIconButton.setText("Use old icon | " + Texts.on);
                                 //oldIconButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "MCPE" && useOldIcon == "on") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 useOldIcon = "off";
 								MoreOptionsPE.saveMainSettings();
-                                oldIconButton.setText("Use old icon | OFF");
+                                oldIconButton.setText("Use old icon | " + Texts.off);
                                 //oldIconButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "Blue" && useOldIcon == "off") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 useOldIcon = "on";
 								MoreOptionsPE.saveMainSettings();
-                                oldIconButton.setText("Use old icon | ON");
+                                oldIconButton.setText("Use old icon | " + Texts.on);
                             } else if (theme == "Blue" && useOldIcon == "on") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 useOldIcon = "off";
 								MoreOptionsPE.saveMainSettings();
-                                oldIconButton.setText("Use old icon | OFF");
+                                oldIconButton.setText("Use old icon | " + Texts.off);
                             }
                         }
                     }));
@@ -7944,19 +9677,19 @@ function openMenu(menu) {
 
 		    var showMainButtonButton = new android.widget.Button(ctx);
                     if (theme == "Alternative" && showMainButton == "off") {
-			showMainButtonButton = minecraftButton("Show main button | OFF");
+			showMainButtonButton = minecraftButton("Show main button | " + Texts.off);
                     } else if (theme == "Alternative" && showMainButton == "on") {
-                        showMainButtonButton = minecraftButton("Show main button | ON");
+                        showMainButtonButton = minecraftButton("Show main button | " + Texts.on);
                     } else if (theme == "MCPE" && showMainButton == "off") {
-                        showMainButtonButton = minecraftButton("Show main button | OFF");
+                        showMainButtonButton = minecraftButton("Show main button | " + Texts.off);
                         //showMainButtonButton.setBackgroundDrawable(mcpeButtonOldImage);
                     } else if (theme == "MCPE" && showMainButton == "on") {
-                        showMainButtonButton = minecraftButton("Show main button | ON");
+                        showMainButtonButton = minecraftButton("Show main button | " + Texts.on);
                         //showMainButtonButton.setBackgroundDrawable(mcpeButtonOldImage);
                     } else if (theme == "Blue" && showMainButton == "off") {
-                        showMainButtonButton = minecraftButton("Show main button | OFF");
+                        showMainButtonButton = minecraftButton("Show main button | " + Texts.off);
                     } else if (theme == "Blue" && useOldIcon == "on") {
-                        showMainButtonButton = minecraftButton("Show main button | ON");
+                        showMainButtonButton = minecraftButton("Show main button | " + Texts.on);
                     }
                     showMainButtonButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
@@ -7964,34 +9697,34 @@ function openMenu(menu) {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 showMainButton = "on";
 								MoreOptionsPE.saveMainSettings();
-                                showMainButtonButton.setText("Show main button | ON");
+                                showMainButtonButton.setText("Show main button | " + Texts.on);
                             } else if (theme == "Alternative" && showMainButton == "on") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 showMainButton = "off";
 								MoreOptionsPE.saveMainSettings();
-                                showMainButtonButton.setText("Show main button | OFF");
+                                showMainButtonButton.setText("Show main button | " + Texts.off);
                             } else if (theme == "MCPE" && showMainButton == "off") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 showMainButton = "on";
 								MoreOptionsPE.saveMainSettings();
-                                showMainButtonButton.setText("Show main button | ON");
+                                showMainButtonButton.setText("Show main button | " + Texts.on);
                                 //showMainButtonButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "MCPE" && showMainButton == "on") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 showMainButton = "off";
 								MoreOptionsPE.saveMainSettings();
-                                showMainButtonButton.setText("Show main button | OFF");
+                                showMainButtonButton.setText("Show main button | " + Texts.off);
                                 //showMainButtonButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "Blue" && showMainButton == "off") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 showMainButton = "on";
 								MoreOptionsPE.saveMainSettings();
-                                showMainButtonButton.setText("Show main button | ON");
+                                showMainButtonButton.setText("Show main button | " + Texts.on);
                             } else if (theme == "Blue" && showMainButton == "on") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 showMainButton = "off";
 								MoreOptionsPE.saveMainSettings();
-                                showMainButtonButton.setText("Show main button | OFF");
+                                showMainButtonButton.setText("Show main button | " + Texts.off);
                             }
                         }
                     }));
@@ -8043,7 +9776,7 @@ function openMenu(menu) {
                     } else if (theme == "Alternative" && betterGrass == "fast") {
                         betterGrassButton = minecraftButton("Better Grass | FAST");
                     } else if (theme == "Alternative" && betterGrass == "off") {
-                        betterGrassButton = minecraftButton("Better Grass | OFF");
+                        betterGrassButton = minecraftButton("Better Grass | " + Texts.off);
                     } else if (theme == "MCPE" && betterGrass == "normal") {
                         betterGrassButton = minecraftButton("Better Grass | NORMAL");
                         //betterGrassButton.setBackgroundDrawable(mcpeButtonOldImage);
@@ -8051,14 +9784,14 @@ function openMenu(menu) {
                         betterGrassButton = minecraftButton("Better Grass | FAST");
                         //betterGrassButton.setBackgroundDrawable(mcpeButtonOldImage);
                     } else if (theme == "MCPE" && betterGrass == "off") {
-                        betterGrassButton = minecraftButton("Better Grass | OFF");
+                        betterGrassButton = minecraftButton("Better Grass | " + Texts.off);
                         //betterGrassButton.setBackgroundDrawable(mcpeButtonOldImage);
                     } else if (theme == "Blue" && betterGrass == "normal") {
                         betterGrassButton = minecraftButton("Better Grass | NORMAL");
                     } else if (theme == "Blue" && betterGrass == "fast") {
                         betterGrassButton = minecraftButton("Better Grass | FAST");
                     } else if (theme == "Blue" && betterGrass == "off") {
-                        betterGrassButton = minecraftButton("Better Grass | OFF");
+                        betterGrassButton = minecraftButton("Better Grass | " + Texts.off);
                     }
                     betterGrassButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
@@ -8073,7 +9806,7 @@ function openMenu(menu) {
                                 betterGrass = "off";
 								initializeOptiFine();
 								MoreOptionsPE.saveMainSettings();
-                                betterGrassButton.setText("Better Grass | OFF");
+                                betterGrassButton.setText("Better Grass | " + Texts.off);
                             } else if (theme == "Alternative" && betterGrass == "off") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 betterGrass = "normal";
@@ -8091,7 +9824,7 @@ function openMenu(menu) {
                                 betterGrass = "off";
 								initializeOptiFine();
 								MoreOptionsPE.saveMainSettings();
-                                betterGrassButton.setText("Better Grass | OFF");
+                                betterGrassButton.setText("Better Grass | " + Texts.off);
                             } else if (theme == "MCPE" && betterGrass == "off") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 betterGrass = "normal";
@@ -8109,7 +9842,7 @@ function openMenu(menu) {
                                 betterGrass = "off";
 								initializeOptiFine();
 								MoreOptionsPE.saveMainSettings();
-                                betterGrassButton.setText("Better Grass | OFF");
+                                betterGrassButton.setText("Better Grass | " + Texts.off);
                             } else if (theme == "Blue" && betterGrass == "off") {
 								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                                 betterGrass = "normal";
@@ -8145,8 +9878,8 @@ function openMenu(menu) {
                     var dialog = new android.app.Dialog(ctx);
                     dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
                     dialog.setContentView(dialogLayout);
-                    dialog.setTitle("Edit TapSpammer Message");
-                    inputBar.setHint("TapSpammer Message");
+                    dialog.setTitle("Edit TapSpammer / AutoSpammer Message");
+                    inputBar.setHint(Texts.tapspammer + " / " + Texts.autospammer + " Message");
                     inputBar.setText(spamMessage);
                     inputBar.setTypeface(mcpeFont);
                     if(android.os.Build.VERSION.SDK_INT > 19) { // KITKAT
@@ -8230,6 +9963,108 @@ function openMenu(menu) {
                 }
             }
         });
+		
+    } else if(menu == "defaulturlsetting") {
+        ctx.runOnUiThread(new java.lang.Runnable() {
+            run: function() {
+                try {
+                    dialogGUI = new android.widget.PopupWindow();
+                    var btn = minecraftButton("Change setting");
+                    var btn1 = minecraftButton("Cancel");
+                    var inputBar = new android.widget.EditText(ctx);
+                    var dialogLayout = new android.widget.LinearLayout(ctx);
+                    var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
+                    dialogLayout.setBackgroundDrawable(getStretchedImage(spritesheet, 4 * GuiSize, 4 * GuiSize, 8 * GuiSize, 8 * GuiSize, getContext().getScreenWidth() / 2, getContext().getScreenHeight()));
+                    dialogLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+                    dialogLayout.addView(inputBar);
+                    dialogLayout.addView(btn);
+                    dialogLayout.addView(btn1);
+                    var dialog = new android.app.Dialog(ctx);
+                    dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(dialogLayout);
+                    dialog.setTitle("Default Webbrowser URL");
+                    inputBar.setHint("Default Webbrowser URL (use http:// or https://)");
+                    inputBar.setText(defaultUrl);
+                    inputBar.setTypeface(mcpeFont);
+                    if(android.os.Build.VERSION.SDK_INT > 19) { // KITKAT
+                        inputBar.setShadowLayer(1, Math.round(inputBar.getLineHeight() / 8), Math.round(inputBar.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
+                    } else {
+                        inputBar.setShadowLayer(0.0001, Math.round(inputBar.getLineHeight() / 8), Math.round(inputBar.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
+                    }
+                    dialogGUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.TOP, 0, 0);
+                    dialog.show();
+                    btn.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            defaultUrl = inputBar.getText().toString();
+                            MoreOptionsPE.saveMainSettings();
+                            MoreOptionsPE.loadMainSettings();
+                            dialog.dismiss();
+                        }
+                    });
+                    btn1.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            dialog.dismiss();
+                        }
+                    });
+                } catch(e) {
+                    print("Error: " + e)
+                }
+            }
+        });
+		
+		} else if(menu == "loadwebsite") {
+        ctx.runOnUiThread(new java.lang.Runnable() {
+            run: function() {
+                try {
+                    dialogGUI = new android.widget.PopupWindow();
+                    var btn = minecraftButton("Go to this page");
+                    var btn1 = minecraftButton("Cancel");
+                    var inputBar = new android.widget.EditText(ctx);
+                    var dialogLayout = new android.widget.LinearLayout(ctx);
+                    var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
+                    dialogLayout.setBackgroundDrawable(getStretchedImage(spritesheet, 4 * GuiSize, 4 * GuiSize, 8 * GuiSize, 8 * GuiSize, getContext().getScreenWidth() / 2, getContext().getScreenHeight()));
+                    dialogLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+                    dialogLayout.addView(inputBar);
+                    dialogLayout.addView(btn);
+                    dialogLayout.addView(btn1);
+                    var dialog = new android.app.Dialog(ctx);
+                    dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(dialogLayout);
+                    dialog.setTitle("Go to a webpage");
+                    inputBar.setHint("Enter an url here");
+                    inputBar.setText(webViewer.getUrl());
+                    inputBar.setTypeface(mcpeFont);
+                    if(android.os.Build.VERSION.SDK_INT > 19) { // KITKAT
+                        inputBar.setShadowLayer(1, Math.round(inputBar.getLineHeight() / 8), Math.round(inputBar.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
+                    } else {
+                        inputBar.setShadowLayer(0.0001, Math.round(inputBar.getLineHeight() / 8), Math.round(inputBar.getLineHeight() / 8), android.graphics.Color.parseColor("#FF333333"));
+                    }
+                    dialogGUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.TOP, 0, 0);
+                    dialog.show();
+                    btn.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+							webViewer.loadUrl(inputBar.getText());
+                            dialog.dismiss();
+                        }
+                    });
+                    btn1.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            dialog.dismiss();
+                        }
+                    });
+                } catch(e) {
+                    print("Error: " + e)
+                }
+            }
+        });
     }
 }
 
@@ -8246,9 +10081,9 @@ function chatHook(text) {
             clientMessage(" > .tp <x> <y> <z> - Teleports your player to the given position (x, y, z)");
             clientMessage(" > .sethome - Sets your home at the current player location");
             clientMessage(" > .home - Teleports your player to your current set home location");
-            clientMessage(" > .leave - Leaves the world");
         } else if(commandText[1] == "2") {
             clientMessage(ChatColor.GREEN + "Showing AgameR MoreOptions PE commands help page 2 of 2");
+			clientMessage(" > .leave - Leaves the world");
             clientMessage(" > .version - Tells the current AgameR MoreOptions PE version");
             clientMessage(" > .about - Opens the AgameR MoreOptions PE about screen");
             clientMessage(" > .settings - Opens the AgameR MoreOptions PE settings screen");
@@ -8259,6 +10094,7 @@ function chatHook(text) {
     }
     if(commandText[0] == ".menu") {
         preventDefault();
+		closeHacksList();
         mainMenu();
         exit();
     }
@@ -8309,10 +10145,12 @@ function chatHook(text) {
     }
     if(commandText[0] == ".about") {
         preventDefault();
+		closeHacksList();
         aboutScreen();
     }
     if(commandText[0] == ".settings") {
         preventDefault();
+		closeHacksList();
         settingsScreen();
         exitSettings();
     }
@@ -8324,6 +10162,7 @@ function chatHook(text) {
                 MoreOptionsPE.getLatestVersion();
                 if(latestVersion != CURRENT_VERSION && latestVersion != undefined) {
                     clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE]" + ChatColor.WHITE + " There is a new version available (v" + latestVersion + " for Minecraft Pocket Edition v" + latestPocketEditionVersion + ")!");
+					MoreOptionsPE.showMessage("update", "There is a new version available (v" + latestVersion + " for Minecraft Pocket Edition v" + latestPocketEditionVersion + ")!");
                 } else {
                     currentActivity.runOnUiThread(new java.lang.Runnable() {
                         run: function() {
@@ -8362,7 +10201,7 @@ function chatHook(text) {
 
 //*Mod info*
 //------------
-//Mod version: 1.1.0
+//Mod version: 1.2.0
 //For full changelog, look at the mod's menu ingame
 
 
