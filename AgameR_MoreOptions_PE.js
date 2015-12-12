@@ -22,7 +22,7 @@ var gameSpeedHackSetting = "2";
 var nameColor = "§b";
 var healthColor = "§c";
 var betterGlass = "off";
-var experimentalFeatures = "off";
+var experimentalFeatures = "off"; //<-- Default = off
 var defaultUrl = "https://google.com/"; //<-- Default Webbrowser URL; Default: https://google.com/
 
 /*Per world config*/
@@ -97,7 +97,11 @@ var Texts = {
 	autospammer: "AutoSpammer",
 	autoleave: "AutoLeave",
 	instafood: "InstaFood",
+	powerexplosions: "PowerExplosions",
+	automine: "AutoMine",
 	fun: "Fun",
+	derp: "Derp",
+	twerk: "Twerk",
 	cheats: "Cheats",
 	misc: "Miscellaneous",
 	console: "Console",
@@ -141,7 +145,11 @@ MoreOptionsPE.loadTextsInCurrentLanguage = function() {
 			Texts.autospammer = "AutoSpammen";
 			Texts.autoleave = "AutoVerlassen";
 			Texts.instafood = "Sofortessen";
+			Texts.powerexplosions = "PowerExplosions";
+			Texts.automine = "AutoMine";
 			Texts.fun = "Spaß";
+			Texts.derp = "Derp";
+			Texts.twerk = "Twerk";
 			Texts.cheats = "Cheats";
 			Texts.misc = "Sonstiges";
 			Texts.console = "Konsole";
@@ -218,7 +226,7 @@ MoreOptionsPE.showMainButton = function() {
                     onLongClick: function(v, t) {
                         down = true;
                         ctx.getSystemService(android.content.Context.VIBRATOR_SERVICE).vibrate(37);
-                        print("Now you can move the button!");
+                        android.widget.Toast.makeText(currentActivity, new android.text.Html.fromHtml("<b>AgameR MoreOptions PE</b> Now you can move the button!"), 0).show();
                         return true;
                     }
                 });
@@ -303,6 +311,52 @@ MoreOptionsPE.showMainButton = function() {
             }
         }
     });
+}
+
+MoreOptionsPE.getRandomMessage = function() {
+	var calendarInstance = java.util.Calendar.getInstance();
+	var day = calendarInstance.get(java.util.Calendar.DAY_OF_MONTH);
+	var month = calendarInstance.get(java.util.Calendar.MONTH);
+	if(month == java.util.Calendar.DECEMBER) {
+		if(day == 25) {
+			return "Merry Christmas!";
+		}else{
+			var daysLeft = (25 - day);
+			return daysLeft.toString() + " days left until Christmas!";
+		}
+	}if(day == 1 && month == java.util.Calendar.JANUARY) {
+		return "Happy new year!";
+	}else{
+		return "Welcome back!";
+	}
+}
+
+MoreOptionsPE.setHome = function() {
+	HomeX = Entity.getX(getPlayerEnt());
+    HomeY = Entity.getY(getPlayerEnt());
+    HomeZ = Entity.getZ(getPlayerEnt());
+    MoreOptionsPE.savePerWorldSettings();
+    MoreOptionsPE.loadPerWorldSettings();
+    clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "Home successfully set!");
+}
+
+MoreOptionsPE.tpHome = function() {
+	MoreOptionsPE.loadPerWorldSettings();
+	if(HomeX == null || HomeY == null || HomeZ == null) {
+		clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "You need to set your home using .sethome or the Set Home button first!");
+	} else {
+		Entity.setPosition(getPlayerEnt(), HomeX, HomeY, HomeZ);
+		clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "Succesfully teleported player to the current home location!");
+	}
+}
+
+MoreOptionsPE.clearHome = function() {
+	HomeX = " ";
+    HomeY = " ";
+    HomeZ = " ";
+    MoreOptionsPE.savePerWorldSettings();
+    MoreOptionsPE.loadPerWorldSettings();
+    clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "Home successfully cleared!");
 }
 
 MoreOptionsPE.showExperimentalMenu = function() {
@@ -639,17 +693,15 @@ ModPE.setFoodItem(359,"shears",0,9999,"Shears [EATABLE]");*/
 
 // add these variables in your mod
 
-ModPE.overrideTexture("images/mob/MoreOptionsPE/IronGolem.png", "http://i.imgur.com/uO5JO6l.png") //IronGolemTexture
-
-const CURRENT_VERSION = "1.2.0";
+const CURRENT_VERSION = "1.2.1";
 var latestVersion;
 var latestPocketEditionVersion;
 var minimalMCPEVersion = "0.12.0";
-var targetMCPEVersion = "0.12.x";
+var targetMCPEVersion = "0.13.x";
 var mcpeVersion = ModPE.getMinecraftVersion();
 const MOD_AUTHOR = "peacestorm (@AgameR_Modder)";
 const MOD_CREDITS = "@MyNameIsTriXz (helped me the most), @Desno365, @RedstoneGunMade, @AntiModPE, @tylernomc, @TBPM_MODDER_";
-const MOD_CHANGELOG = "Added a Webbrowser, added many new hacks, added many new cheats, fixed many bugs, added a new splash screen, added support for German, made the main button moveable, added an auto-updater, overall improvements";
+const MOD_CHANGELOG = "Updated for MCPE v0.13.x, added Home cheat, added PowerExplosions hack, added AutoMine hack, moved the Trails button to the Fun category, improved splash screen, bug fixes, overall improvements";
 
 var currentActivity = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 var sdcard = android.os.Environment.getExternalStorageDirectory();
@@ -2101,9 +2153,10 @@ var State25 = false;
 var State26 = false;
 var State27 = false;
 var State28 = false;
+var StatePowerExplosions = false;
+var StateAutoMine = false;
 var StateTwerk = false;
 var StateDerp = false;
-
 var StateTrails = false;
 
 var spawn = false;
@@ -2376,6 +2429,8 @@ function leaveGame() {
     State26 = false;
     State27 = false;
 	State28 = false;
+	StatePowerExplosions = false;
+	StateAutoMine = false;
     StateTwerk = false;
     StateDerp = false;
     closeMenu();
@@ -2521,6 +2576,7 @@ function showHacksList() {
                     var State26Text = "";
                     var State27Text = "";
                     var State28Text = "";
+                    var StatePowerExplosionsText = "";
                     var StateTwerkText = "";
                     var StateDerpText = "";
 					var MoreOptionsHacksListText =  "AgameR MoreOptions PE v" + CURRENT_VERSION;
@@ -2669,6 +2725,16 @@ function showHacksList() {
                     } else if(State28 == false) {
                         State28Text = "";
                     }
+					if(StatePowerExplosions == true) {
+                        StatePowerExplosionsText = " [" + Texts.powerexplosions + "] ";
+                    } else if(StatePowerExplosions == false) {
+                        StatePowerExplosionsText = "";
+                    }
+					if(StateAutoMine == true) {
+                        StateAutoMineText = " [" + Texts.automine + "] ";
+                    } else if(StateAutoMine == false) {
+                        StateAutoMineText = "";
+                    }
                     if(StateTwerk == true) {
                         StateTwerkText = " [" + Texts.twerk + "] ";
                     } else if(StateTwerk == false) {
@@ -2680,7 +2746,7 @@ function showHacksList() {
                         StateDerpText = "";
                     }
                     var MoreOptionsHacksListTextView = minecraftText(MoreOptionsHacksListText);
-					var StatesText = minecraftText(StateText + State1Text + State2Text + State3Text + State4Text + State5Text + State6Text + State7Text + State8Text + State9Text + State10Text + State11Text + State12Text + State13Text + State14Text + State15Text + State16Text + State17Text + State18Text + State19Text + State20Text + State21Text + State22Text + State23Text + State24Text + State25Text + State26Text + State27Text + State28Text + StateTwerkText + StateDerpText);
+					var StatesText = minecraftText(StateText + State1Text + State2Text + State3Text + State4Text + State5Text + State6Text + State7Text + State8Text + State9Text + State10Text + State11Text + State12Text + State13Text + State14Text + State15Text + State16Text + State17Text + State18Text + State19Text + State20Text + State21Text + State22Text + State23Text + State24Text + State25Text + State26Text + State27Text + State28Text + StatePowerExplosionsText + StateAutoMineText + StateTwerkText + StateDerpText);
                     MoreOptionsHacksListTextView.setTextSize(15);
 					MoreOptionsHacksListTextView.setTextColor(android.graphics.Color.parseColor("#0099FF"));
                     StatesText.setTextSize(15);
@@ -2749,12 +2815,9 @@ function showMainMenuList() {
                     var newLine2Text = new android.widget.TextView(ctx);
                     var btn = new android.widget.Button(ctx);*/
 					var MoreOptionsMainMenuText = "<font color='#0099FF'>AgameR MoreOptions PE v" + CURRENT_VERSION + "</font>";
-                    var MoreOptionsMainMenuTextTextView = minecraftText(MoreOptionsMainMenuText);
+					var MoreOptionsMainMenuSplashTipMessageText = "<font color='#FFFF00'>" + MoreOptionsPE.getRandomMessage() + "</font>";
 					var text = MoreOptionsMainMenuText + " - " + MOD_CHANGELOG;
 					var ChangelogText = minecraftText(android.text.Html.fromHtml(text), android.widget.TextView.BufferType.SPANNABLE);
-                    MoreOptionsMainMenuTextTextView.setTextSize(15);
-					MoreOptionsMainMenuTextTextView.setTextColor(android.graphics.Color.parseColor("#0099FF"));
-					MoreOptionsMainMenuTextTextView.setGravity(android.view.Gravity.CENTER);
                     ChangelogText.setTextSize(15);
 					ChangelogText.setGravity(android.view.Gravity.CENTER);
 					ChangelogText.setEllipsize(android.text.TextUtils.TruncateAt.MARQUEE);
@@ -2762,7 +2825,10 @@ function showMainMenuList() {
 					ChangelogText.setSingleLine();
 					ChangelogText.setHorizontallyScrolling(true);
 					ChangelogText.setSelected(true);
-					var newLineText = minecraftText("\n\n\n\n\n");
+					var newLineText = minecraftText("\n");
+					var splashTipMessage = minecraftText(android.text.Html.fromHtml(MoreOptionsMainMenuSplashTipMessageText), android.widget.TextView.BufferType.SPANNABLE);
+					splashTipMessage.setGravity(android.view.Gravity.CENTER);
+					var newLineText2 = minecraftText("\n\n\n");
 					var playButton = new android.widget.Button(ctx);
 					playButton.setBackground(playButtonImage);
 					playButton.setGravity(android.view.Gravity.CENTER);
@@ -2787,8 +2853,8 @@ function showMainMenuList() {
 							return false;
 						}
 					});
-					var newLineText2 = new android.widget.TextView(ctx);
-					newLineText2.setText("\n");
+					var newLineText3 = new android.widget.TextView(ctx);
+					newLineText3.setText("\n");
 					var splashTwitterButton = new android.widget.Button(ctx);
 					splashTwitterButton.setBackgroundDrawable(splashTwitterButtonImage);
 					splashTwitterButton.setGravity(android.view.Gravity.CENTER);
@@ -2829,8 +2895,10 @@ function showMainMenuList() {
                     //mainMenuListLayout.addView(MoreOptionsMainMenuTextTextView);
                     mainMenuListLayout.addView(ChangelogText);
                     mainMenuListLayout.addView(newLineText);
-                    mainMenuListLayout.addView(playButton);
+                    mainMenuListLayout.addView(splashTipMessage);
                     mainMenuListLayout.addView(newLineText2);
+                    mainMenuListLayout.addView(playButton);
+                    mainMenuListLayout.addView(newLineText3);
                     mainMenuListLayout.addView(splashTwitterButton);
                     //var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16*GuiSize, 16*GuiSize, false);
                     /*newLineText.setText("\n");
@@ -3715,21 +3783,11 @@ function consoleScreen() {
 								}
 							}
 							if(inputText[0] == ".sethome") {
-								HomeX = Entity.getX(getPlayerEnt());
-								HomeY = Entity.getY(getPlayerEnt());
-								HomeZ = Entity.getZ(getPlayerEnt());
-								MoreOptionsPE.savePerWorldSettings();
-								MoreOptionsPE.loadPerWorldSettings();
+								MoreOptionsPE.setHome();
 								clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "Home successfully set!");
 							}
 							if(inputText[0] == ".home") {
-								MoreOptionsPE.loadPerWorldSettings();
-								if(HomeX == null || HomeY == null || HomeZ == null) {
-									clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "You need to set your home using .sethome first!");
-								} else {
-									Entity.setPosition(getPlayerEnt(), HomeX, HomeY, HomeZ);
-									clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "Succesfully teleported player to the current home location!");
-								}
+								MoreOptionsPE.tpHome();
 							}
 							if(inputText[0] == ".leave") {
 								ModPE.leaveGame();
@@ -3834,6 +3892,11 @@ function playerCustomizerScreen() {
     ctx.runOnUiThread(new java.lang.Runnable({
         run: function() {
             try {
+				for(var i = 0; i < 37; i++) {
+                    if(Player.getCarriedItem(i) == 0) {
+						android.widget.Toast.makeText(currentActivity, new android.text.Html.fromHtml("<b>AgameR MoreOptions PE</b> Make sure that the selected inventory slot isn't empty!"), 0).show();
+					}
+                }
                 var playerCustomizerMenuLayout = new android.widget.LinearLayout(ctx);
                 var playerCustomizerMenuLeftScroll = new android.widget.ScrollView(ctx);
                 var playerCustomizerMenuMiddleScroll = new android.widget.ScrollView(ctx);
@@ -3880,13 +3943,6 @@ function playerCustomizerScreen() {
                 var layoutParams = new android.widget.LinearLayout.LayoutParams(750, 750);
                 skinViewer.setLayoutParams(layoutParams);
                 var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
-                var trailsBtn = minecraftButton("Trails | " + Texts.off);
-                if(StateTrails == true) {
-                    trailsBtn.setText("Trails | " + Texts.on);
-                }
-                if(StateTrails == false) {
-                    trailsBtn.setText("Trails | " + Texts.off);
-                }
                 var btn = minecraftButton("TNT");
                 var btn1 = minecraftButton("Chicken");
                 var btn2 = minecraftButton("Cow");
@@ -3916,7 +3972,6 @@ function playerCustomizerScreen() {
                 //circularDrawable.setStroke(cET.dpToPx(2), android.graphics.Color.parseColor("#EEEEEE"));
                 //circularDrawable.setSize(cET.dpToPx(240), cET.dpToPx(240));*/
 				playerCustomizerMenuLeftLayout.addView(playerCustomizerLeftEnter);
-                playerCustomizerMenuLeftLayout.addView(trailsBtn);
                 playerCustomizerMenuLeftLayout.addView(skinViewer);
 				playerCustomizerMenuRightLayout.addView(playerCustomizerRightEnter);
                 playerCustomizerMenuRightLayout.addView(morphTitle);
@@ -3950,18 +4005,6 @@ function playerCustomizerScreen() {
 					MCPEVersionText.setText("Current MCPE version : v" + mcpeVersion);
 					newLine2Text.setText("\n");
                     //morphOkBtn.setText("Ok");*/
-                trailsBtn.setOnClickListener(new android.view.View.OnClickListener() {
-                    onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
-                        if(StateTrails == false) {
-                            StateTrails = true;
-                            trailsBtn.setText("Trails | " + Texts.on);
-                        } else if(StateTrails == true) {
-                            StateTrails = false;
-                            trailsBtn.setText("Trails | " + Texts.off);
-                        }
-                    }
-                });
                 btn.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
                         Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
@@ -4266,6 +4309,8 @@ function disableHacks() {
     State26 = false;
     State27 = false;
     State28 = false;
+	StatePowerExplosions = false;
+	StateAutoMine = false;
 	StateTwerk = false;
 	StateDerp = false;
 }
@@ -6862,6 +6907,150 @@ function mainMenu() {
                         }
                     }
                 }));
+				
+				var button29 = new android.widget.Button(ctx);
+                if(StatePowerExplosions == false && theme == "Alternative") {
+                    button29 = new android.widget.Button(ctx);
+                    button29.setText(Texts.powerexplosions + " | " + Texts.off);
+                    button29.setBackgroundColor(android.graphics.Color.RED);
+                } else if(StatePowerExplosions == true && theme == "Alternative") {
+                    button29 = new android.widget.Button(ctx);
+                    button29.setText(Texts.powerexplosions + " | " + Texts.on);
+                    button29.setBackgroundColor(android.graphics.Color.GREEN);
+                } else if(StatePowerExplosions == false && theme == "MCPE") {
+                    button29 = minecraftButton(Texts.powerexplosions + " | " + Texts.off);
+                    //button29.setTypeface(mcpeFont);
+                    //button29.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(StatePowerExplosions == true && theme == "MCPE") {
+                    button29 = minecraftButton(Texts.powerexplosions + " | " + Texts.on);
+                    //button29.setTypeface(mcpeFont);
+                    //button29.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(StatePowerExplosions == false && theme == "Blue") {
+                    button29 = new android.widget.Button(ctx);
+                    button29.setText(Texts.powerexplosions + " | " + Texts.off);
+                    button29.setTextColor(android.graphics.Color.WHITE);
+                    button29.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    button29.setTypeface(mcpeFont);
+                } else if(StatePowerExplosions == true && theme == "Blue") {
+                    button29 = new android.widget.Button(ctx);
+                    button29.setText(Texts.powerexplosions + " | " + Texts.on);
+                    button29.setTextColor(android.graphics.Color.BLUE);
+                    button29.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    button29.setTypeface(mcpeFont);
+                }
+
+                button29.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        if(StatePowerExplosions == false && theme == "Alternative") {
+                            StatePowerExplosions = true;
+                            
+                            button29.setText(Texts.powerexplosions + " | " + Texts.on);
+                            button29.setBackgroundColor(android.graphics.Color.GREEN);
+                        } else if(StatePowerExplosions == true && theme == "Alternative") {
+                            StatePowerExplosions = false;
+                            
+                            button29.setText(Texts.powerexplosions + " | " + Texts.off);
+                            button29.setBackgroundColor(android.graphics.Color.RED);
+                        } else if(StatePowerExplosions == false && theme == "MCPE") {
+                            StatePowerExplosions = true;
+                            
+                            button29.setText(Texts.powerexplosions + " | " + Texts.on);
+                            //button29.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(StatePowerExplosions == true && theme == "MCPE") {
+                            StatePowerExplosions = false;
+                            
+                            button29.setText(Texts.powerexplosions + " | " + Texts.off);
+                            //button29.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(StatePowerExplosions == false && theme == "Blue") {
+                            StatePowerExplosions = true;
+                            
+                            button29.setText(Texts.powerexplosions + " | " + Texts.on);
+                            button29.setTextColor(android.graphics.Color.BLUE);
+                            button29.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            button29.setTypeface(mcpeFont);
+                        } else if(StatePowerExplosions == true && theme == "Blue") {
+                            StatePowerExplosions = false;
+                            
+                            button29.setText(Texts.powerexplosions + " | " + Texts.off);
+                            button29.setTextColor(android.graphics.Color.WHITE);
+                            button29.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            button29.setTypeface(mcpeFont);
+                        }
+                    }
+                }));
+				
+				var button30 = new android.widget.Button(ctx);
+                if(StateAutoMine == false && theme == "Alternative") {
+                    button30 = new android.widget.Button(ctx);
+                    button30.setText(Texts.automine + " | " + Texts.off);
+                    button30.setBackgroundColor(android.graphics.Color.RED);
+                } else if(StateAutoMine == true && theme == "Alternative") {
+                    button30 = new android.widget.Button(ctx);
+                    button30.setText(Texts.automine + " | " + Texts.on);
+                    button30.setBackgroundColor(android.graphics.Color.GREEN);
+                } else if(StateAutoMine == false && theme == "MCPE") {
+                    button30 = minecraftButton(Texts.automine + " | " + Texts.off);
+                    //button30.setTypeface(mcpeFont);
+                    //button30.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(StateAutoMine == true && theme == "MCPE") {
+                    button30 = minecraftButton(Texts.automine + " | " + Texts.on);
+                    //button30.setTypeface(mcpeFont);
+                    //button30.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(StateAutoMine == false && theme == "Blue") {
+                    button30 = new android.widget.Button(ctx);
+                    button30.setText(Texts.automine + " | " + Texts.off);
+                    button30.setTextColor(android.graphics.Color.WHITE);
+                    button30.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    button30.setTypeface(mcpeFont);
+                } else if(StateAutoMine == true && theme == "Blue") {
+                    button30 = new android.widget.Button(ctx);
+                    button30.setText(Texts.automine + " | " + Texts.on);
+                    button30.setTextColor(android.graphics.Color.BLUE);
+                    button30.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    button30.setTypeface(mcpeFont);
+                }
+
+                button30.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        if(StateAutoMine == false && theme == "Alternative") {
+                            StateAutoMine = true;
+                            
+                            button30.setText(Texts.automine + " | " + Texts.on);
+                            button30.setBackgroundColor(android.graphics.Color.GREEN);
+                        } else if(StateAutoMine == true && theme == "Alternative") {
+                            StateAutoMine = false;
+                            
+                            button30.setText(Texts.automine + " | " + Texts.off);
+                            button30.setBackgroundColor(android.graphics.Color.RED);
+                        } else if(StateAutoMine == false && theme == "MCPE") {
+                            StateAutoMine = true;
+                            
+                            button30.setText(Texts.automine + " | " + Texts.on);
+                            //button30.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(StateAutoMine == true && theme == "MCPE") {
+                            StateAutoMine = false;
+                            
+                            button30.setText(Texts.automine + " | " + Texts.off);
+                            //button30.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(StateAutoMine == false && theme == "Blue") {
+                            StateAutoMine = true;
+                            
+                            button30.setText(Texts.automine + " | " + Texts.on);
+                            button30.setTextColor(android.graphics.Color.BLUE);
+                            button30.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            button30.setTypeface(mcpeFont);
+                        } else if(StateAutoMine == true && theme == "Blue") {
+                            StateAutoMine = false;
+                            
+                            button30.setText(Texts.automine + " | " + Texts.off);
+                            button30.setTextColor(android.graphics.Color.WHITE);
+                            button30.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            button30.setTypeface(mcpeFont);
+                        }
+                    }
+                }));
 
                 var dividerViewer = new android.widget.ImageView(ctx);
                 dividerViewer.setImageBitmap(android.graphics.BitmapFactory.decodeByteArray(divider, 0, divider.length));
@@ -7043,6 +7232,78 @@ function mainMenu() {
                             derpButton.setTextColor(android.graphics.Color.WHITE);
                             derpButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             derpButton.setTypeface(mcpeFont);
+                        }
+                    }
+                }));
+				
+				var trailsButton = new android.widget.Button(ctx);
+                if(StateTrails == false && theme == "Alternative") {
+                    trailsButton = new android.widget.Button(ctx);
+                    trailsButton.setText("Trails | " + Texts.off);
+                    trailsButton.setBackgroundColor(android.graphics.Color.RED);
+                } else if(StateTrails == true && theme == "Alternative") {
+                    trailsButton = new android.widget.Button(ctx);
+                    trailsButton.setText("Trails | " + Texts.on);
+                    trailsButton.setBackgroundColor(android.graphics.Color.GREEN);
+                } else if(StateTrails == false && theme == "MCPE") {
+                    trailsButton = minecraftButton("Trails | " + Texts.off);
+                    //trailsButton.setTypeface(mcpeFont);
+                    //trailsButton.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(StateTrails == true && theme == "MCPE") {
+                    trailsButton = minecraftButton("Trails | " + Texts.on);
+                    //trailsButton.setTypeface(mcpeFont);
+                    //trailsButton.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(StateTrails == false && theme == "Blue") {
+                    trailsButton = new android.widget.Button(ctx);
+                    trailsButton.setText("Trails | " + Texts.off);
+                    trailsButton.setTextColor(android.graphics.Color.WHITE);
+                    trailsButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    trailsButton.setTypeface(mcpeFont);
+                } else if(StateTrails == true && theme == "Blue") {
+                    trailsButton = new android.widget.Button(ctx);
+                    trailsButton.setText("Trails | " + Texts.on);
+                    trailsButton.setTextColor(android.graphics.Color.BLUE);
+                    trailsButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    trailsButton.setTypeface(mcpeFont);
+                }
+
+                trailsButton.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        if(StateTrails == false && theme == "Alternative") {
+                            StateTrails = true;
+                            
+                            trailsButton.setText("Trails | " + Texts.on);
+                            trailsButton.setBackgroundColor(android.graphics.Color.GREEN);
+                        } else if(StateTrails == true && theme == "Alternative") {
+                            StateTrails = false;
+                            
+                            trailsButton.setText("Trails | " + Texts.off);
+                            trailsButton.setBackgroundColor(android.graphics.Color.RED);
+                        } else if(StateTrails == false && theme == "MCPE") {
+                            StateTrails = true;
+                            
+                            trailsButton.setText("Trails | " + Texts.on);
+                            //trailsButton.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(StateTrails == true && theme == "MCPE") {
+                            StateTrails = false;
+                            
+                            trailsButton.setText("Trails | " + Texts.off);
+                            //trailsButton.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(StateTrails == false && theme == "Blue") {
+                            StateTrails = true;
+                            
+                            trailsButton.setText("Trails | " + Texts.on);
+                            trailsButton.setTextColor(android.graphics.Color.BLUE);
+                            trailsButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            trailsButton.setTypeface(mcpeFont);
+                        } else if(StateTrails == true && theme == "Blue") {
+                            StateTrails = false;
+                            
+                            trailsButton.setText("Trails | " + Texts.off);
+                            trailsButton.setTextColor(android.graphics.Color.WHITE);
+                            trailsButton.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            trailsButton.setTypeface(mcpeFont);
                         }
                     }
                 }));
@@ -7387,6 +7648,41 @@ function mainMenu() {
                         openMenu("weather");
                     }
                 }));
+				
+				var cheatsButton10 = new android.widget.Button(ctx);
+                if(theme == "Alternative") {
+                    cheatsButton10 = new android.widget.Button(ctx);
+                    cheatsButton10.setText("Home");
+                    cheatsButton10.setBackgroundColor(android.graphics.Color.GRAY);
+                } else if(theme == "MCPE") {
+                    cheatsButton10 = minecraftButton("Home");
+                    //cheatsButton10.setTypeface(mcpeFont);
+                    //cheatsButton10.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(theme == "Blue") {
+                    cheatsButton10 = new android.widget.Button(ctx);
+                    cheatsButton10.setText("Home");
+                    cheatsButton10.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    cheatsButton10.setTypeface(mcpeFont);
+                }
+
+                cheatsButton10.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        if(theme == "Alternative") {
+                            cheatsButton10.setText("Home");
+                            cheatsButton10.setBackgroundColor(android.graphics.Color.GRAY);
+                        } else if(theme == "MCPE") {
+                            cheatsButton10.setText("Home");
+                            //cheatsButton10.setTypeface(mcpeFont);
+                            //cheatsButton10.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(theme == "Blue") {
+                            cheatsButton10.setText("Home");
+                            cheatsButton10.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            cheatsButton10.setTypeface(mcpeFont);
+                        }
+                        openMenu("home");
+                    }
+                }));
 
                 var dividerViewer2 = new android.widget.ImageView(ctx);
                 dividerViewer2.setImageBitmap(android.graphics.BitmapFactory.decodeByteArray(divider, 0, divider.length));
@@ -7606,12 +7902,15 @@ function mainMenu() {
 				menuLayout.addView(button26);
 				menuLayout.addView(button27);
 				menuLayout.addView(button28);
+				menuLayout.addView(button29);
+				menuLayout.addView(button30);
                 if(theme == "Blue") {
                     menuLayout.addView(dividerViewer);
                 }
                 menuLayout.addView(funTitle);
                 //menuLayout.addView(twerkButton);
                 menuLayout.addView(derpButton);
+                menuLayout.addView(trailsButton);
                 if(theme == "Blue") {
                     menuLayout.addView(dividerViewer1);
                 }
@@ -7625,6 +7924,7 @@ function mainMenu() {
                 menuLayout.addView(cheatsButton7);
                 menuLayout.addView(cheatsButton8);
                 menuLayout.addView(cheatsButton9);
+                menuLayout.addView(cheatsButton10);
                 if(theme == "Blue") {
                     menuLayout.addView(dividerViewer2);
                 }
@@ -7864,15 +8164,9 @@ function exitPlayerCustomizer() {
     ctxe.runOnUiThread(new java.lang.Runnable({
         run: function() {
             try {
+                var trailsPlayerCustomizerLayout = new android.widget.LinearLayout(ctxe);
                 var xPlayerCustomizerLayout = new android.widget.LinearLayout(ctxe);
-                var xPlayerCustomizerButton = new android.widget.Button(ctxe);
-                if(theme == "Alternative") {
-                    xPlayerCustomizerButton = minecraftButtonX("X");
-                } else if(theme == "MCPE") {
-                    xPlayerCustomizerButton = minecraftButtonX("X");
-                } else if(theme == "Blue") {
-                    xPlayerCustomizerButton = minecraftButtonX("X");
-                }
+				var xPlayerCustomizerButton = minecraftButtonX("X");
                 /*xButton.setOnTouchListener(new android.view.View.OnTouchListener({
                     onClick: function(viewarg) {
 						if(theme == "MCPE"){
@@ -7892,7 +8186,7 @@ function exitPlayerCustomizer() {
                 xPlayerCustomizerLayout.addView(xPlayerCustomizerButton);
                 exitPlayerCustomizerUI = new android.widget.PopupWindow(xPlayerCustomizerLayout, dip2px(40), dip2px(40));
                 exitPlayerCustomizerUI.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-                exitPlayerCustomizerUI.showAtLocation(ctxe.getWindow().getDecorView(), android.view.Gravity.RIGHT | android.view.Gravity.TOP, 0, 0);
+                exitPlayerCustomizerUI.showAtLocation(ctxe.getWindow().getDecorView(), android.view.Gravity.RIGHT | android.view.Gravity.TOP, 10, 10);
             } catch(exception) {
                 print(exception);
             }
@@ -8270,7 +8564,9 @@ function modTick() {
 		}
     }if(State28 == true) {
         Player.setHunger(20);
-    }
+    }if(StateAutoMine == true && ModPE.playerHasSplitControls() == "1") {
+		Level.destroyBlock(Player.getPointedBlockX(), Player.getPointedBlockY(), Player.getPointedBlockZ());
+	}
     if(StateTrails == true) {
         var x = Player.getX();
         var y = Player.getY();
@@ -8313,6 +8609,8 @@ function modTick() {
         State26 = false;
         State27 = false;
 		State28 = false;
+		StatePowerExplosions = false;
+		StateAutoMine = false;
         StateTwerk = false;
         StateDerp = false;
     }
@@ -8323,6 +8621,20 @@ ModPE.goToURL = function(url) {
     var uri = android.net.Uri.parse(url);
     var intent = new android.content.Intent(android.content.Intent.ACTION_VIEW, uri);
     ctx.startActivity(intent);
+};
+
+ModPE.playerHasSplitControls = function() {
+    var file = new java.io.File("/sdcard/games/com.mojang/minecraftpe/options.txt");
+    var br = new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file)));
+    var read, splitcontrols;
+    while((read = br.readLine()) != null) {
+        if(read.split(":")[0] == "ctrl_usetouchjoypad") {
+            splitcontrols = read.split(":")[1];
+            break;
+        }
+    }
+    br.close();
+    return splitcontrols;
 };
 
 var signX;
@@ -8360,6 +8672,17 @@ function useItem(x, y, z, itemId, blockId) {
 		if(spectator == "on") {
 			preventDefault();
 		}
+	}
+}
+
+var powerExplosionsStage = 0;
+
+function explodeHook(entity, x, y, z, power, onFire) {
+	if(StatePowerExplosions == true && powerExplosionsStage == 0) {
+		powerExplosionsStage = 1;
+		preventDefault();
+		Level.explode(x, y, z, 10);
+		powerExplosionsStage = 0;
 	}
 }
 
@@ -8797,7 +9120,7 @@ function openMenu(menu) {
                             line0 = inputBar.getText();
                             line1 = inputBar1.getText();
                             line2 = inputBar2.getText();
-                            line3 = inpurBar3.getText();
+                            line3 = inputBar3.getText();
                             Level.setSignText(signX, signY, signZ, 0, line0);
                             Level.setSignText(signX, signY, signZ, 1, line1);
                             Level.setSignText(signX, signY, signZ, 2, line2);
@@ -8956,6 +9279,66 @@ function openMenu(menu) {
                             Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
                             Level.setRainLevel(0);
 							Level.setLightningLevel(0);
+                            dialog.dismiss();
+                        }
+                    });
+                    btn3.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            dialog.dismiss();
+                        }
+                    });
+                } catch(e) {
+                    print("Error: " + e)
+                }
+            }
+        });
+		
+	} else if(menu == "home") {
+        ctx.runOnUiThread(new java.lang.Runnable() {
+            run: function() {
+                try {
+                    dialogGUI = new android.widget.PopupWindow();
+                    var btn = minecraftButton("Teleport to Home");
+                    var btn1 = minecraftButton("Set Home");
+                    var btn2 = minecraftButton("Clear Home");
+                    var btn3 = minecraftButton("Cancel");
+                    var newLineTextView = minecraftText("\n");
+                    var dialogLayout = new android.widget.LinearLayout(ctx);
+                    var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
+                    dialogLayout.setBackgroundDrawable(getStretchedImage(spritesheet, 4 * GuiSize, 4 * GuiSize, 8 * GuiSize, 8 * GuiSize, getContext().getScreenWidth() / 2, getContext().getScreenHeight()));
+                    dialogLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+                    dialogLayout.addView(btn);
+                    dialogLayout.addView(btn1);
+                    dialogLayout.addView(btn2);
+                    dialogLayout.addView(newLineTextView);
+                    dialogLayout.addView(btn3);
+                    var dialog = new android.app.Dialog(ctx);
+                    dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(dialogLayout);
+                    dialog.setTitle("Home");
+                    dialogGUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                    dialogGUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.TOP, 0, 0);
+                    dialog.show();
+                    btn.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            MoreOptionsPE.tpHome();
+                            dialog.dismiss();
+                        }
+                    });
+                    btn1.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            MoreOptionsPE.setHome();
+                            dialog.dismiss();
+                        }
+                    });
+					btn2.setOnClickListener(new android.view.View.OnClickListener() {
+                        onClick: function(view) {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            MoreOptionsPE.clearHome();
                             dialog.dismiss();
                         }
                     });
@@ -10074,20 +10457,22 @@ function chatHook(text) {
         preventDefault();
         if(commandText[1] == null || commandText[1] == "1") {
             clientMessage(ChatColor.GREEN + "--- Showing AgameR MoreOptions PE commands help page 1 of 2 (.help <page>) ---");
-            clientMessage(" > .help <page> - Shows a list of availabe commands");
-            clientMessage(" > .menu - Opens the AgameR MoreOptions PE menu");
-            clientMessage(" > .panic - Disables all hacks");
-            clientMessage(" > .getpos - Returns your position (x, y, z)");
-            clientMessage(" > .tp <x> <y> <z> - Teleports your player to the given position (x, y, z)");
-            clientMessage(" > .sethome - Sets your home at the current player location");
-            clientMessage(" > .home - Teleports your player to your current set home location");
+            clientMessage(ChatColor.GRAY + " > .help <page> - Shows a list of availabe commands");
+            clientMessage(ChatColor.GRAY + " > .menu - Opens the AgameR MoreOptions PE menu");
+            clientMessage(ChatColor.GRAY + " > .panic - Disables all hacks");
+            clientMessage(ChatColor.GRAY + " > .getpos - Returns your position (x, y, z)");
+            clientMessage(ChatColor.GRAY + " > .tp <x> <y> <z> - Teleports your player to the given position (x, y, z)");
+            clientMessage(ChatColor.GRAY + " > .sethome - Sets your home at the current player location");
+            clientMessage(ChatColor.GRAY + " > .home - Teleports your player to your current set home location");
         } else if(commandText[1] == "2") {
-            clientMessage(ChatColor.GREEN + "Showing AgameR MoreOptions PE commands help page 2 of 2");
-			clientMessage(" > .leave - Leaves the world");
-            clientMessage(" > .version - Tells the current AgameR MoreOptions PE version");
-            clientMessage(" > .about - Opens the AgameR MoreOptions PE about screen");
-            clientMessage(" > .settings - Opens the AgameR MoreOptions PE settings screen");
-            clientMessage(" > .update - Checks for updates");
+            clientMessage(ChatColor.GREEN + "--- Showing AgameR MoreOptions PE commands help page 2 of 2 (.help <page>) ---");
+			clientMessage(ChatColor.GRAY + " > .clearhome - Clears your current home location");
+			clientMessage(ChatColor.GRAY + " > .leave - Leaves the world");
+            clientMessage(ChatColor.GRAY + " > .version - Tells the current AgameR MoreOptions PE version");
+            clientMessage(ChatColor.GRAY + " > .about - Opens the AgameR MoreOptions PE about screen");
+            clientMessage(ChatColor.GRAY + " > .settings - Opens the AgameR MoreOptions PE settings screen");
+            clientMessage(ChatColor.GRAY + " > .update - Checks for updates");
+            clientMessage(ChatColor.GRAY + " > .twitter - Go to peacestorm on Twitter");
         } else {
             clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.RED + "Usage: .help <page>");
         }
@@ -10118,22 +10503,15 @@ function chatHook(text) {
     }
     if(commandText[0] == ".sethome") {
         preventDefault();
-        HomeX = Entity.getX(getPlayerEnt());
-        HomeY = Entity.getY(getPlayerEnt());
-        HomeZ = Entity.getZ(getPlayerEnt());
-        MoreOptionsPE.savePerWorldSettings();
-        MoreOptionsPE.loadPerWorldSettings();
-        clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "Home successfully set!");
+        MoreOptionsPE.setHome();
     }
     if(commandText[0] == ".home") {
         preventDefault();
-        MoreOptionsPE.loadPerWorldSettings();
-        if(HomeX == null || HomeY == null || HomeZ == null) {
-            clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "You need to set your home using .sethome first!");
-        } else {
-            Entity.setPosition(getPlayerEnt(), HomeX, HomeY, HomeZ);
-            clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "Succesfully teleported player to the current home location!");
-        }
+        MoreOptionsPE.tpHome();
+    }
+	if(commandText[0] == ".clearhome") {
+        preventDefault();
+        MoreOptionsPE.clearHome();
     }
     if(commandText[0] == ".leave") {
         preventDefault();
@@ -10177,6 +10555,10 @@ function chatHook(text) {
         preventDefault();
         ModPE.goToURL("http://peacestorm.github.io/easter-egg/");
     }
+	if(commandText[0] == ".twitter") {
+        preventDefault();
+        ModPE.goToURL("https://twitter.com/AgameR_Modder/");
+    }
 }
 
 //*Copyright & Permissions*
@@ -10201,7 +10583,7 @@ function chatHook(text) {
 
 //*Mod info*
 //------------
-//Mod version: 1.2.0
+//Mod version: 1.2.1
 //For full changelog, look at the mod's menu ingame
 
 
