@@ -104,7 +104,19 @@ var Texts = {
 	derp: "Derp",
 	twerk: "Twerk",
 	cheats: "Cheats",
+	add_item_to_inventory: "Add item to inventory",
+	gamemode: "Gamemode",
+	time: "Time",
+	health: "Health",
+	effects: "Effects",
+	teleport: "Teleport",
+	clear_inventory: "Clear Inventory",
+	add_experience: "Add experience",
+	weather: "Weather",
+	home: "Home",
 	misc: "Miscellaneous",
+	player_customizer: "Player Customizer",
+	webbrowser: "Webbrowser",
 	console: "Console",
 	online_players_list: "Online Players List"
 }
@@ -146,14 +158,27 @@ MoreOptionsPE.loadTextsInCurrentLanguage = function() {
 			Texts.autospammer = "AutoSpammen";
 			Texts.autoleave = "AutoVerlassen";
 			Texts.instafood = "Sofortessen";
-			Texts.powerexplosions = "PowerExplosions";
-			Texts.automine = "AutoMine";
-			Texts.tapremover = "TapRemover";
+			Texts.powerexplosions = "PowerExplosion";
+			Texts.automine = "AutoAbbauen";
+			Texts.tapremover = "Klick-Entferner";
 			Texts.fun = "Spaß";
 			Texts.derp = "Derp";
 			Texts.twerk = "Twerk";
+			Texts.trails = "Trails";
 			Texts.cheats = "Cheats";
+			Texts.add_item_to_inventory = "Gegenstand ins inventar hinzufügen";
+			Texts.gamemode = "Spielmodus";
+			Texts.time = "Zeit";
+			Texts.health = "Leben";
+			Texts.effects = "Effekte";
+			Texts.teleport = "Teleport";
+			Texts.clear_inventory = "Inventar Leeren";
+			Texts.add_experience = "Level hinzufügen";
+			Texts.weather = "Wetter";
+			Texts.home = "Haus";
 			Texts.misc = "Sonstiges";
+			Texts.player_customizer = "Spieler Bearbeiter";
+			Texts.webbrowser = "Internet Browser";
 			Texts.console = "Konsole";
 			Texts.online_players_list = "Online Spieler Liste";
 			ModPE.log("Übersetzung erfolgreich geladen. (de_DE)");
@@ -211,7 +236,7 @@ MoreOptionsPE.showMainButton = function() {
 
 				consoleBtn.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-						Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+						Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
 						if(MoreOptionsPE.getMyScriptName() == null) {
 							MoreOptionsPE.showMessage("warning", "Rename the mod to AgameR MoreOptions PE v" + CURRENT_VERSION + ".js!");
 						}else {
@@ -255,7 +280,7 @@ MoreOptionsPE.showMainButton = function() {
 
                 menuBtn.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-						Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+						Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
 						if(MoreOptionsPE.getMyScriptName() == null) {
 							MoreOptionsPE.showMessage("warning", "Rename the mod to AgameR MoreOptions PE v" + CURRENT_VERSION + ".js!");
 						}else {
@@ -271,7 +296,7 @@ MoreOptionsPE.showMainButton = function() {
                     onLongClick: function(v, t) {
                         down = true;
                         ctx.getSystemService(android.content.Context.VIBRATOR_SERVICE).vibrate(37);
-                        print("Now you can move the button!");
+                        android.widget.Toast.makeText(currentActivity, new android.text.Html.fromHtml("<b>AgameR MoreOptions PE</b> Now you can move the button!"), 0).show();
                         return true;
                     }
                 });
@@ -350,7 +375,7 @@ MoreOptionsPE.setHome = function() {
 
 MoreOptionsPE.tpHome = function() {
 	MoreOptionsPE.loadPerWorldSettings();
-	if(HomeX == null || HomeY == null || HomeZ == null) {
+	if(HomeX == null || HomeY == null || HomeZ == null || HomeX == " " || HomeY == " " || HomeZ == " ") {
 		clientMessage(ChatColor.BLUE + "[AgameR MoreOptions PE] " + ChatColor.WHITE + "You need to set your home using .sethome or the Set Home button first!");
 	} else {
 		Entity.setPosition(getPlayerEnt(), HomeX, HomeY, HomeZ);
@@ -496,7 +521,7 @@ MoreOptionsPE.showMessage = function(type, message) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -541,13 +566,13 @@ MoreOptionsPE.showMessage = function(type, message) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
 					btnUpdate.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
 							dialog.dismiss();
 							MoreOptionsPE.autoUpdater();
                         }
@@ -704,7 +729,7 @@ ModPE.setFoodItem(359,"shears",0,9999,"Shears [EATABLE]");*/
 
 // add these variables in your mod
 
-const CURRENT_VERSION = "1.2.2";
+const CURRENT_VERSION = "1.2.3";
 var latestVersion;
 var latestPocketEditionVersion;
 var minimalMCPEVersion = "0.12.0";
@@ -712,7 +737,7 @@ var targetMCPEVersion = "0.13.x";
 var mcpeVersion = ModPE.getMinecraftVersion();
 const MOD_AUTHOR = "peacestorm (@AgameR_Modder)";
 const MOD_CREDITS = "@MyNameIsTriXz (helped me the most), @Desno365, @RedstoneGunMade, @AntiModPE, @tylernomc, @TBPM_MODDER_";
-const MOD_CHANGELOG = "Added TapRemover hack, added missing Rabbit health indicator, small improvements";
+const MOD_CHANGELOG = "Fixed button sounds, Better Grass texture and particles aren't wrong anymore, fixed Player Customizer showing the same text 36 times when the selected inventory slot is empty, fixed the bug where the player could be teleported to bedrock after clearing the Home location and using the Teleport to Home function, improved Player Customizer UI, improved Settings UI, added more German translations";
 
 var currentActivity = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 var sdcard = android.os.Environment.getExternalStorageDirectory();
@@ -1620,7 +1645,7 @@ MoreOptionsPE.initializeOptiFine = function() {
             ["grass", 2],
             ["grass", 2],
             ["grass", 2]
-        ], 3, 32, 4);
+        ], 2, 32, 4);
         Block.setDestroyTime(2, 0.6);
     }
     if(betterGrass == "fast") {
@@ -1631,18 +1656,18 @@ MoreOptionsPE.initializeOptiFine = function() {
             ["grass", 2],
             ["grass", 2],
             ["grass", 2]
-        ], 3);
+        ], 2);
         Block.setDestroyTime(2, 0.6);
     }
     if(betterGrass == "off") {
         Block.defineBlock(2, "Grass Block", [
-            ["grass", 0], //bottom
+            ["dirt", 0], //bottom
             ["grass", 2], //top
             ["grass", 3],
             ["grass", 3],
             ["grass", 3],
             ["grass", 3]
-        ], 3);
+        ], 2);
         Block.setDestroyTime(2, 0.6);
     }
     if(betterGlass == "on") {
@@ -2492,7 +2517,7 @@ var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
             menuBtn.setTextSize(20);
             menuBtn.setOnClickListener(new android.view.View.OnClickListener({
                 onClick: function(viewarg) {
-                    Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                    Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
 					closeHacksList();
                     mainMenu();
                     exit();
@@ -2901,11 +2926,13 @@ function showMainMenuList() {
 					playButton.setOnClickListener(new android.view.View.OnClickListener({
 						onClick: function(viewarg) {
 							mainMenuTextList.dismiss();
+							MoreOptionsPE.loadTextsInCurrentLanguage();
 							MoreOptionsPE.showMainButton();
 					}}));
 					splashTwitterButton.setOnClickListener(new android.view.View.OnClickListener({
 						onClick: function(viewarg) {
 							mainMenuTextList.dismiss();
+							MoreOptionsPE.loadTextsInCurrentLanguage();
 							MoreOptionsPE.showMainButton();
 							ModPE.goToUrl("https://twitter.com/AgameR_Modder");
 					}}))
@@ -2983,34 +3010,34 @@ function settingsScreen() {
                 exitPositionButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative" && crossButtonPosition == "right") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             crossButtonPosition = "left";
                             MoreOptionsPE.saveMainSettings();
                             exitPositionButton.setText("Exit button position | LEFT");
                         } else if(theme == "Alternative" && crossButtonPosition == "left") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             crossButtonPosition = "right";
                             MoreOptionsPE.saveMainSettings();
                             exitPositionButton.setText("Exit button position | RIGHT");
                         } else if(theme == "MCPE" && crossButtonPosition == "right") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             crossButtonPosition = "left";
                             MoreOptionsPE.saveMainSettings();
                             exitPositionButton.setText("Exit button position | LEFT");
                             //exitPositionButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "MCPE" && crossButtonPosition == "left") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             crossButtonPosition = "right";
                             MoreOptionsPE.saveMainSettings();
                             exitPositionButton.setText("Exit button position | RIGHT");
                             //exitPositionButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue" && crossButtonPosition == "right") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             crossButtonPosition = "left";
                             MoreOptionsPE.saveMainSettings();
                             exitPositionButton.setText("Exit button position | LEFT");
                         } else if(theme == "Blue" && crossButtonPosition == "left") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             crossButtonPosition = "right";
                             MoreOptionsPE.saveMainSettings();
                             exitPositionButton.setText("Exit button position | RIGHT");
@@ -3031,18 +3058,18 @@ function settingsScreen() {
                 themeButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             theme = "MCPE";
                             MoreOptionsPE.saveMainSettings();
                             themeButton.setText("Theme | MCPE");
                             //themeButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "MCPE") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             theme = "Blue";
                             MoreOptionsPE.saveMainSettings();
                             themeButton.setText("Theme | Blue");
                         } else if(theme == "Blue") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             theme = "Alternative";
                             MoreOptionsPE.saveMainSettings();
                             themeButton.setText("Theme | Alternative");
@@ -3070,34 +3097,34 @@ function settingsScreen() {
                 fullScreenButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative" && fullScreen == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             fullScreen = "on";
                             MoreOptionsPE.saveMainSettings();
                             fullScreenButton.setText("Fullscreen | " + Texts.on);
                         } else if(theme == "Alternative" && fullScreen == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             fullScreen = "off";
                             MoreOptionsPE.saveMainSettings();
                             fullScreenButton.setText("Fullscreen | " + Texts.off);
                         } else if(theme == "MCPE" && fullScreen == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             fullScreen = "on";
                             MoreOptionsPE.saveMainSettings();
                             fullScreenButton.setText("Fullscreen | " + Texts.on);
                             //fullScreenButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "MCPE" && fullScreen == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             fullScreen = "off";
                             MoreOptionsPE.saveMainSettings();
                             fullScreenButton.setText("Fullscreen | " + Texts.off);
                             //fullScreenButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue" && fullScreen == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             fullScreen = "on";
                             MoreOptionsPE.saveMainSettings();
                             fullScreenButton.setText("Fullscreen | " + Texts.on);
                         } else if(theme == "Blue" && fullScreen == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             fullScreen = "off";
                             MoreOptionsPE.saveMainSettings();
                             fullScreenButton.setText("Fullscreen | " + Texts.off);
@@ -3125,34 +3152,34 @@ function settingsScreen() {
                 hacksListButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative" && showList == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             showList = "on";
                             MoreOptionsPE.saveMainSettings();
                             hacksListButton.setText("Show hack list | " + Texts.on);
                         } else if(theme == "Alternative" && showList == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             showList = "off";
                             MoreOptionsPE.saveMainSettings();
                             hacksListButton.setText("Show hack list | " + Texts.off);
                         } else if(theme == "MCPE" && showList == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             showList = "on";
                             MoreOptionsPE.saveMainSettings();
                             hacksListButton.setText("Show hack list | " + Texts.on);
                             //hacksListButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "MCPE" && showList == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             showList = "off";
                             MoreOptionsPE.saveMainSettings();
                             hacksListButton.setText("Show hack list | " + Texts.off);
                             //hacksListButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue" && showList == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             showList = "on";
                             MoreOptionsPE.saveMainSettings();
                             hacksListButton.setText("Show hack list | " + Texts.on);
                         } else if(theme == "Blue" && showList == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             showList = "off";
                             MoreOptionsPE.saveMainSettings();
                             hacksListButton.setText("Show hack list | " + Texts.off);
@@ -3180,34 +3207,34 @@ function settingsScreen() {
                 oldIconButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative" && useOldIcon == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             useOldIcon = "on";
                             MoreOptionsPE.saveMainSettings();
                             oldIconButton.setText("Use old icon | " + Texts.on);
                         } else if(theme == "Alternative" && useOldIcon == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             useOldIcon = "off";
                             MoreOptionsPE.saveMainSettings();
                             oldIconButton.setText("Use old icon | " + Texts.off);
                         } else if(theme == "MCPE" && useOldIcon == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             useOldIcon = "on";
                             MoreOptionsPE.saveMainSettings();
                             oldIconButton.setText("Use old icon | " + Texts.on);
                             //oldIconButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "MCPE" && useOldIcon == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             useOldIcon = "off";
                             MoreOptionsPE.saveMainSettings();
                             oldIconButton.setText("Use old icon | " + Texts.off);
                             //oldIconButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue" && useOldIcon == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             useOldIcon = "on";
                             MoreOptionsPE.saveMainSettings();
                             oldIconButton.setText("Use old icon | " + Texts.on);
                         } else if(theme == "Blue" && useOldIcon == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             useOldIcon = "off";
                             MoreOptionsPE.saveMainSettings();
                             oldIconButton.setText("Use old icon | " + Texts.off);
@@ -3235,34 +3262,34 @@ function settingsScreen() {
                 showMainButtonButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative" && showMainButton == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             showMainButton = "on";
                             MoreOptionsPE.saveMainSettings();
                             showMainButtonButton.setText("Show main button | " + Texts.on);
                         } else if(theme == "Alternative" && showMainButton == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             showMainButton = "off";
                             MoreOptionsPE.saveMainSettings();
                             showMainButtonButton.setText("Show main button | " + Texts.off);
                         } else if(theme == "MCPE" && showMainButton == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             showMainButton = "on";
                             MoreOptionsPE.saveMainSettings();
                             showMainButtonButton.setText("Show main button | " + Texts.on);
                             //showMainButtonButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "MCPE" && showMainButton == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             showMainButton = "off";
                             MoreOptionsPE.saveMainSettings();
                             showMainButtonButton.setText("Show main button | " + Texts.off);
                             //showMainButtonButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue" && showMainButton == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             showMainButton = "on";
                             MoreOptionsPE.saveMainSettings();
                             showMainButtonButton.setText("Show main button | " + Texts.on);
                         } else if(theme == "Blue" && showMainButton == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             showMainButton = "off";
                             MoreOptionsPE.saveMainSettings();
                             showMainButtonButton.setText("Show main button | " + Texts.off);
@@ -3292,14 +3319,14 @@ function settingsScreen() {
                 spamMessageButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
-                            openMenu(Texts.tapspammer+ "setting");
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            openMenu("tapspammersetting");
                         } else if(theme == "MCPE") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
-                            openMenu(Texts.tapspammer+ "setting");
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            openMenu("tapspammersetting");
                         } else if(theme == "Blue") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
-                            openMenu(Texts.tapspammer+ "setting");
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            openMenu("tapspammersetting");
                         }
                     }
                 }));
@@ -3317,13 +3344,13 @@ function settingsScreen() {
                 gameSpeedHackSettingButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             openMenu("gamespeedsetting");
                         } else if(theme == "MCPE") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             openMenu("gamespeedsetting");
                         } else if(theme == "Blue") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             openMenu("gamespeedsetting");
                         }
                     }
@@ -3365,55 +3392,55 @@ function settingsScreen() {
                 betterGrassButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative" && betterGrass == "normal") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGrass = "fast";
                             MoreOptionsPE.initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGrassButton.setText("Better Grass | FAST");
                         } else if(theme == "Alternative" && betterGrass == "fast") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGrass = "off";
                             MoreOptionsPE.initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGrassButton.setText("Better Grass | " + Texts.off);
                         } else if(theme == "Alternative" && betterGrass == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGrass = "normal";
                             MoreOptionsPE.initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGrassButton.setText("Better Grass | NORMAL");
                         } else if(theme == "MCPE" && betterGrass == "normal") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGrass = "fast";
                             MoreOptionsPE.initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGrassButton.setText("Better Grass | FAST");
                         } else if(theme == "MCPE" && betterGrass == "fast") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGrass = "off";
                             MoreOptionsPE.initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGrassButton.setText("Better Grass | " + Texts.off);
                         } else if(theme == "MCPE" && betterGrass == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGrass = "normal";
                             MoreOptionsPE.initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGrassButton.setText("Better Grass | NORMAL");
                         } else if(theme == "Blue" && betterGrass == "normal") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGrass = "fast";
                             MoreOptionsPE.initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGrassButton.setText("Better Grass | FAST");
                         } else if(theme == "Blue" && betterGrass == "fast") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGrass = "off";
                             MoreOptionsPE.initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGrassButton.setText("Better Grass | " + Texts.off);
                         } else if(theme == "Blue" && betterGrass == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGrass = "normal";
                             MoreOptionsPE.initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
@@ -3442,37 +3469,37 @@ function settingsScreen() {
                 betterGlassButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative" && betterGlass == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGlass = "off";
                             initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGlassButton.setText("Better Glass | " + Texts.off);
                         } else if(theme == "Alternative" && betterGlass == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGlass = "on";
                             initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGlassButton.setText("Better Glass | " + Texts.on);
                         } else if(theme == "MCPE" && betterGlass == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGlass = "off";
                             initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGlassButton.setText("Better Glass | " + Texts.off);
                         } else if(theme == "MCPE" && betterGlass == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGlass = "on";
                             initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGlassButton.setText("Better Glass | " + Texts.on);
                         } else if(theme == "Blue" && betterGlass == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGlass = "off";
                             initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
                             betterGlassButton.setText("Better Glass | " + Texts.off);
                         } else if(theme == "Blue" && betterGlass == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             betterGlass = "on";
                             initializeOptiFine();
                             MoreOptionsPE.saveMainSettings();
@@ -3510,34 +3537,34 @@ function settingsScreen() {
                 experimentalFeaturesButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative" && experimentalFeatures == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             experimentalFeatures = "on";
                             MoreOptionsPE.saveMainSettings();
                             experimentalFeaturesButton.setText("Experimental Features | " + Texts.on);
                         } else if(theme == "Alternative" && experimentalFeatures == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             experimentalFeatures = "off";
                             MoreOptionsPE.saveMainSettings();
                             experimentalFeaturesButton.setText("Experimental Features | " + Texts.off);
                         } else if(theme == "MCPE" && experimentalFeatures == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             experimentalFeatures = "on";
                             MoreOptionsPE.saveMainSettings();
                             experimentalFeaturesButton.setText("Experimental Features | " + Texts.on);
                             //experimentalFeaturesButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "MCPE" && experimentalFeatures == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             experimentalFeatures = "off";
                             MoreOptionsPE.saveMainSettings();
                             experimentalFeaturesButton.setText("Experimental Features | " + Texts.off);
                             //experimentalFeaturesButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue" && experimentalFeatures == "off") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             experimentalFeatures = "on";
                             MoreOptionsPE.saveMainSettings();
                             experimentalFeaturesButton.setText("Experimental Features | " + Texts.on);
                         } else if(theme == "Blue" && experimentalFeatures == "on") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             experimentalFeatures = "off";
                             MoreOptionsPE.saveMainSettings();
                             experimentalFeaturesButton.setText("Experimental Features | " + Texts.off);
@@ -3558,27 +3585,29 @@ function settingsScreen() {
                 defaultUrlButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
                         if(theme == "Alternative") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             openMenu("defaulturlsetting");
                             defaultUrlButton.setText("Change default Webbrowser URL..");
                         } else if(theme == "MCPE") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             openMenu("defaulturlsetting");
                             defaultUrlButton.setText("Change default Webbrowser URL...");
                             //defaultUrlButton.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             openMenu("defaulturlsetting");
                             defaultUrlButton.setText("Change default Webbrowser URL...");
                         }
                     }
                 }));
                 settingsMenuLayout.addView(defaultUrlButton);
+				
+				var headerHeight = displayHeight / (displayHeight / 104);
 
                 //More buttons...
-                settingsMenu = new android.widget.PopupWindow(settingsMenuLayout1, ctx.getWindowManager().getDefaultDisplay().getWidth(), ctx.getWindowManager().getDefaultDisplay().getHeight());
+                settingsMenu = new android.widget.PopupWindow(settingsMenuLayout1, ctx.getWindowManager().getDefaultDisplay().getWidth(), ctx.getWindowManager().getDefaultDisplay().getHeight() - headerHeight);
                 settingsMenu.setBackgroundDrawable(getStretchedImage(spritesheet, 4 * GuiSize, 4 * GuiSize, 8 * GuiSize, 8 * GuiSize, getContext().getScreenWidth() / 2, getContext().getScreenHeight()));
-                settingsMenu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.CENTER | android.view.Gravity.TOP, 0, 0);
+                settingsMenu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.CENTER | android.view.Gravity.BOTTOM, 0, 0);
             } catch(error) {
                 print('An error occured: ' + error);
             }
@@ -3638,7 +3667,7 @@ function aboutScreen() {
                     //btn.setText("Ok");*/
                 aboutOkBtn.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         aboutMenu.dismiss();
 						showHacksList();
 						MoreOptionsPE.showMainButton();
@@ -3700,7 +3729,7 @@ function onlinePlayersListScreen() {
                     //btn.setText("Ok");*/
                 /*aboutOkBtn.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         onlinePlayersListMenu.dismiss();
 						showHacksList();
 						MoreOptionsPE.showMainButton();
@@ -3757,7 +3786,7 @@ function consoleScreen() {
                     //btn.setText("Ok");*/
                 consoleSendBtn.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
 						inputText = consoleInput.getText().toString().split(" ");
 						    if(inputText[0] == ".help" || inputText[0] == ".?") {
 								if(inputText[1] == null || inputText[1] == "1") {
@@ -3820,6 +3849,7 @@ function consoleScreen() {
 							if(inputText[0] == ".settings") {
 								consoleMenu.dismiss();
 								settingsScreen();
+								header("Settings");
 								exitSettings();
 							}
 							if(inputText[0] == ".update") {
@@ -3885,7 +3915,7 @@ function exitConsole() {
                 }}));*/
                 xConsoleButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         exitConsoleUI.dismiss(); //Close
                         consoleMenu.dismiss(); //Close
 						showHacksList();
@@ -3910,11 +3940,9 @@ function playerCustomizerScreen() {
     ctx.runOnUiThread(new java.lang.Runnable({
         run: function() {
             try {
-				for(var i = 0; i < 37; i++) {
-                    if(Player.getCarriedItem(i) == 0) {
-						android.widget.Toast.makeText(currentActivity, new android.text.Html.fromHtml("<b>AgameR MoreOptions PE</b> Make sure that the selected inventory slot isn't empty!"), 0).show();
-					}
-                }
+                if(Player.getCarriedItem() == 0) {
+					android.widget.Toast.makeText(currentActivity, new android.text.Html.fromHtml("<b>AgameR MoreOptions PE</b> Make sure that the selected inventory slot isn't empty!"), 0).show();
+				}
                 var playerCustomizerMenuLayout = new android.widget.LinearLayout(ctx);
                 var playerCustomizerMenuLeftScroll = new android.widget.ScrollView(ctx);
                 var playerCustomizerMenuMiddleScroll = new android.widget.ScrollView(ctx);
@@ -3943,20 +3971,21 @@ function playerCustomizerScreen() {
                 var MCPEVersionText = new android.widget.TextView(ctx);
                 var newLine2Text = new android.widget.TextView(ctx);
                 var morphOkBtn = new android.widget.Button(ctx);*/
-				var playerCustomizerLeftEnter = minecraftText("\n\n\n");
-				var playerCustomizerRightEnter = minecraftText("\n\n\n");
                 var morphTitle = minecraftText("Morphing");
                 var morphEnter = minecraftText("\n");
                 var skinImage = new android.graphics.BitmapFactory.decodeFile(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/games/com.mojang/minecraftpe/custom.png");
 				var steveImage = new android.graphics.BitmapFactory.decodeStream(ModPE.openInputStreamFromTexturePack("images/mob/steve.png"));
 				var alexImage = new android.graphics.BitmapFactory.decodeStream(ModPE.openInputStreamFromTexturePack("images/mob/alex.png"));
                 var skinViewer = new android.widget.ImageView(ctx);
+                var skinViewerText = minecraftText("Sorry, your skin can't be viewed");
 				if(ModPE.getCurrentUsedSkin() == "Standard_Alex") {
 					skinViewer.setImageBitmap(alexImage);
 				}if(ModPE.getCurrentUsedSkin() == "Standard_Steve") {
 					skinViewer.setImageBitmap(steveImage);
 				}if(ModPE.getCurrentUsedSkin() == "Standard_Custom") {
 					skinViewer.setImageBitmap(skinImage);
+				}else{
+					playerCustomizerMenuLeftLayout.addView(skinViewerText);
 				}
                 var layoutParams = new android.widget.LinearLayout.LayoutParams(750, 750);
                 skinViewer.setLayoutParams(layoutParams);
@@ -3989,9 +4018,7 @@ function playerCustomizerScreen() {
                 btnCircular.setBackgroundDrawable(circularDrawable);
                 //circularDrawable.setStroke(cET.dpToPx(2), android.graphics.Color.parseColor("#EEEEEE"));
                 //circularDrawable.setSize(cET.dpToPx(240), cET.dpToPx(240));*/
-				playerCustomizerMenuLeftLayout.addView(playerCustomizerLeftEnter);
                 playerCustomizerMenuLeftLayout.addView(skinViewer);
-				playerCustomizerMenuRightLayout.addView(playerCustomizerRightEnter);
                 playerCustomizerMenuRightLayout.addView(morphTitle);
                 playerCustomizerMenuRightLayout.addView(morphEnter);
                 playerCustomizerMenuRightLayout.addView(btn);
@@ -4025,7 +4052,7 @@ function playerCustomizerScreen() {
                     //morphOkBtn.setText("Ok");*/
                 btn.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.tnt);
                         playerCustomizerMenu.dismiss();
                         exitPlayerCustomizerUI.dismiss();
@@ -4036,7 +4063,7 @@ function playerCustomizerScreen() {
                 });
                 btn1.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.chicken);
                         Entity.setMobSkin(Player.getEntity(), "mob/chicken.png");
                         playerCustomizerMenu.dismiss();
@@ -4048,7 +4075,7 @@ function playerCustomizerScreen() {
                 });
                 btn2.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.cow);
                         Entity.setMobSkin(Player.getEntity(), "mob/cow.png");
                         playerCustomizerMenu.dismiss();
@@ -4060,7 +4087,7 @@ function playerCustomizerScreen() {
                 });
                 btn3.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), 7);
                         Entity.setMobSkin(Player.getEntity(), "mob/mooshroom.png");
                         playerCustomizerMenu.dismiss();
@@ -4072,7 +4099,7 @@ function playerCustomizerScreen() {
                 });
                 btn4.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.pig);
                         Entity.setMobSkin(Player.getEntity(), "mob/pig.png");
                         playerCustomizerMenu.dismiss();
@@ -4084,7 +4111,7 @@ function playerCustomizerScreen() {
                 });
                 btn5.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.sheep);
                         Entity.setMobSkin(Player.getEntity(), "mob/sheep_0.png");
                         playerCustomizerMenu.dismiss();
@@ -4096,7 +4123,7 @@ function playerCustomizerScreen() {
                 });
                 btn6.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.human);
                         Entity.setMobSkin(Player.getEntity(), "mob/steve.png");
                         playerCustomizerMenu.dismiss();
@@ -4108,7 +4135,7 @@ function playerCustomizerScreen() {
                 });
                 btn7.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.skeleton);
                         Entity.setMobSkin(Player.getEntity(), "mob/skeleton.png");
                         playerCustomizerMenu.dismiss();
@@ -4120,7 +4147,7 @@ function playerCustomizerScreen() {
                 });
                 btn8.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.spider);
                         Entity.setMobSkin(Player.getEntity(), "mob/spider.tga");
                         playerCustomizerMenu.dismiss();
@@ -4132,7 +4159,7 @@ function playerCustomizerScreen() {
                 });
                 btn9.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.silverfish);
                         Entity.setMobSkin(Player.getEntity(), "mob/silverfish.png");
                         playerCustomizerMenu.dismiss();
@@ -4144,7 +4171,7 @@ function playerCustomizerScreen() {
                 });
                 btn10.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.creeper);
                         Entity.setMobSkin(Player.getEntity(), "mob/creeper.png");
                         playerCustomizerMenu.dismiss();
@@ -4156,7 +4183,7 @@ function playerCustomizerScreen() {
                 });
                 btn11.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.enderman);
                         Entity.setMobSkin(Player.getEntity(), "mob/enderman.tga");
                         playerCustomizerMenu.dismiss();
@@ -4168,7 +4195,7 @@ function playerCustomizerScreen() {
                 });
                 btn12.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.minecart);
                         Entity.setMobSkin(Player.getEntity(), "entity/minecart.png");
                         playerCustomizerMenu.dismiss();
@@ -4180,7 +4207,7 @@ function playerCustomizerScreen() {
                 });
                 btn13.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.villager);
                         Entity.setMobSkin(Player.getEntity(), "mob/villager/butcher.png");
                         playerCustomizerMenu.dismiss();
@@ -4192,7 +4219,7 @@ function playerCustomizerScreen() {
                 });
                 btn14.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.bat);
                         Entity.setMobSkin(Player.getEntity(), "mob/bat.png");
                         playerCustomizerMenu.dismiss();
@@ -4204,7 +4231,7 @@ function playerCustomizerScreen() {
                 });
                 btn15.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.ironGolem);
                         Entity.setMobSkin(Player.getEntity(), "mob/iron_golem.png");
                         playerCustomizerMenu.dismiss();
@@ -4216,7 +4243,7 @@ function playerCustomizerScreen() {
                 });
                 btn16.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.zombie);
                         Entity.setMobSkin(Player.getEntity(), "mob/zombie.png");
                         playerCustomizerMenu.dismiss();
@@ -4228,7 +4255,7 @@ function playerCustomizerScreen() {
                 });
                 btn17.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.arrow);
                         Entity.setMobSkin(Player.getEntity(), "item/arrows.png");
                         playerCustomizerMenu.dismiss();
@@ -4240,7 +4267,7 @@ function playerCustomizerScreen() {
                 });
                 btn18.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.boat);
                         Entity.setMobSkin(Player.getEntity(), "entity/boat/boat_oak.png");
                         playerCustomizerMenu.dismiss();
@@ -4252,7 +4279,7 @@ function playerCustomizerScreen() {
                 });
                 btn19.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.ghast);
                         Entity.setMobSkin(Player.getEntity(), "mob/ghast.png");
                         playerCustomizerMenu.dismiss();
@@ -4264,7 +4291,7 @@ function playerCustomizerScreen() {
                 });
 				btn20.setOnClickListener(new android.view.View.OnClickListener() {
                     onClick: function(view) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         Entity.setRenderType(Player.getEntity(), EntityRenderType.squid);
                         Entity.setMobSkin(Player.getEntity(), "mob/squid.png");
                         playerCustomizerMenu.dismiss();
@@ -4280,10 +4307,12 @@ function playerCustomizerScreen() {
 				dirt.setColorFilter(android.graphics.Color.rgb(70, 70, 70), android.graphics.PorterDuff.Mode.MULTIPLY);
 				dirt.setTileModeXY(android.graphics.Shader.TileMode.REPEAT, android.graphics.Shader.TileMode.REPEAT);
 
+				var headerHeight = displayHeight / (displayHeight / 104);
+				
                 //More buttons...
-                playerCustomizerMenu = new android.widget.PopupWindow(playerCustomizerMenuLayout, ctx.getWindowManager().getDefaultDisplay().getWidth(), ctx.getWindowManager().getDefaultDisplay().getHeight());
+                playerCustomizerMenu = new android.widget.PopupWindow(playerCustomizerMenuLayout, ctx.getWindowManager().getDefaultDisplay().getWidth(), ctx.getWindowManager().getDefaultDisplay().getHeight() - headerHeight);
                 playerCustomizerMenu.setBackgroundDrawable(dirt);
-                playerCustomizerMenu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.CENTER | android.view.Gravity.TOP, 0, 0);
+                playerCustomizerMenu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.CENTER | android.view.Gravity.BOTTOM, 0, 0);
             } catch(error) {
                 print('An error occured: ' + error);
             }
@@ -4353,7 +4382,7 @@ function mainMenu() {
                 logoViewer.setImageBitmap(android.graphics.BitmapFactory.decodeByteArray(logo, 0, logo.length));
                 logoViewer.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         exitUI.dismiss(); //Close
                         menu.dismiss();
                         aboutScreen();
@@ -4425,7 +4454,7 @@ function mainMenu() {
                 }
                 panicButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         disableHacks();
                         menu.dismiss();
                         exitUI.dismiss();
@@ -4547,7 +4576,7 @@ function mainMenu() {
 
                 button.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State == false && theme == "Alternative") {
 							if(Level.getGameMode() == 1 && spectator == "on") {
 								State = true;
@@ -4682,7 +4711,7 @@ function mainMenu() {
 
                 button1.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State1 == false && theme == "Alternative") {
                             State1 = true;
                             
@@ -4822,7 +4851,7 @@ function mainMenu() {
 
                 button2.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State2 == false && theme == "Alternative") {
                             if(Level.getGameMode() == 1) {
                                 State2 = true;
@@ -4957,7 +4986,7 @@ function mainMenu() {
 
                 button3.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State3 == false && theme == "Alternative") {
                             State3 = true;
                             
@@ -5038,7 +5067,7 @@ function mainMenu() {
 
                 button4.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State4 == false && theme == "Alternative") {
                             State4 = true;
                             
@@ -5118,7 +5147,7 @@ function mainMenu() {
 
                 button5.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State5 == false && theme == "Alternative") {
                             State5 = true;
                             
@@ -5199,7 +5228,7 @@ function mainMenu() {
 
                 button6.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State6 == false && theme == "Alternative") {
                             State6 = true;
                             
@@ -5286,7 +5315,7 @@ function mainMenu() {
 
                 button7.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State7 == false && theme == "Alternative") {
                             State7 = true;
                             
@@ -5367,7 +5396,7 @@ function mainMenu() {
 
                 button8.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State8 == false && theme == "Alternative") {
                             State8 = true;
                             
@@ -5446,7 +5475,7 @@ function mainMenu() {
 
                 button9.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State9 == false && theme == "Alternative") {
                             State9 = true;
                             
@@ -5525,7 +5554,7 @@ function mainMenu() {
 
                 button10.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State10 == false && theme == "Alternative") {
                             State10 = true;
                             
@@ -5610,7 +5639,7 @@ function mainMenu() {
 
                 button11.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State11 == false && theme == "Alternative") {
                             State11 = true;
                             
@@ -5695,7 +5724,7 @@ function mainMenu() {
 
                 button12.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State12 == false && theme == "Alternative") {
                             State12 = true;
                             
@@ -5774,7 +5803,7 @@ function mainMenu() {
 
                 button13.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State13 == false && theme == "Alternative") {
                             State13 = true;
                             
@@ -5853,7 +5882,7 @@ function mainMenu() {
 
                 button14.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State14 == false && theme == "Alternative") {
                             State14 = true;
                             
@@ -5928,7 +5957,7 @@ function mainMenu() {
 
                 button15.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State15 == false && theme == "Alternative") {
                             State15 = true;
                             
@@ -6001,7 +6030,7 @@ function mainMenu() {
 
                 button16.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State16 == false && theme == "Alternative") {
                             State16 = true;
                             
@@ -6074,7 +6103,7 @@ function mainMenu() {
 
                 button17.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State17 == false && theme == "Alternative") {
                             State17 = true;
                             
@@ -6153,7 +6182,7 @@ function mainMenu() {
 
                 button18.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State18 == false && theme == "Alternative") {
                             State18 = true;
                             
@@ -6232,7 +6261,7 @@ function mainMenu() {
 
                 button19.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State19 == false && theme == "Alternative") {
                             State19 = true;
                             
@@ -6311,7 +6340,7 @@ function mainMenu() {
 
                 button20.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State20 == false && theme == "Alternative") {
                             State20 = true;
                             
@@ -6384,7 +6413,7 @@ function mainMenu() {
 
                 button21.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State21 == false && theme == "Alternative") {
                             State21 = true;
                             
@@ -6456,7 +6485,7 @@ function mainMenu() {
 
                 button22.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State22 == false && theme == "Alternative") {
                             State22 = true;
                             
@@ -6528,7 +6557,7 @@ function mainMenu() {
 
                 button23.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State23 == false && theme == "Alternative") {
                             State23 = true;
                             
@@ -6600,7 +6629,7 @@ function mainMenu() {
 
                 button24.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State24 == false && theme == "Alternative") {
                             State24 = true;
                             
@@ -6672,7 +6701,7 @@ function mainMenu() {
 
                 button25.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State25 == false && theme == "Alternative") {
                             State25 = true;
                             
@@ -6744,7 +6773,7 @@ function mainMenu() {
 
                 button26.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State26 == false && theme == "Alternative") {
                             State26 = true;
                             
@@ -6816,7 +6845,7 @@ function mainMenu() {
 
                 button27.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State27 == false && theme == "Alternative") {
                             State27 = true;
                             
@@ -6888,7 +6917,7 @@ function mainMenu() {
 
                 button28.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(State28 == false && theme == "Alternative") {
                             State28 = true;
                             
@@ -6960,7 +6989,7 @@ function mainMenu() {
 
                 button29.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(StatePowerExplosions == false && theme == "Alternative") {
                             StatePowerExplosions = true;
                             
@@ -7032,7 +7061,7 @@ function mainMenu() {
 
                 button30.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(StateAutoMine == false && theme == "Alternative") {
                             StateAutoMine = true;
                             
@@ -7104,7 +7133,7 @@ function mainMenu() {
 
                 button31.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(StateTapRemover == false && theme == "Alternative") {
                             StateTapRemover = true;
                             
@@ -7195,7 +7224,7 @@ function mainMenu() {
 
                 twerkButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(StateTwerk == false && theme == "Alternative") {
                             StateTwerk = true;
                             twerkCounter = 1;
@@ -7288,7 +7317,7 @@ function mainMenu() {
 
                 derpButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(StateDerp == false && theme == "Alternative") {
                             StateDerp = true;
                             
@@ -7360,7 +7389,7 @@ function mainMenu() {
 
                 trailsButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(StateTrails == false && theme == "Alternative") {
                             StateTrails = true;
                             
@@ -7423,30 +7452,30 @@ function mainMenu() {
                 var cheatsButton1 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     cheatsButton1 = new android.widget.Button(ctx);
-                    cheatsButton1.setText("Add item to inventory");
+                    cheatsButton1.setText(Texts.add_item_to_inventory);
                     cheatsButton1.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    cheatsButton1 = minecraftButton("Add item to inventory");
+                    cheatsButton1 = minecraftButton(Texts.add_item_to_inventory);
                     //cheatsButton1.setTypeface(mcpeFont);
                     //cheatsButton1.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     cheatsButton1 = new android.widget.Button(ctx);
-                    cheatsButton1.setText("Add item to inventory");
+                    cheatsButton1.setText(Texts.add_item_to_inventory);
                     cheatsButton1.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     cheatsButton1.setTypeface(mcpeFont);
                 }
                 cheatsButton1.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            cheatsButton1.setText("Add item to inventory");
+                            cheatsButton1.setText(Texts.add_item_to_inventory);
                             cheatsButton1.setBackgroundColor(android.graphics.Color.GRAY);
                         } else if(theme == "MCPE") {
-                            cheatsButton1.setText("Add item to inventory");
+                            cheatsButton1.setText(Texts.add_item_to_inventory);
                             //cheatsButton1.setTypeface(mcpeFont);
                             //cheatsButton1.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue") {
-                            cheatsButton1.setText("Add item to inventory");
+                            cheatsButton1.setText(Texts.add_item_to_inventory);
                             cheatsButton1.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             cheatsButton1.setTypeface(mcpeFont);
                         }
@@ -7458,31 +7487,31 @@ function mainMenu() {
                 var cheatsButton2 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     cheatsButton2 = new android.widget.Button(ctx);
-                    cheatsButton2.setText("Gamemode");
+                    cheatsButton2.setText(Texts.gamemode);
                     cheatsButton2.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    cheatsButton2 = minecraftButton("Gamemode");
+                    cheatsButton2 = minecraftButton(Texts.gamemode);
                     //cheatsButton2.setTypeface(mcpeFont);
                     //cheatsButton2.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     cheatsButton2 = new android.widget.Button(ctx);
-                    cheatsButton2.setText("Gamemode");
+                    cheatsButton2.setText(Texts.gamemode);
                     cheatsButton2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     cheatsButton2.setTypeface(mcpeFont);
                 }
 
                 cheatsButton2.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            cheatsButton2.setText("Gamemode");
+                            cheatsButton2.setText(Texts.gamemode);
                             cheatsButton2.setBackgroundColor(android.graphics.Color.GRAY);
                         } else if(theme == "MCPE") {
-                            cheatsButton2.setText("Gamemode");
+                            cheatsButton2.setText(Texts.gamemode);
                             //cheatsButton2.setTypeface(mcpeFont);
                             //cheatsButton2.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue") {
-                            cheatsButton2.setText("Gamemode");
+                            cheatsButton2.setText(Texts.gamemode);
                             cheatsButton2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             cheatsButton2.setTypeface(mcpeFont);
                         }
@@ -7494,31 +7523,31 @@ function mainMenu() {
                 var cheatsButton3 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     cheatsButton3 = new android.widget.Button(ctx);
-                    cheatsButton3.setText("Time");
+                    cheatsButton3.setText(Texts.time);
                     cheatsButton3.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    cheatsButton3 = minecraftButton("Time");
+                    cheatsButton3 = minecraftButton(Texts.time);
                     //cheatsButton3.setTypeface(mcpeFont);
                     //cheatsButton3.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     cheatsButton3 = new android.widget.Button(ctx);
-                    cheatsButton3.setText("Time");
+                    cheatsButton3.setText(Texts.time);
                     cheatsButton3.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     cheatsButton3.setTypeface(mcpeFont);
                 }
 
                 cheatsButton3.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            cheatsButton3.setText("Time");
+                            cheatsButton3.setText(Texts.time);
                             cheatsButton3.setBackgroundColor(android.graphics.Color.GRAY);
                         } else if(theme == "MCPE") {
-                            cheatsButton3.setText("Time");
+                            cheatsButton3.setText(Texts.time);
                             //cheatsButton3.setTypeface(mcpeFont);
                             //cheatsButton3.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue") {
-                            cheatsButton3.setText("Time");
+                            cheatsButton3.setText(Texts.time);
                             cheatsButton3.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             cheatsButton3.setTypeface(mcpeFont);
                         }
@@ -7530,31 +7559,31 @@ function mainMenu() {
                 var cheatsButton4 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     cheatsButton4 = new android.widget.Button(ctx);
-                    cheatsButton4.setText("Health");
+                    cheatsButton4.setText(Texts.health);
                     cheatsButton4.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    cheatsButton4 = minecraftButton("Health");
+                    cheatsButton4 = minecraftButton(Texts.health);
                     //cheatsButton4.setTypeface(mcpeFont);
                     //cheatsButton4.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     cheatsButton4 = new android.widget.Button(ctx);
-                    cheatsButton4.setText("Health");
+                    cheatsButton4.setText(Texts.health);
                     cheatsButton4.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     cheatsButton4.setTypeface(mcpeFont);
                 }
 
                 cheatsButton4.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            cheatsButton4.setText("Health");
+                            cheatsButton4.setText(Texts.health);
                             cheatsButton4.setBackgroundColor(android.graphics.Color.GRAY);
                         } else if(theme == "MCPE") {
-                            cheatsButton4.setText("Health");
+                            cheatsButton4.setText(Texts.health);
                             //cheatsButton4.setTypeface(mcpeFont);
                             //cheatsButton4.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue") {
-                            cheatsButton4.setText("Health");
+                            cheatsButton4.setText(Texts.health);
                             cheatsButton4.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             cheatsButton4.setTypeface(mcpeFont);
                         }
@@ -7566,31 +7595,31 @@ function mainMenu() {
                 var cheatsButton5 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     cheatsButton5 = new android.widget.Button(ctx);
-                    cheatsButton5.setText("Effects");
+                    cheatsButton5.setText(Texts.effects);
                     cheatsButton5.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    cheatsButton5 = minecraftButton("Effects");
+                    cheatsButton5 = minecraftButton(Texts.effects);
                     //cheatsButton5.setTypeface(mcpeFont);
                     //cheatsButton5.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     cheatsButton5 = new android.widget.Button(ctx);
-                    cheatsButton5.setText("Effects");
+                    cheatsButton5.setText(Texts.effects);
                     cheatsButton5.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     cheatsButton5.setTypeface(mcpeFont);
                 }
 
                 cheatsButton5.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            cheatsButton5.setText("Effects");
+                            cheatsButton5.setText(Texts.effects);
                             cheatsButton5.setBackgroundColor(android.graphics.Color.GRAY);
                         } else if(theme == "MCPE") {
-                            cheatsButton5.setText("Effects");
+                            cheatsButton5.setText(Texts.effects);
                             //cheatsButton5.setTypeface(mcpeFont);
                             //cheatsButton5.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue") {
-                            cheatsButton5.setText("Effects");
+                            cheatsButton5.setText(Texts.effects);
                             cheatsButton5.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             cheatsButton5.setTypeface(mcpeFont);
                         }
@@ -7601,31 +7630,31 @@ function mainMenu() {
                 var cheatsButton6 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     cheatsButton6 = new android.widget.Button(ctx);
-                    cheatsButton6.setText("Teleport");
+                    cheatsButton6.setText(Texts.teleport);
                     cheatsButton6.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    cheatsButton6 = minecraftButton("Teleport");
+                    cheatsButton6 = minecraftButton(Texts.teleport);
                     //cheatsButton6.setTypeface(mcpeFont);
                     //cheatsButton6.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     cheatsButton6 = new android.widget.Button(ctx);
-                    cheatsButton6.setText("Teleport");
+                    cheatsButton6.setText(Texts.teleport);
                     cheatsButton6.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     cheatsButton6.setTypeface(mcpeFont);
                 }
 
                 cheatsButton6.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            cheatsButton6.setText("Teleport");
+                            cheatsButton6.setText(Texts.teleport);
                             cheatsButton6.setBackgroundColor(android.graphics.Color.GRAY);
                         } else if(theme == "MCPE") {
-                            cheatsButton6.setText("Teleport");
+                            cheatsButton6.setText(Texts.teleport);
                             //cheatsButton6.setTypeface(mcpeFont);
                             //cheatsButton6.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue") {
-                            cheatsButton6.setText("Teleport");
+                            cheatsButton6.setText(Texts.teleport);
                             cheatsButton6.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             cheatsButton6.setTypeface(mcpeFont);
                         }
@@ -7636,31 +7665,31 @@ function mainMenu() {
                 var cheatsButton7 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     cheatsButton7 = new android.widget.Button(ctx);
-                    cheatsButton7.setText("Clear Inventory");
+                    cheatsButton7.setText(Texts.clear_inventory);
                     cheatsButton7.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    cheatsButton7 = minecraftButton("Clear Inventory");
+                    cheatsButton7 = minecraftButton(Texts.clear_inventory);
                     //cheatsButton7.setTypeface(mcpeFont);
                     //cheatsButton7.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     cheatsButton7 = new android.widget.Button(ctx);
-                    cheatsButton7.setText("Clear Inventory");
+                    cheatsButton7.setText(Texts.clear_inventory);
                     cheatsButton7.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     cheatsButton7.setTypeface(mcpeFont);
                 }
 
                 cheatsButton7.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            cheatsButton7.setText("Clear Inventory");
+                            cheatsButton7.setText(Texts.clear_inventory);
                             cheatsButton7.setBackgroundColor(android.graphics.Color.GRAY);
                         } else if(theme == "MCPE") {
-                            cheatsButton7.setText("Clear Inventory");
+                            cheatsButton7.setText(Texts.clear_inventory);
                             //cheatsButton7.setTypeface(mcpeFont);
                             //cheatsButton7.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue") {
-                            cheatsButton7.setText("Clear Inventory");
+                            cheatsButton7.setText(Texts.clear_inventory);
                             cheatsButton7.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             cheatsButton7.setTypeface(mcpeFont);
                         }
@@ -7673,31 +7702,31 @@ function mainMenu() {
 				var cheatsButton8 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     cheatsButton8 = new android.widget.Button(ctx);
-                    cheatsButton8.setText("Add experience");
+                    cheatsButton8.setText(Texts.add_experience);
                     cheatsButton8.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    cheatsButton8 = minecraftButton("Add experience");
+                    cheatsButton8 = minecraftButton(Texts.add_experience);
                     //cheatsButton8.setTypeface(mcpeFont);
                     //cheatsButton8.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     cheatsButton8 = new android.widget.Button(ctx);
-                    cheatsButton8.setText("Add experience");
+                    cheatsButton8.setText(Texts.add_experience);
                     cheatsButton8.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     cheatsButton8.setTypeface(mcpeFont);
                 }
 
                 cheatsButton8.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            cheatsButton8.setText("Add experience");
+                            cheatsButton8.setText(Texts.add_experience);
                             cheatsButton8.setBackgroundColor(android.graphics.Color.GRAY);
                         } else if(theme == "MCPE") {
-                            cheatsButton8.setText("Add experience");
+                            cheatsButton8.setText(Texts.add_experience);
                             //cheatsButton8.setTypeface(mcpeFont);
                             //cheatsButton8.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue") {
-                            cheatsButton8.setText("Add experience");
+                            cheatsButton8.setText(Texts.add_experience);
                             cheatsButton8.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             cheatsButton8.setTypeface(mcpeFont);
                         }
@@ -7708,31 +7737,31 @@ function mainMenu() {
 				var cheatsButton9 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     cheatsButton9 = new android.widget.Button(ctx);
-                    cheatsButton9.setText("Weather");
+                    cheatsButton9.setText(Texts.weather);
                     cheatsButton9.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    cheatsButton9 = minecraftButton("Weather");
+                    cheatsButton9 = minecraftButton(Texts.weather);
                     //cheatsButton9.setTypeface(mcpeFont);
                     //cheatsButton9.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     cheatsButton9 = new android.widget.Button(ctx);
-                    cheatsButton9.setText("Weather");
+                    cheatsButton9.setText(Texts.weather);
                     cheatsButton9.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     cheatsButton9.setTypeface(mcpeFont);
                 }
 
                 cheatsButton9.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            cheatsButton9.setText("Weather");
+                            cheatsButton9.setText(Texts.weather);
                             cheatsButton9.setBackgroundColor(android.graphics.Color.GRAY);
                         } else if(theme == "MCPE") {
-                            cheatsButton9.setText("Weather");
+                            cheatsButton9.setText(Texts.weather);
                             //cheatsButton9.setTypeface(mcpeFont);
                             //cheatsButton9.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue") {
-                            cheatsButton9.setText("Weather");
+                            cheatsButton9.setText(Texts.weather);
                             cheatsButton9.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             cheatsButton9.setTypeface(mcpeFont);
                         }
@@ -7743,31 +7772,31 @@ function mainMenu() {
 				var cheatsButton10 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     cheatsButton10 = new android.widget.Button(ctx);
-                    cheatsButton10.setText("Home");
+                    cheatsButton10.setText(Texts.home);
                     cheatsButton10.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    cheatsButton10 = minecraftButton("Home");
+                    cheatsButton10 = minecraftButton(Texts.home);
                     //cheatsButton10.setTypeface(mcpeFont);
                     //cheatsButton10.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     cheatsButton10 = new android.widget.Button(ctx);
-                    cheatsButton10.setText("Home");
+                    cheatsButton10.setText(Texts.home);
                     cheatsButton10.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     cheatsButton10.setTypeface(mcpeFont);
                 }
 
                 cheatsButton10.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            cheatsButton10.setText("Home");
+                            cheatsButton10.setText(Texts.home);
                             cheatsButton10.setBackgroundColor(android.graphics.Color.GRAY);
                         } else if(theme == "MCPE") {
-                            cheatsButton10.setText("Home");
+                            cheatsButton10.setText(Texts.home);
                             //cheatsButton10.setTypeface(mcpeFont);
                             //cheatsButton10.setBackgroundDrawable(mcpeButtonOldImage);
                         } else if(theme == "Blue") {
-                            cheatsButton10.setText("Home");
+                            cheatsButton10.setText(Texts.home);
                             cheatsButton10.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                             cheatsButton10.setTypeface(mcpeFont);
                         }
@@ -7798,42 +7827,42 @@ function mainMenu() {
                 var miscButton1 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     miscButton1 = new android.widget.Button(ctx);
-                    miscButton1.setText("Player Customizer");
+                    miscButton1.setText(Texts.player_customizer);
                     miscButton1.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    miscButton1 = minecraftButton("Player Customizer");
+                    miscButton1 = minecraftButton(Texts.player_customizer);
                     //miscButton1.setTypeface(mcpeFont);
                     //miscButton1.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     miscButton1 = new android.widget.Button(ctx);
-                    miscButton1.setText("Player Customizer");
+                    miscButton1.setText(Texts.player_customizer);
                     miscButton1.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     miscButton1.setTypeface(mcpeFont);
                 }
 
                 miscButton1.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             exitUI.dismiss(); //Close
                             menu.dismiss();
                             playerCustomizerScreen();
-							header("Player Customizer");
+							header(Texts.player_customizer);
                             exitPlayerCustomizer();
                         } else if(theme == "MCPE") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             exitUI.dismiss(); //Close
                             menu.dismiss();
                             playerCustomizerScreen();
-							header("Player Customizer");
+							header(Texts.player_customizer);
                             exitPlayerCustomizer();
                         } else if(theme == "Blue") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             exitUI.dismiss(); //Close
                             menu.dismiss();
                             playerCustomizerScreen();
-							header("Player Customizer");
+							header(Texts.player_customizer);
                             exitPlayerCustomizer();
                         }
                     }
@@ -7842,36 +7871,36 @@ function mainMenu() {
 				var miscButton2 = new android.widget.Button(ctx);
                 if(theme == "Alternative") {
                     miscButton2 = new android.widget.Button(ctx);
-                    miscButton2.setText("Webbrowser");
+                    miscButton2.setText(Texts.webbrowser);
                     miscButton2.setBackgroundColor(android.graphics.Color.GRAY);
                 } else if(theme == "MCPE") {
-                    miscButton2 = minecraftButton("Webbrowser");
+                    miscButton2 = minecraftButton(Texts.webbrowser);
                     //miscButton2.setTypeface(mcpeFont);
                     //miscButton2.setBackgroundDrawable(mcpeButtonOldImage);
                 } else if(theme == "Blue") {
                     miscButton2 = new android.widget.Button(ctx);
-                    miscButton2.setText("Webbrowser");
+                    miscButton2.setText(Texts.webbrowser);
                     miscButton2.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                     miscButton2.setTypeface(mcpeFont);
                 }
 
                 miscButton2.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             exitUI.dismiss(); //Close
                             menu.dismiss();
                             openWebbrowser(defaultUrl);
 							webbrowserButtons();
                         } else if(theme == "MCPE") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             exitUI.dismiss(); //Close
                             menu.dismiss();
                             openWebbrowser(defaultUrl);
 							webbrowserButtons();
                         } else if(theme == "Blue") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             exitUI.dismiss(); //Close
                             menu.dismiss();
                             openWebbrowser(defaultUrl);
@@ -7898,21 +7927,21 @@ function mainMenu() {
 
                 miscButton3.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             exitUI.dismiss(); //Close
                             menu.dismiss();
                             consoleScreen();
 							exitConsole();
                         } else if(theme == "MCPE") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             exitUI.dismiss(); //Close
                             menu.dismiss();
                             consoleScreen();
 							exitConsole();
                         } else if(theme == "Blue") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             exitUI.dismiss(); //Close
                             menu.dismiss();
                             consoleScreen();
@@ -7939,19 +7968,19 @@ function mainMenu() {
 
                 miscButton4.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         if(theme == "Alternative") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             exitUI.dismiss(); //Close
                             menu.dismiss();
                             onlinePlayersListScreen();
                         } else if(theme == "MCPE") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             exitUI.dismiss(); //Close
                             menu.dismiss();
                             onlinePlayersListScreen();
                         } else if(theme == "Blue") {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             exitUI.dismiss(); //Close
                             menu.dismiss();
                             onlinePlayersListScreen();
@@ -8066,10 +8095,11 @@ function mainMenu() {
                 }
                 settingsButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         exitUI.dismiss(); //Close
                         menu.dismiss();
                         settingsScreen();
+						header("Settings");
                         exitSettings();
                     }
                 }));
@@ -8092,7 +8122,7 @@ function mainMenu() {
                 }
                 aboutButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         openMenu("about");
                     }
                 }));
@@ -8115,7 +8145,7 @@ function mainMenu() {
                 }
                 changelogButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         openMenu("changelog");
                     }
                 }));
@@ -8138,7 +8168,7 @@ function mainMenu() {
                 }
                 updateButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         // check for updates
                         new java.lang.Thread(new java.lang.Runnable() {
                             run: function() {
@@ -8229,7 +8259,7 @@ function exit() {
                 }}));*/
                 xButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         exitUI.dismiss(); //Close
                         menu.dismiss(); //Close
 						showHacksList();
@@ -8267,7 +8297,7 @@ function exitPlayerCustomizer() {
                 }}));*/
                 xPlayerCustomizerButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         exitPlayerCustomizerUI.dismiss(); //Close
 						headerGUI.dismiss(); //Close
                         playerCustomizerMenu.dismiss(); //Close
@@ -8308,8 +8338,9 @@ function exitSettings() {
                 }}));*/
                 xSettingsButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         exitSettingsUI.dismiss(); //Close
+						headerGUI.dismiss(); //Close
                         settingsMenu.dismiss(); //Close
 						showHacksList();
 						MoreOptionsPE.showMainButton();
@@ -8318,7 +8349,7 @@ function exitSettings() {
                 xSettingsLayout.addView(xSettingsButton);
                 exitSettingsUI = new android.widget.PopupWindow(xSettingsLayout, dip2px(40), dip2px(40));
                 exitSettingsUI.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-                exitSettingsUI.showAtLocation(ctxe.getWindow().getDecorView(), android.view.Gravity.RIGHT | android.view.Gravity.TOP, 0, 0);
+                exitSettingsUI.showAtLocation(ctxe.getWindow().getDecorView(), android.view.Gravity.RIGHT | android.view.Gravity.TOP, 10, 10);
             } catch(exception) {
                 print(exception);
             }
@@ -8354,7 +8385,7 @@ function webbrowserButtons() {
                 }}));*/
                 xWebbrowserButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                         exitWebbrowserUI.dismiss(); //Close
                         reloadWebbrowserUI.dismiss(); //Close
                         loadWebbrowserUI.dismiss(); //Close
@@ -8365,14 +8396,14 @@ function webbrowserButtons() {
                 }));
 				reloadWebbrowserButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
 						webViewer.reload();
                         //print(webViewer.getUrl());
                     }
                 }));
 				loadWebbrowserButton.setOnClickListener(new android.view.View.OnClickListener({
                     onClick: function(viewarg) {
-                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
 						openMenu("loadwebsite");
                         //print(webViewer.getUrl());
                     }
@@ -8872,7 +8903,7 @@ function openMenu(menu) {
                     var dialog = new android.app.Dialog(ctx);
                     dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
                     dialog.setContentView(dialogLayout);
-                    dialog.setTitle("Time");
+                    dialog.setTitle(Texts.time);
                     dialogGUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
                     dialogGUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
                     dialogGUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.TOP, 0, 0);
@@ -8932,7 +8963,7 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             var consoleInputText = inputBar.getText();
                             chatHook(consoleInputText);
                             dialog.dismiss();
@@ -8940,7 +8971,7 @@ function openMenu(menu) {
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -8955,7 +8986,7 @@ function openMenu(menu) {
             run: function() {
                 try {
                     dialogGUI = new android.widget.PopupWindow();
-                    var btn = minecraftButton("Add experience");
+                    var btn = minecraftButton(Texts.add_experience);
                     var btn1 = minecraftButton("Cancel");
                     var inputBar = new android.widget.EditText(ctx);
                     inputBar.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
@@ -8969,7 +9000,7 @@ function openMenu(menu) {
                     var dialog = new android.app.Dialog(ctx);
                     dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
                     dialog.setContentView(dialogLayout);
-                    dialog.setTitle("Add experience");
+                    dialog.setTitle(Texts.add_experience);
                     inputBar.setHint("Amount of experience");
                     inputBar.setTypeface(mcpeFont);
                     if(android.os.Build.VERSION.SDK_INT > 19) { // KITKAT
@@ -8983,7 +9014,7 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             var experienceAmount = inputBar.getText();
                             Player.addExp(experienceAmount);
                             dialog.dismiss();
@@ -8991,7 +9022,7 @@ function openMenu(menu) {
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -9027,13 +9058,13 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                             ModPE.goToURL("https://twitter.com/AgameR_Modder");
                         }
@@ -9076,13 +9107,13 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                             ModPE.goToURL("https://twitter.com/AgameR_Modder");
                         }
@@ -9149,7 +9180,7 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -9218,7 +9249,7 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             line0 = inputBar.getText();
                             line1 = inputBar1.getText();
                             line2 = inputBar2.getText();
@@ -9232,7 +9263,7 @@ function openMenu(menu) {
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -9266,14 +9297,14 @@ function openMenu(menu) {
                     var dialog = new android.app.Dialog(ctx);
                     dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
                     dialog.setContentView(dialogLayout);
-                    dialog.setTitle("Gamemode");
+                    dialog.setTitle(Texts.gamemode);
                     dialogGUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
                     dialogGUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
                     dialogGUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.TOP, 0, 0);
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             Level.setGameMode(0);
 							hardcore = "off";
 							spectator = "off";
@@ -9284,7 +9315,7 @@ function openMenu(menu) {
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             Level.setGameMode(1);
 							hardcore = "off";
 							spectator = "off";
@@ -9297,7 +9328,7 @@ function openMenu(menu) {
                     });
 					btn2.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             Level.setGameMode(0);
 							hardcore = "on";
 							spectator = "off";
@@ -9308,7 +9339,7 @@ function openMenu(menu) {
                     });
                     btn3.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             Level.setGameMode(1);
 							hardcore = "off";
 							spectator = "on";
@@ -9323,7 +9354,7 @@ function openMenu(menu) {
                     });
                     btn4.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -9355,14 +9386,14 @@ function openMenu(menu) {
                     var dialog = new android.app.Dialog(ctx);
                     dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
                     dialog.setContentView(dialogLayout);
-                    dialog.setTitle("Gamemode");
+                    dialog.setTitle(Texts.gamemode);
                     dialogGUI.setHeight(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
                     dialogGUI.setWidth(android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
                     dialogGUI.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.TOP, 0, 0);
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             Level.setRainLevel(1);
 							Level.setLightningLevel(0);
                             dialog.dismiss();
@@ -9370,7 +9401,7 @@ function openMenu(menu) {
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             Level.setRainLevel(0);
 							Level.setLightningLevel(1);
                             dialog.dismiss();
@@ -9378,7 +9409,7 @@ function openMenu(menu) {
                     });
 					btn2.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             Level.setRainLevel(0);
 							Level.setLightningLevel(0);
                             dialog.dismiss();
@@ -9386,7 +9417,7 @@ function openMenu(menu) {
                     });
                     btn3.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -9425,28 +9456,28 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             MoreOptionsPE.tpHome();
                             dialog.dismiss();
                         }
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             MoreOptionsPE.setHome();
                             dialog.dismiss();
                         }
                     });
 					btn2.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             MoreOptionsPE.clearHome();
                             dialog.dismiss();
                         }
                     });
                     btn3.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -9481,7 +9512,7 @@ function openMenu(menu) {
                     var dialog = new android.app.Dialog(ctx);
                     dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
                     dialog.setContentView(dialogLayout);
-                    dialog.setTitle("Add item to inventory");
+                    dialog.setTitle(Texts.add_item_to_inventory);
                     inputBar.setHint("ID");
                     inputBar.setTypeface(mcpeFont);
                     if(android.os.Build.VERSION.SDK_INT > 19) { // KITKAT
@@ -9509,7 +9540,7 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             var itemId = inputBar.getText();
                             var damage = inputBar1.getText();
                             var amount = inputBar2.getText();
@@ -9519,7 +9550,7 @@ function openMenu(menu) {
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -9548,7 +9579,7 @@ function openMenu(menu) {
                     var dialog = new android.app.Dialog(ctx);
                     dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
                     dialog.setContentView(dialogLayout);
-                    dialog.setTitle("Health");
+                    dialog.setTitle(Texts.health);
                     inputBar.setHint("0 = kill; 20 = full health");
                     inputBar.setTypeface(mcpeFont);
                     if(android.os.Build.VERSION.SDK_INT > 19) { // KITKAT
@@ -9562,7 +9593,7 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             var health = inputBar.getText();
                             Entity.setHealth(Player.getEntity(), health);
                             dialog.dismiss();
@@ -9570,7 +9601,7 @@ function openMenu(menu) {
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -9750,7 +9781,7 @@ function openMenu(menu) {
                     var dialog = new android.app.Dialog(ctx);
                     dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
                     dialog.setContentView(dialogLayout);
-                    dialog.setTitle("Effects");
+                    dialog.setTitle(Texts.effects);
                     particlesTitle.setTextSize(10);
                     inputBar.setHint("Effect ID");
                     inputBar.setTypeface(mcpeFont);
@@ -9784,7 +9815,7 @@ function openMenu(menu) {
                     });
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             var effectId = inputBar.getText();
                             var seconds = inputBar1.getText();
                             Entity.addEffect(getPlayerEnt(), parseInt(effectId), parseInt(seconds) * 20, toggled, toggled);
@@ -9793,7 +9824,7 @@ function openMenu(menu) {
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -9808,7 +9839,7 @@ function openMenu(menu) {
             run: function() {
                 try {
                     dialogGUI = new android.widget.PopupWindow();
-                    var btn = minecraftButton("Teleport");
+                    var btn = minecraftButton(Texts.teleport);
                     var btn1 = minecraftButton("Cancel");
                     var inputBar = new android.widget.EditText(ctx);
                     inputBar.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
@@ -9828,7 +9859,7 @@ function openMenu(menu) {
                     var dialog = new android.app.Dialog(ctx);
                     dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
                     dialog.setContentView(dialogLayout);
-                    dialog.setTitle("Teleport");
+                    dialog.setTitle(Texts.teleport);
                     inputBar.setHint("X");
                     inputBar1.setHint("Y");
                     inputBar2.setHint("Z");
@@ -9856,7 +9887,7 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             var tpX = inputBar.getText();
                             var tpY = inputBar1.getText();
                             var tpZ = inputBar2.getText();
@@ -9866,7 +9897,7 @@ function openMenu(menu) {
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -9921,34 +9952,34 @@ function openMenu(menu) {
                     exitPositionButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
                             if (theme == "Alternative" && crossButtonPosition == "right") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 crossButtonPosition = "left";
 								MoreOptionsPE.saveMainSettings();
                                 exitPositionButton.setText("Exit button position | LEFT");
                             } else if (theme == "Alternative" && crossButtonPosition == "left") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 crossButtonPosition = "right";
 								MoreOptionsPE.saveMainSettings();
                                 exitPositionButton.setText("Exit button position | RIGHT");
                             } else if (theme == "MCPE" && crossButtonPosition == "right") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 crossButtonPosition = "left";
 								MoreOptionsPE.saveMainSettings();
                                 exitPositionButton.setText("Exit button position | LEFT");
                                 //exitPositionButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "MCPE" && crossButtonPosition == "left") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 crossButtonPosition = "right";
 								MoreOptionsPE.saveMainSettings();
                                 exitPositionButton.setText("Exit button position | RIGHT");
                                 //exitPositionButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "Blue" && crossButtonPosition == "right") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 crossButtonPosition = "left";
 								MoreOptionsPE.saveMainSettings();
                                 exitPositionButton.setText("Exit button position | LEFT");
                             } else if (theme == "Blue" && crossButtonPosition == "left") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 crossButtonPosition = "right";
 								MoreOptionsPE.saveMainSettings();
                                 exitPositionButton.setText("Exit button position | RIGHT");
@@ -9969,18 +10000,18 @@ function openMenu(menu) {
                     themeButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
                             if (theme == "Alternative") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 theme = "MCPE";
 								MoreOptionsPE.saveMainSettings();
                                 themeButton.setText("Theme | MCPE");
                                 //themeButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "MCPE") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 theme = "Blue";
 								MoreOptionsPE.saveMainSettings();
                                 themeButton.setText("Theme | Blue");
                             } else if (theme == "Blue") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 theme = "Alternative";
 								MoreOptionsPE.saveMainSettings();
                                 themeButton.setText("Theme | Alternative");
@@ -10008,34 +10039,34 @@ function openMenu(menu) {
                     fullScreenButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
                             if (theme == "Alternative" && fullScreen == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 fullScreen = "on";
 								MoreOptionsPE.saveMainSettings();
                                 fullScreenButton.setText("Fullscreen | " + Texts.on);
                             } else if (theme == "Alternative" && fullScreen == "on") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 fullScreen = "off";
 								MoreOptionsPE.saveMainSettings();
                                 fullScreenButton.setText("Fullscreen | " + Texts.off);
                             } else if (theme == "MCPE" && fullScreen == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 fullScreen = "on";
 								MoreOptionsPE.saveMainSettings();
                                 fullScreenButton.setText("Fullscreen | " + Texts.on);
                                 //fullScreenButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "MCPE" && fullScreen == "on") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 fullScreen = "off";
 								MoreOptionsPE.saveMainSettings();
                                 fullScreenButton.setText("Fullscreen | " + Texts.off);
                                 //fullScreenButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "Blue" && fullScreen == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 fullScreen = "on";
 								MoreOptionsPE.saveMainSettings();
                                 fullScreenButton.setText("Fullscreen | " + Texts.on);
                             } else if (theme == "Blue" && fullScreen == "on") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 fullScreen = "off";
 								MoreOptionsPE.saveMainSettings();
                                 fullScreenButton.setText("Fullscreen | " + Texts.off);
@@ -10063,39 +10094,39 @@ function openMenu(menu) {
                     hacksListButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
                             if (theme == "Alternative" && showList == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 showList = "on";
 								MoreOptionsPE.saveMainSettings();
 								showHacksList();
                                 hacksListButton.setText("Show hack list | " + Texts.on);
                             } else if (theme == "Alternative" && showList == "on") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 showList = "off";
 								MoreOptionsPE.saveMainSettings();
 								hacksList.dismiss();
                                 hacksListButton.setText("Show hack list | " + Texts.off);
                             } else if (theme == "MCPE" && showList == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 showList = "on";
 								MoreOptionsPE.saveMainSettings();
 								showHacksList();
                                 hacksListButton.setText("Show hack list | " + Texts.on);
                                 //hacksListButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "MCPE" && showList == "on") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 showList = "off";
 								MoreOptionsPE.saveMainSettings();
 								hacksList.dismiss();
                                 hacksListButton.setText("Show hack list | " + Texts.off);
                                 //hacksListButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "Blue" && showList == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 showList = "on";
 								MoreOptionsPE.saveMainSettings();
 								showHacksList();
                                 hacksListButton.setText("Show hack list | " + Texts.on);
                             } else if (theme == "Blue" && showList == "on") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 showList = "off";
 								MoreOptionsPE.saveMainSettings();
 								hacksList.dismiss();
@@ -10124,34 +10155,34 @@ function openMenu(menu) {
                     oldIconButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
                             if (theme == "Alternative" && useOldIcon == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 useOldIcon = "on";
 								MoreOptionsPE.saveMainSettings();
                                 oldIconButton.setText("Use old icon | " + Texts.on);
                             } else if (theme == "Alternative" && useOldIcon == "on") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 useOldIcon = "off";
 								MoreOptionsPE.saveMainSettings();
                                 oldIconButton.setText("Use old icon | " + Texts.off);
                             } else if (theme == "MCPE" && useOldIcon == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 useOldIcon = "on";
 								MoreOptionsPE.saveMainSettings();
                                 oldIconButton.setText("Use old icon | " + Texts.on);
                                 //oldIconButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "MCPE" && useOldIcon == "on") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 useOldIcon = "off";
 								MoreOptionsPE.saveMainSettings();
                                 oldIconButton.setText("Use old icon | " + Texts.off);
                                 //oldIconButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "Blue" && useOldIcon == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 useOldIcon = "on";
 								MoreOptionsPE.saveMainSettings();
                                 oldIconButton.setText("Use old icon | " + Texts.on);
                             } else if (theme == "Blue" && useOldIcon == "on") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 useOldIcon = "off";
 								MoreOptionsPE.saveMainSettings();
                                 oldIconButton.setText("Use old icon | " + Texts.off);
@@ -10179,34 +10210,34 @@ function openMenu(menu) {
                     showMainButtonButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
                             if (theme == "Alternative" && showMainButton == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 showMainButton = "on";
 								MoreOptionsPE.saveMainSettings();
                                 showMainButtonButton.setText("Show main button | " + Texts.on);
                             } else if (theme == "Alternative" && showMainButton == "on") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 showMainButton = "off";
 								MoreOptionsPE.saveMainSettings();
                                 showMainButtonButton.setText("Show main button | " + Texts.off);
                             } else if (theme == "MCPE" && showMainButton == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 showMainButton = "on";
 								MoreOptionsPE.saveMainSettings();
                                 showMainButtonButton.setText("Show main button | " + Texts.on);
                                 //showMainButtonButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "MCPE" && showMainButton == "on") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 showMainButton = "off";
 								MoreOptionsPE.saveMainSettings();
                                 showMainButtonButton.setText("Show main button | " + Texts.off);
                                 //showMainButtonButton.setBackgroundDrawable(mcpeButtonOldImage);
                             } else if (theme == "Blue" && showMainButton == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 showMainButton = "on";
 								MoreOptionsPE.saveMainSettings();
                                 showMainButtonButton.setText("Show main button | " + Texts.on);
                             } else if (theme == "Blue" && showMainButton == "on") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 showMainButton = "off";
 								MoreOptionsPE.saveMainSettings();
                                 showMainButtonButton.setText("Show main button | " + Texts.off);
@@ -10236,11 +10267,11 @@ function openMenu(menu) {
                     spamMessageButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
                             if (theme == "Alternative") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             } else if (theme == "MCPE") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             } else if (theme == "Blue") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             }
                         }
                     }));
@@ -10281,55 +10312,55 @@ function openMenu(menu) {
                     betterGrassButton.setOnClickListener(new android.view.View.OnClickListener({
                         onClick: function(viewarg) {
                             if (theme == "Alternative" && betterGrass == "normal") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 betterGrass = "fast";
 								initializeOptiFine();
 								MoreOptionsPE.saveMainSettings();
                                 betterGrassButton.setText("Better Grass | FAST");
                             } else if (theme == "Alternative" && betterGrass == "fast") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 betterGrass = "off";
 								initializeOptiFine();
 								MoreOptionsPE.saveMainSettings();
                                 betterGrassButton.setText("Better Grass | " + Texts.off);
                             } else if (theme == "Alternative" && betterGrass == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 betterGrass = "normal";
 								initializeOptiFine();
 								MoreOptionsPE.saveMainSettings();
                                 betterGrassButton.setText("Better Grass | NORMAL");
                             } else if (theme == "MCPE" && betterGrass == "normal") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 betterGrass = "fast";
 								initializeOptiFine();
 								MoreOptionsPE.saveMainSettings();
                                 betterGrassButton.setText("Better Grass | FAST");
                             } else if (theme == "MCPE" && betterGrass == "fast") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 betterGrass = "off";
 								initializeOptiFine();
 								MoreOptionsPE.saveMainSettings();
                                 betterGrassButton.setText("Better Grass | " + Texts.off);
                             } else if (theme == "MCPE" && betterGrass == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 betterGrass = "normal";
 								initializeOptiFine();
 								MoreOptionsPE.saveMainSettings();
                                 betterGrassButton.setText("Better Grass | NORMAL");
                             } else if (theme == "Blue" && betterGrass == "normal") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 betterGrass = "fast";
 								initializeOptiFine();
 								MoreOptionsPE.saveMainSettings();
                                 betterGrassButton.setText("Better Grass | FAST");
                             } else if (theme == "Blue" && betterGrass == "fast") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 betterGrass = "off";
 								initializeOptiFine();
 								MoreOptionsPE.saveMainSettings();
                                 betterGrassButton.setText("Better Grass | " + Texts.off);
                             } else if (theme == "Blue" && betterGrass == "off") {
-								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+								Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                                 betterGrass = "normal";
 								initializeOptiFine();
 								MoreOptionsPE.saveMainSettings();
@@ -10378,7 +10409,7 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             spamMessage = inputBar.getText();
                             MoreOptionsPE.saveMainSettings();
                             MoreOptionsPE.loadMainSettings();
@@ -10387,7 +10418,7 @@ function openMenu(menu) {
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -10430,7 +10461,7 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             gameSpeedHackSetting = inputBar.getText().toString();
                             MoreOptionsPE.saveMainSettings();
                             MoreOptionsPE.loadMainSettings();
@@ -10439,7 +10470,7 @@ function openMenu(menu) {
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -10482,7 +10513,7 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             defaultUrl = inputBar.getText().toString();
                             MoreOptionsPE.saveMainSettings();
                             MoreOptionsPE.loadMainSettings();
@@ -10491,7 +10522,7 @@ function openMenu(menu) {
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -10534,14 +10565,14 @@ function openMenu(menu) {
                     dialog.show();
                     btn.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
 							webViewer.loadUrl(inputBar.getText());
                             dialog.dismiss();
                         }
                     });
                     btn1.setOnClickListener(new android.view.View.OnClickListener() {
                         onClick: function(view) {
-                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 100);
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
                             dialog.dismiss();
                         }
                     });
@@ -10632,6 +10663,7 @@ function chatHook(text) {
         preventDefault();
 		closeHacksList();
         settingsScreen();
+		header("Settings");
         exitSettings();
     }
     if(commandText[0] == ".update") {
@@ -10685,10 +10717,10 @@ function chatHook(text) {
 
 //*Mod info*
 //------------
-//Mod version: 1.2.2
+//Mod version: 1.2.3
 //For full changelog, look at the mod's menu ingame
 
 
 //*Ideas*
 //---------
-//If you have any ideas for this mod, please send them to my MC-Forum account, or on Twitter: @AgameR_Modder
+//If you have any ideas for this mod, please send them to my MC-Forum account, or on Twitter: @AgameR_Moddery
