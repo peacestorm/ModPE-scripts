@@ -24,6 +24,8 @@ var healthColor = "§c";
 var betterGlass = "off";
 var experimentalFeatures = "off"; //<-- Default = off
 var defaultUrl = "https://google.com/"; //<-- Default Webbrowser URL; Default: https://google.com/
+var transparentBackground = "on"; //<-- Transparent menu background; Default: on
+var menuPosition = "right"; //<-- Menu position; Default: right
 
 /*Per world config*/
 var HomeX;
@@ -45,6 +47,7 @@ var line2;
 var line3;
 var newScript;
 var webViewer;
+var zahl;
 var MoreOptionsPE = {};
 //End of Some vars
 
@@ -100,9 +103,11 @@ var Texts = {
 	powerexplosions: "PowerExplosions",
 	automine: "AutoMine",
 	tapremover: "TapRemover",
+	killaura: "KillAura",
 	fun: "Fun",
 	derp: "Derp",
 	twerk: "Twerk",
+	trails: "Trails",
 	cheats: "Cheats",
 	add_item_to_inventory: "Add item to inventory",
 	gamemode: "Gamemode",
@@ -161,6 +166,7 @@ MoreOptionsPE.loadTextsInCurrentLanguage = function() {
 			Texts.powerexplosions = "PowerExplosion";
 			Texts.automine = "AutoAbbauen";
 			Texts.tapremover = "Klick-Entferner";
+			Texts.killaura = "KillAura";
 			Texts.fun = "Spaß";
 			Texts.derp = "Derp";
 			Texts.twerk = "Twerk";
@@ -350,14 +356,13 @@ MoreOptionsPE.getMessage = function() {
 	var calendarInstance = java.util.Calendar.getInstance();
 	var day = calendarInstance.get(java.util.Calendar.DAY_OF_MONTH);
 	var month = calendarInstance.get(java.util.Calendar.MONTH);
-	if(month == java.util.Calendar.DECEMBER) {
-		if(day == 25) {
-			return "Merry Christmas! " + MoreOptionsPE.getRandomMessage();
-		}else{
-			var daysLeft = (25 - day);
-			return daysLeft.toString() + " days left until Christmas! " + MoreOptionsPE.getRandomMessage();
-		}
-	}if(day == 1 && month == java.util.Calendar.JANUARY) {
+	var year = calendarInstance.get(java.util.Calendar.YEAR);
+	if(month == java.util.Calendar.DECEMBER && day == 25) {
+		return "Merry Christmas! " + MoreOptionsPE.getRandomMessage();
+	}if(month == java.util.Calendar.DECEMBER && day < 25) {
+		var daysLeft = (25 - day);
+		return daysLeft.toString() + " days left until Christmas! " + MoreOptionsPE.getRandomMessage();
+	}if(month == java.util.Calendar.JANUARY && day == 1) {
 		return "Happy new year! " + MoreOptionsPE.getRandomMessage();
 	}else{
 		return MoreOptionsPE.getRandomMessage();
@@ -729,15 +734,15 @@ ModPE.setFoodItem(359,"shears",0,9999,"Shears [EATABLE]");*/
 
 // add these variables in your mod
 
-const CURRENT_VERSION = "1.2.3";
+const CURRENT_VERSION = "1.3.0-pre";
 var latestVersion;
 var latestPocketEditionVersion;
-var minimalMCPEVersion = "0.12.0";
+var minimalMCPEVersion = "0.13.0";
 var targetMCPEVersion = "0.13.x";
 var mcpeVersion = ModPE.getMinecraftVersion();
 const MOD_AUTHOR = "peacestorm (@AgameR_Modder)";
 const MOD_CREDITS = "@MyNameIsTriXz (helped me the most), @Desno365, @RedstoneGunMade, @AntiModPE, @tylernomc, @TBPM_MODDER_";
-const MOD_CHANGELOG = "Fixed button sounds, Better Grass texture and particles aren't wrong anymore, fixed Player Customizer showing the same text 36 times when the selected inventory slot is empty, fixed the bug where the player could be teleported to bedrock after clearing the Home location and using the Teleport to Home function, improved Player Customizer UI, improved Settings UI, added more German translations";
+const MOD_CHANGELOG = "Added KillAura, added more settings, made the Hacks List a little bit bigger, SignEditor isn't experimental anymore, fixed TapTeleporter being undefined in the hacks list, fixed Player Customizer always saying that the player's skin couldn't be loaded, fixed Trails not showing up in the Hacks List, fixed splash screen still saying \"x days left until Christmas!\", overall improvements";
 
 var currentActivity = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 var sdcard = android.os.Environment.getExternalStorageDirectory();
@@ -1532,6 +1537,8 @@ MoreOptionsPE.saveMainSettings = function() {
     outWrite.append("," + betterGlass.toString());
     outWrite.append("," + experimentalFeatures.toString());
     outWrite.append("," + defaultUrl.toString());
+    outWrite.append("," + transparentBackground.toString());
+    outWrite.append("," + menuPosition.toString());
     //outWrite.append("," + notepadText.toString());
 
     outWrite.close();
@@ -1570,6 +1577,10 @@ MoreOptionsPE.loadMainSettings = function() {
     experimentalFeatures = str.toString().split(",")[10];
 	}if(str.toString().split(",")[11] != null && str.toString().split(",")[11] != undefined) {
     defaultUrl = str.toString().split(",")[11];
+	}if(str.toString().split(",")[12] != null && str.toString().split(",")[12] != undefined) {
+    transparentBackground = str.toString().split(",")[12];
+	}if(str.toString().split(",")[13] != null && str.toString().split(",")[13] != undefined) {
+    menuPosition = str.toString().split(",")[13];
 	}
     fos.close();
 }
@@ -2192,15 +2203,40 @@ var State28 = false;
 var StatePowerExplosions = false;
 var StateAutoMine = false;
 var StateTapRemover = false;
+var StateKillAura = false;
 var StateTwerk = false;
 var StateDerp = false;
 var StateTrails = false;
 
-var spawn = false;
+var spawnMode = false;
 var entityId;
 
-function spawnEntity(entityId) {
+function nameToId(name) { //Credits to MCMrARM for this function
+    if(name == "Chicken") return 10;
+    if(name == "Cow") return 11;
+    if(name == "Pig") return 12;
+    if(name == "Sheep") return 13;
+    
+    if(name == "Zombie") return 32;
+    if(name == "Creeper") return 33;
+    if(name == "Skeleton") return 34;
+    if(name == "Spider") return 35;
+    if(name == "Zombie Pigman") return 36;
+    
+    if(name == "Dropped item") return 64;
+    if(name == "Primed TNT") return 65;
+    
+    if(name == "Arrow") return 80;
+    if(name == "Snowball") return 81;
+    if(name == "Egg") return 82;
+    if(name == "Painting") return 83;
+    if(name == "Minecart") return 84;
+    
+    return -1;
+}
 
+function spawnEntity(x, y, z, side, entityId) {
+	Level.spawnMob(x-(side==4?1:0)+(side==5?1:0)+0.5,y-(side==0?1:0)+(side==1?1:0)+0.5,z-(side==2?1:0)+(side==3?1:0)+0.5, entityId);
 }
 
 function destroyBlock(x, y, z, side) {
@@ -2469,6 +2505,7 @@ function leaveGame() {
 	StatePowerExplosions = false;
 	StateAutoMine = false;
 	StateTapRemover = false;
+	StateKillAura = false;
     StateTwerk = false;
     StateDerp = false;
     closeMenu();
@@ -2694,7 +2731,7 @@ function showHacksList() {
                         State14Text = "";
                     }
                     if(State15 == true) {
-                        State15Text = " [" + Texts.teleporter + "] ";
+                        State15Text = " [" + Texts.tapteleporter + "] ";
                     } else if(State15 == false) {
                         State15Text = "";
                     }
@@ -2704,7 +2741,7 @@ function showHacksList() {
                         State16Text = "";
                     }
                     if(State17 == true) {
-                        State17Text = " [" + Texts.signeditor + " (EXPERIMENTAL)] ";
+                        State17Text = " [" + Texts.signeditor + "] ";
                     } else if(State17 == false) {
                         State17Text = "";
                     }
@@ -2778,6 +2815,11 @@ function showHacksList() {
                     } else if(StateTapRemover == false) {
                         StateTapRemoverText = "";
                     }
+					if(StateKillAura == true) {
+                        StateKillAuraText = " [" + Texts.killaura + "] ";
+                    } else if(StateKillAura == false) {
+                        StateKillAuraText = "";
+                    }
                     if(StateTwerk == true) {
                         StateTwerkText = " [" + Texts.twerk + "] ";
                     } else if(StateTwerk == false) {
@@ -2788,8 +2830,13 @@ function showHacksList() {
                     } else if(StateDerp == false) {
                         StateDerpText = "";
                     }
+					if(StateTrails == true) {
+                        StateTrailsText = " [" + Texts.trails + "] ";
+                    } else if(StateTrails == false) {
+                        StateTrailsText = "";
+                    }
                     var MoreOptionsHacksListTextView = minecraftText(MoreOptionsHacksListText);
-					var StatesText = minecraftText(StateText + State1Text + State2Text + State3Text + State4Text + State5Text + State6Text + State7Text + State8Text + State9Text + State10Text + State11Text + State12Text + State13Text + State14Text + State15Text + State16Text + State17Text + State18Text + State19Text + State20Text + State21Text + State22Text + State23Text + State24Text + State25Text + State26Text + State27Text + State28Text + StatePowerExplosionsText + StateAutoMineText + StateTapRemoverText + StateTwerkText + StateDerpText);
+					var StatesText = minecraftText(StateText + State1Text + State2Text + State3Text + State4Text + State5Text + State6Text + State7Text + State8Text + State9Text + State10Text + State11Text + State12Text + State13Text + State14Text + State15Text + State16Text + State17Text + State18Text + State19Text + State20Text + State21Text + State22Text + State23Text + State24Text + State25Text + State26Text + State27Text + State28Text + StatePowerExplosionsText + StateAutoMineText + StateTapRemoverText + StateKillAuraText + StateTwerkText + StateDerpText + StateTrailsText);
                     MoreOptionsHacksListTextView.setTextSize(15);
 					MoreOptionsHacksListTextView.setTextColor(android.graphics.Color.parseColor("#0099FF"));
                     StatesText.setTextSize(15);
@@ -2811,7 +2858,7 @@ function showHacksList() {
                     //btn.setText("Ok");*/
 
                     //More buttons...
-                    hacksList = new android.widget.PopupWindow(hacksListLayout, ctx.getWindowManager().getDefaultDisplay().getWidth() / 2, ctx.getWindowManager().getDefaultDisplay().getHeight() / 10);
+                    hacksList = new android.widget.PopupWindow(hacksListLayout, ctx.getWindowManager().getDefaultDisplay().getWidth() / 1.5, ctx.getWindowManager().getDefaultDisplay().getHeight() / 9.9);
                     //hacksList.setBackgroundDrawable(getStretchedImage(spritesheet, 4*GuiSize, 4*GuiSize, 8*GuiSize, 8*GuiSize,getContext().getScreenWidth()/2, getContext().getScreenHeight()));
                     hacksList.setTouchable(false);
                     hacksList.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.LEFT | android.view.Gravity.TOP, 0, 0);
@@ -3297,6 +3344,116 @@ function settingsScreen() {
                     }
                 }));
                 settingsMenuLayout.addView(showMainButtonButton);
+				
+				var transparentBackgroundButton = new android.widget.Button(ctx);
+                if(theme == "Alternative" && transparentBackground == "off") {
+                    transparentBackgroundButton = minecraftButton("Transparent Background (50%) | " + Texts.off);
+                } else if(theme == "Alternative" && transparentBackground == "on") {
+                    transparentBackgroundButton = minecraftButton("Transparent Background (50%) | " + Texts.on);
+                } else if(theme == "MCPE" && transparentBackground == "off") {
+                    transparentBackgroundButton = minecraftButton("Transparent Background (50%) | " + Texts.off);
+                    //transparentBackgroundButton.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(theme == "MCPE" && transparentBackground == "on") {
+                    transparentBackgroundButton = minecraftButton("Transparent Background (50%) | " + Texts.on);
+                    //transparentBackgroundButton.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(theme == "Blue" && transparentBackground == "off") {
+                    transparentBackgroundButton = minecraftButton("Transparent Background (50%) | " + Texts.off);
+                } else if(theme == "Blue" && transparentBackground == "on") {
+                    transparentBackgroundButton = minecraftButton("Transparent Background (50%) | " + Texts.on);
+                }
+                transparentBackgroundButton.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        if(theme == "Alternative" && transparentBackground == "off") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            transparentBackground = "on";
+                            MoreOptionsPE.saveMainSettings();
+                            transparentBackgroundButton.setText("Transparent Background (50%) | " + Texts.on);
+                        } else if(theme == "Alternative" && transparentBackground == "on") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            transparentBackground = "off";
+                            MoreOptionsPE.saveMainSettings();
+                            transparentBackgroundButton.setText("Transparent Background (50%) | " + Texts.off);
+                        } else if(theme == "MCPE" && transparentBackground == "off") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            transparentBackground = "on";
+                            MoreOptionsPE.saveMainSettings();
+                            transparentBackgroundButton.setText("Transparent Background (50%) | " + Texts.on);
+                            //transparentBackgroundButton.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(theme == "MCPE" && transparentBackground == "on") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            transparentBackground = "off";
+                            MoreOptionsPE.saveMainSettings();
+                            transparentBackgroundButton.setText("Transparent Background (50%) | " + Texts.off);
+                            //transparentBackgroundButton.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(theme == "Blue" && transparentBackground == "off") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            transparentBackground = "on";
+                            MoreOptionsPE.saveMainSettings();
+                            transparentBackgroundButton.setText("Transparent Background (50%) | " + Texts.on);
+                        } else if(theme == "Blue" && transparentBackground == "on") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            transparentBackground = "off";
+                            MoreOptionsPE.saveMainSettings();
+                            transparentBackgroundButton.setText("Transparent Background (50%) | " + Texts.off);
+                        }
+                    }
+                }));
+                settingsMenuLayout.addView(transparentBackgroundButton);
+				
+				var menuPositionButton = new android.widget.Button(ctx);
+                if(theme == "Alternative" && menuPosition == "left") {
+                    menuPositionButton = minecraftButton("Menu Position | LEFT");
+                } else if(theme == "Alternative" && menuPosition == "right") {
+                    menuPositionButton = minecraftButton("Menu Position | RIGHT");
+                } else if(theme == "MCPE" && menuPosition == "left") {
+                    menuPositionButton = minecraftButton("Menu Position | LEFT");
+                    //menuPositionButton.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(theme == "MCPE" && menuPosition == "right") {
+                    menuPositionButton = minecraftButton("Menu Position | RIGHT");
+                    //menuPositionButton.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(theme == "Blue" && menuPosition == "left") {
+                    menuPositionButton = minecraftButton("Menu Position | LEFT");
+                } else if(theme == "Blue" && menuPosition == "right") {
+                    menuPositionButton = minecraftButton("Menu Position | RIGHT");
+                }
+                menuPositionButton.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        if(theme == "Alternative" && menuPosition == "left") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            menuPosition = "right";
+                            MoreOptionsPE.saveMainSettings();
+                            menuPositionButton.setText("Menu Position | RIGHT");
+                        } else if(theme == "Alternative" && menuPosition == "right") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            menuPosition = "left";
+                            MoreOptionsPE.saveMainSettings();
+                            menuPositionButton.setText("Menu Position | LEFT");
+                        } else if(theme == "MCPE" && menuPosition == "left") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            menuPosition = "right";
+                            MoreOptionsPE.saveMainSettings();
+                            menuPositionButton.setText("Menu Position | RIGHT");
+                            //menuPositionButton.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(theme == "MCPE" && menuPosition == "right") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            menuPosition = "left";
+                            MoreOptionsPE.saveMainSettings();
+                            menuPositionButton.setText("Menu Position | LEFT");
+                            //menuPositionButton.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(theme == "Blue" && menuPosition == "left") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            menuPosition = "right";
+                            MoreOptionsPE.saveMainSettings();
+                            menuPositionButton.setText("Menu Position | RIGHT");
+                        } else if(theme == "Blue" && menuPosition == "right") {
+                            Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                            menuPosition = "left";
+                            MoreOptionsPE.saveMainSettings();
+                            menuPositionButton.setText("Menu Position | LEFT");
+                        }
+                    }
+                }));
+                settingsMenuLayout.addView(menuPositionButton);
 
                 var hacksSettingsTitle = defaultSubTitle("Hack Settings");
                 hacksSettingsTitle.setTextSize(16);
@@ -3771,6 +3928,8 @@ function consoleScreen() {
                 var consoleSendBtn = new android.widget.Button(ctx);*/
 				var consoleOutputText = minecraftText("Welcome to the console! Use .help for a list of commands!");
                 var consoleInput = minecraftEditText();
+                consoleInput.requestFocus();
+				ctx.getSystemService(android.content.Context.INPUT_METHOD_SERVICE).showSoftInput(consoleInput, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
                 var consoleSendBtn = minecraftButton("Send");
                 var dialogLayout = new android.widget.LinearLayout(ctx);
                 var spritesheet = android.graphics.Bitmap.createScaledBitmap(trimImage(GetSpritesheet(), 0, 0, 16, 16), 16 * GuiSize, 16 * GuiSize, false);
@@ -3871,7 +4030,7 @@ function consoleScreen() {
 									}
 								}).start();
 							}
-							if(commandText[0] == ".easteregg") {
+							if(inputText[0] == ".easteregg") {
 								consoleMenu.dismiss();
 								ModPE.goToURL("http://peacestorm.github.io/easter-egg/");
 							}
@@ -3984,7 +4143,7 @@ function playerCustomizerScreen() {
 					skinViewer.setImageBitmap(steveImage);
 				}if(ModPE.getCurrentUsedSkin() == "Standard_Custom") {
 					skinViewer.setImageBitmap(skinImage);
-				}else{
+				}if(ModPE.getCurrentUsedSkin() != "Standard_Alex" && ModPE.getCurrentUsedSkin() != "Standard_Steve" && ModPE.getCurrentUsedSkin() != "Standard_Custom") {
 					playerCustomizerMenuLeftLayout.addView(skinViewerText);
 				}
                 var layoutParams = new android.widget.LinearLayout.LayoutParams(750, 750);
@@ -4359,8 +4518,10 @@ function disableHacks() {
 	StatePowerExplosions = false;
 	StateAutoMine = false;
 	StateTapRemover = false;
+	StateKillAura = false;
 	StateTwerk = false;
 	StateDerp = false;
+	StateTrails = false;
 }
 
 function mainMenu() {
@@ -7171,6 +7332,78 @@ function mainMenu() {
                         }
                     }
                 }));
+				
+				var button32 = new android.widget.Button(ctx);
+                if(StateKillAura == false && theme == "Alternative") {
+                    button32 = new android.widget.Button(ctx);
+                    button32.setText(Texts.killaura + " | " + Texts.off);
+                    button32.setBackgroundColor(android.graphics.Color.RED);
+                } else if(StateKillAura == true && theme == "Alternative") {
+                    button32 = new android.widget.Button(ctx);
+                    button32.setText(Texts.killaura + " | " + Texts.on);
+                    button32.setBackgroundColor(android.graphics.Color.GREEN);
+                } else if(StateKillAura == false && theme == "MCPE") {
+                    button32 = minecraftButton(Texts.killaura + " | " + Texts.off);
+                    //button32.setTypeface(mcpeFont);
+                    //button32.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(StateKillAura == true && theme == "MCPE") {
+                    button32 = minecraftButton(Texts.killaura + " | " + Texts.on);
+                    //button32.setTypeface(mcpeFont);
+                    //button32.setBackgroundDrawable(mcpeButtonOldImage);
+                } else if(StateKillAura == false && theme == "Blue") {
+                    button32 = new android.widget.Button(ctx);
+                    button32.setText(Texts.killaura + " | " + Texts.off);
+                    button32.setTextColor(android.graphics.Color.WHITE);
+                    button32.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    button32.setTypeface(mcpeFont);
+                } else if(StateKillAura == true && theme == "Blue") {
+                    button32 = new android.widget.Button(ctx);
+                    button32.setText(Texts.killaura + " | " + Texts.on);
+                    button32.setTextColor(android.graphics.Color.BLUE);
+                    button32.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    button32.setTypeface(mcpeFont);
+                }
+
+                button32.setOnClickListener(new android.view.View.OnClickListener({
+                    onClick: function(viewarg) {
+                        Level.playSound(Player.getX(), Player.getY(), Player.getZ(), "random.click", 100, 0);
+                        if(StateKillAura == false && theme == "Alternative") {
+                            StateKillAura = true;
+                            
+                            button32.setText(Texts.killaura + " | " + Texts.on);
+                            button32.setBackgroundColor(android.graphics.Color.GREEN);
+                        } else if(StateKillAura == true && theme == "Alternative") {
+                            StateKillAura = false;
+                            
+                            button32.setText(Texts.killaura + " | " + Texts.off);
+                            button32.setBackgroundColor(android.graphics.Color.RED);
+                        } else if(StateKillAura == false && theme == "MCPE") {
+                            StateKillAura = true;
+                            
+                            button32.setText(Texts.killaura + " | " + Texts.on);
+                            //button32.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(StateKillAura == true && theme == "MCPE") {
+                            StateKillAura = false;
+                            
+                            button32.setText(Texts.killaura + " | " + Texts.off);
+                            //button32.setBackgroundDrawable(mcpeButtonOldImage);
+                        } else if(StateKillAura == false && theme == "Blue") {
+                            StateKillAura = true;
+                            
+                            button32.setText(Texts.killaura + " | " + Texts.on);
+                            button32.setTextColor(android.graphics.Color.BLUE);
+                            button32.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            button32.setTypeface(mcpeFont);
+                        } else if(StateKillAura == true && theme == "Blue") {
+                            StateKillAura = false;
+                            
+                            button32.setText(Texts.killaura + " | " + Texts.off);
+                            button32.setTextColor(android.graphics.Color.WHITE);
+                            button32.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                            button32.setTypeface(mcpeFont);
+                        }
+                    }
+                }));
 
                 var dividerViewer = new android.widget.ImageView(ctx);
                 dividerViewer.setImageBitmap(android.graphics.BitmapFactory.decodeByteArray(divider, 0, divider.length));
@@ -8008,8 +8241,8 @@ function mainMenu() {
                 menuLayout.addView(button14);
                 menuLayout.addView(button15);
                 menuLayout.addView(button16);
+				menuLayout.addView(button17);
                 if(experimentalFeatures == "on") {
-                    menuLayout.addView(button17);
                     menuLayout.addView(button18);
                 }
                 menuLayout.addView(button19);
@@ -8025,6 +8258,7 @@ function mainMenu() {
 				menuLayout.addView(button29);
 				menuLayout.addView(button30);
 				menuLayout.addView(button31);
+				menuLayout.addView(button32);
                 if(theme == "Blue") {
                     menuLayout.addView(dividerViewer);
                 }
@@ -8215,14 +8449,17 @@ function mainMenu() {
                     menu = new android.widget.PopupWindow(menuLayout1, ctx.getWindowManager().getDefaultDisplay().getWidth(), ctx.getWindowManager().getDefaultDisplay().getHeight());
                 }
 
-                if(theme == "Alternative") {
+                if(transparentBackground == "off") {
                     menu.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.BLACK));
-                } else if(theme == "MCPE") {
-                    menu.setBackgroundDrawable(blackTImage /*mcpeBackgroundImage*/ /*new android.graphics.drawable.ColorDrawable(android.graphics.Color.BLACK)*/ );
-                } else if(theme == "Blue") {
-                    menu.setBackgroundDrawable(blackTImage /*mcpeBackgroundImage*/ /*new android.graphics.drawable.ColorDrawable(android.graphics.Color.BLACK)*/ );
+                } else if(transparentBackground == "on") {
+                    menu.setBackgroundDrawable(blackTImage);
                 }
-                menu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.RIGHT | android.view.Gravity.TOP, 0, 0);
+				
+				if(menuPosition == "right") {
+					menu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.RIGHT | android.view.Gravity.TOP, 0, 0);
+				} else if(menuPosition == "left") {
+					menu.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.LEFT | android.view.Gravity.TOP, 0, 0);
+				}
 
                 /*var WindowManager = ctx.getSystemService(ctx.WINDOW_SERVICE);
                 ctx.getWindow().addFlags(ctx.getWindowManager().LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -8694,6 +8931,16 @@ function modTick() {
         Player.setHunger(20);
     }if(StateAutoMine == true && ModPE.playerHasSplitControls() == "1") {
 		Level.destroyBlock(Player.getPointedBlockX(), Player.getPointedBlockY(), Player.getPointedBlockZ());
+	}if(StateKillAura == true) {
+		var mobs = Entity.getAll();
+		for(var i = 0; i < mobs.length; i++) {
+			var x = Entity.getX(mobs[i]) - getPlayerX();
+			var y = Entity.getY(mobs[i]) - getPlayerY();
+			var z = Entity.getZ(mobs[i]) - getPlayerZ();
+			if(x*x+y*y+z*z<=4*4 && mobs[i] != getPlayerEnt()) {
+				Entity.setHealth(mobs[i], 0);
+			}
+		}
 	}if(StateTrails == true) {
         var x = Player.getX();
         var y = Player.getY();
@@ -8739,6 +8986,7 @@ function modTick() {
 		StatePowerExplosions = false;
 		StateAutoMine = false;
 		StateTapRemover = false;
+		StateKillAura = false;
         StateTwerk = false;
         StateDerp = false;
 		StateTrails = false;
@@ -10717,10 +10965,10 @@ function chatHook(text) {
 
 //*Mod info*
 //------------
-//Mod version: 1.2.3
+//Mod version: 1.3.0-pre
 //For full changelog, look at the mod's menu ingame
 
 
 //*Ideas*
 //---------
-//If you have any ideas for this mod, please send them to my MC-Forum account, or on Twitter: @AgameR_Moddery
+//If you have any ideas for this mod, please send them to my MC-Forum account, or on Twitter: @AgameR_Modder
